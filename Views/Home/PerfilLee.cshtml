@@ -457,8 +457,12 @@
                 <h5 class="modal-title">DESTACATE</h5>
             </div>
             <div class="modal-body" id="modal-adaptacion">
+             <a data-bs-toggle="modal" data-bs-target="#modal_certificaciones">
                <button class="btn btn-primary w-100 " id="buton_plus" type="submit"><i class="fa-solid fa-medal" style="font-size: 25px; margin-bottom: 8px;"></i> <br> CERTIFICACIONES</button>
+             </a>
+             <a data-bs-toggle="modal" data-bs-target="#modal_idiomas">   
                 <button class="btn btn-primary w-100 " id="buton_plus2" type="submit"><i class="fa-solid fa-comments" style="font-size: 25px; margin-bottom: 8px;"></i> <br> IDIOMAS</button>
+            </a>
             </div>
         </div>
     </div>
@@ -606,11 +610,6 @@ function mostrarSugerencias() {
     }
 }
 
-function eliminarArchivo(button, itemUrl) {
-    // Encuentra el btn del carrusel 
-    const carouselItem = button.closest('.carousel-item');
-    carouselItem.remove();
-}
 
 $('#ModalCudForm').onclick(function(e) {
     e.preventDefault(); 
@@ -648,9 +647,82 @@ $(document).ready(function () {
     });
 });
   
+  $('#ModalCertificacionForm').submit(function(e) {
+    e.preventDefault(); 
+    console.log($(this).serialize()); 
+    
+    var id = $('input[name="id"]').val();
+    var idInfoEmpleado = '@Model.id'; // Asigna el valor manualmente
+    $('input[name="id_info_empleado"]').val(idInfoEmpleado);
+    console.log("ID Info Empleado: ", idInfoEmpleado);
+
+    $.ajax({
+        type: 'POST',
+        url: '/Home/InsertarCertificaciones/' + id, 
+        data: $(this).serialize(),
+        success: function(response) {
+            console.log("Respuesta recibida: ", response);
+            var nuevaListaCertificacion = $(response).find('#CertificacionContainer').html();
+            if (nuevaListaCertificacionn) {
+                $('#CertificacionContainer').html(nuevaListaCertificacionn); 
+                $('#ModalContainer').modal('hide'); 
+                console.log("Modal cerrado y lista actualizada.");
+            } else {
+                console.log("No se encontró la lista de educación en la respuesta.");
+            }
+        },
+        error: function(error) {
+            console.log("Error: ", error);
+        }
+    });
+});
+
+const sugerencias = [
+    "Acceso a rampas",
+    "Material en braille",
+    "Intérprete de lenguaje de señas",
+    "Software de lectura de pantalla",
+    "Asistencia personal",
+    "Rampa",
+    "Baño adaptado a sillas de ruedas"
+];
+
+function mostrarSugerencias() {
+    const input = document.getElementById('nombre');
+    const sugerenciasContainer = document.getElementById('sugerencias-container');
+    sugerenciasContainer.innerHTML = '';
+    
+    const valor = input.value.toLowerCase();
+    if (valor) {
+        const sugerenciasFiltradas = sugerencias.filter(sugerencia => 
+            sugerencia.toLowerCase().includes(valor)
+        );
+        
+        sugerenciasFiltradas.forEach(sugerencia => {
+            const div = document.createElement('div');
+            div.classList.add('sugerencia');
+            div.textContent = sugerencia;
+            div.onclick = () => {
+                input.value = sugerencia;
+                sugerenciasContainer.innerHTML = '';
+            };
+            sugerenciasContainer.appendChild(div);
+        });
+    }
+}
 
   
 </script>
+
+
+
+
+
+
+
+
+
+
 
 <style>
 /*profesion */
@@ -678,7 +750,7 @@ $(document).ready(function () {
   align-items: center;
   padding: 20px;
   margin: 0;
-  background-color: var(--user-selected-color); /* Color elegido por el usuario */
+  background-color: var(--user-selected-color); 
   background-image: repeating-linear-gradient(
     45deg,
     rgba(255, 255, 255, 0.1),
@@ -691,4 +763,3 @@ $(document).ready(function () {
 
 </style>
 
-<!--HOLIIS-->

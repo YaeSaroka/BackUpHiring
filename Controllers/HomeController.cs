@@ -373,5 +373,111 @@ public IActionResult EliminarArchivo(string fileUrl, int Id_Empleado)
     }
 }
 
+//CERTIFICACIONES
+[HttpPost]
+public IActionResult InsertarCertificaciones(Certificacion certificacion, int Id_Info_Empleado, int id)
+{
+    if (id != 0 || id==0)
+    {
+        Models.BD.InsertarCertificaciones(certificacion, Id_Info_Empleado);
+    }
+    else
+    {
+        var certificacionExistente = Models.BD.SelectCertificacion(Id_Info_Empleado);
+        if (certificacionExistente.Any(c => c.titulo == certificacion.titulo && c.empresa_emisora == certificacion.empresa_emisora && c.id_credencial == certificacion.id_credencial && c.url_credencial= certificacion.url_credencial)) 
+        {
+            ViewBag.MensajeError = "Esta certificación ya fue añadida.";
+            Informacion_Personal_Empleado perfil = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+            ViewBag.Lista_Certificacion = certificacionExistente;
+            return View("PerfilLee", perfil);
+        }
+        Models.BD.InsertarCertificaciones(certificacion, Id_Info_Empleado);
+    }
+    List<Certificacion> Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
+    ViewBag.Lista_Certificacion = Lista_Certificacion;
+    Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+    return View("PerfilLee", perfilActualizado);
+}
+public IActionResult EliminarCertificacion(int Id_Info_Empleado, int id)
+{
+    try
+    {
+        Models.BD.EliminarCertificacion(id);
+        List<Certificacion> Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
+        ViewBag.Lista_Certificacion = Lista_Certificacion;
+        Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+        ViewBag.Lista_educacion = Models.BD.SelectEducacion(id);
+        ViewBag.Adaptacion = Models.BD.SelectAdaptacion(id);
+        return Json(new { success = true });
+    }
+    catch (Exception ex)
+    {
+        return Json(new { success = false, message = "No se pudo eliminar la educación." });
+    }
+}
 
+public JsonResult ObtenerDatosCertificacion(int id)
+{
+    var certificacion = Models.BD.SelectCertificacionIdCard(id);
+
+    if (certificacion == null)
+    {
+        return Json(new { success = false, message = "Certificacion no encontrada." });
+    }
+    return Json(new
+    {
+        success = true,
+        id = certificacion.id,
+        titulo = certificacion.titulo,
+        empresa_emisora= certificacion.empresa_emisora,
+        id_credencial= certificacion.id_credencial,
+        url_credencial=certificacion.url_credencial
+    });
+}
+
+//Idioma
+[HttpPost]
+public IActionResult InsertarIdioma(Idioma idioma, int Id_Info_Empleado, int id)
+{
+    if (id != 0 || id==0)
+    {
+        Models.BD.InsertarIdioma(idioma, Id_Info_Empleado);
+    }
+    Idioma idioma_ = Models.BD.SelectIdioma(Id_Info_Empleado);
+    ViewBag.idioma_ = idioma_;
+    Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+    return View("PerfilLee", perfilActualizado);
+}
+public IActionResult EliminarIdioma(int Id_Info_Empleado, int id)
+{
+    try
+    {
+        Models.BD.EliminarIdioma(id);
+       Idioma idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
+        ViewBag.idioma = idioma;
+         Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+         ViewBag.Lista_educacion = Models.BD.SelectEducacion(id);
+        ViewBag.Adaptacion = Models.BD.SelectAdaptacion(id);
+        return Json(new { success = true });
+    }
+    catch (Exception ex)
+    {
+        return Json(new { success = false, message = " ERROR. No se pudo eliminar el Idioma." });
+    }
+}
+public JsonResult ObtenerDatosIdioma(int id)
+{
+    var idioma = Models.BD.SelectIdiomaIdCard(id);
+
+    if (idioma == null)
+    {
+        return Json(new { success = false, message = "Idioma no encontrado." });
+    }
+    return Json(new
+    {
+        success = true,
+        id = idioma.id,
+        nombre = idioma.nombre
+    });
+}
 }

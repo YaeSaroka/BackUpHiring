@@ -6,7 +6,7 @@ namespace Hiring.Models;
 
 public  class BD
 {
-     private static string ConnectionString { get; set; } = @"Server=LEO-LENOVO\SQLEXPRESS;DataBase=Hiring;Trusted_Connection=True;";   
+     private static string ConnectionString { get; set; } = @"Server=.;DataBase=Hiring;Trusted_Connection=True;";   
      public static Usuario user; //agarra el usuario loggeado
 
 
@@ -316,9 +316,122 @@ public static void EliminarMultimedia(string url, int id)
                 db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
             }
         }
+//CERTIFICACIONES
+public static void InsertarCertificaciones(Certificacion Certificaciones, int id_info_empleado, string myfile)
+    {
+        try
+        {
+            using (SqlConnection db = new SqlConnection(ConnectionString))
+            {
+                string sp = "InsertarCertificaciones";
+                var parameters = new 
+                { 
+                    id = Certificaciones.id == 0 ? 0 : cud.id, 
+                titulo = Certificaciones.titulo,
+                empresa_emisora= Certificaciones.empresa_emisora,
+                id_credencial= Certificaciones.id_credencial,
+                url_credencial= Certificaciones.url_credencial,
+                id_info_empleado= Certificaciones.id_info_empleado
+                };
+                db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error al insertar el cud en la base de datos.", ex);
+        }
+    }
 
+ public static List<Certificacion> SelectCertificacion(int Id_Info_Empleado)
+    {
+        List<Certificacion> Lista_Certificacion = new List<Certificacion>(); 
+
+        using (SqlConnection db = new SqlConnection(ConnectionString))
+        {
+            string sp = "SelectCertificacion";
+            Lista_Certificacion = db.Query<Certificacion>(sp, new { id_info_empleado = Id_Info_Empleado}, commandType: CommandType.StoredProcedure).ToList();
+        }
+
+        return Lista_Certificacion;
+    }
+    public static Certificacion SelectCertificacionIdCard(int id)
+    {
+        Certificacion certificacion = null;
+        using (SqlConnection db = new SqlConnection(ConnectionString))
+        {
+            string sp = "SelectCertificacionIdCard";
+            certificacion = db.QueryFirstOrDefault<Certificacion>(sp, new { id = id}, commandType: CommandType.StoredProcedure);
+        }
+
+        return certificacion;
+    }
+    public static void EliminarCertificacion(int id)
+    {
+        using (SqlConnection db = new SqlConnection(ConnectionString))
+        {
+            string sp = "EliminarCertificacion";
+             var parameters = new { id = id};
+            db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
+        }
+    }
+
+//IDIOMAS
+public static void InsertarIdioma(Idioma Idioma, int id_info_empleado)
+{
+    try
+    {
+        using (SqlConnection db = new SqlConnection(ConnectionString))
+        {
+            string sp = "InsertarIdioma";
+            var parameters = new 
+            { 
+                id = Idioma.id == 0 ? 0 : Idioma.id, 
+                nombre = Idioma.nombre, 
+                id_info_empleado= Idioma.id_info_empleado
+            };
+            db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
+        }
+    }
+    catch (Exception ex)
+    {
+        throw new Exception("Error al insertar la necesidad de adaptacion en la base de datos.", ex);
+    }
 }
 
+   public static Idioma SelectIdioma(int Id_Info_Empleado)
+{
+    Idioma idioma = null; 
+
+    using (SqlConnection db = new SqlConnection(ConnectionString))
+    {
+        string sp = "SelectIdioma";
+        idioma = db.QueryFirstOrDefault<Idioma>(sp, new { id_info_empleado = Id_Info_Empleado }, commandType: CommandType.StoredProcedure);
+    }
+
+    return idioma;
+}
+public static Necesidad SelectIdiomaIdCard(int id)
+    {
+        Idioma idioma = null;
+        using (SqlConnection db = new SqlConnection(ConnectionString))
+        {
+            string sp = "SelectIdiomaIdCard";
+            idioma = db.QueryFirstOrDefault<Idioma>(sp, new { id = id}, commandType: CommandType.StoredProcedure);
+        }
+
+        return idioma;
+    }
+    public static void EliminarIdioma(int id)
+        {
+            using (SqlConnection db = new SqlConnection(ConnectionString))
+            {
+                string sp = "EliminarIdioma";
+                var parameters = new { id = id};
+                db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
     
+
+}
 
     

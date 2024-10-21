@@ -387,3 +387,132 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
 });
 
+//CERTIFICACION
+$(document).on('click', '.editar-icono', function () {
+    var id = $(this).data('id');
+
+    $.ajax({
+        url: '/Home/ObtenerDatosCertificacion/' + id,
+        type: 'GET',
+        success: function (response) {
+            if (response.success === false) {
+                alert(response.message);
+            } else {
+                console.log("ID obtenido: ", response.id); 
+                $('input[name="id"]').val(response.id); 
+                $('input[name="titulo"]').val(response.titulo);
+                $('input[name="empresa_emisora"]').val(response.empresa_emisora);
+                $('input[name="id_credencial"]').val(response.id_credencial);
+                $('input[name="url_credencial"]').val(response.url_credencial);
+                $('#ModalCertificacion').modal('show');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error al obtener los datos: ", error);
+        }
+    });
+});
+
+$(document).on('click', '.eliminar-icono-certificacion', function () {
+    var id = $(this).data('id');
+
+    $(document).on('click', '.eliminar-icono-certificacion', function () {
+        var id = $(this).data('id');
+    
+        $.ajax({
+            url: '/Home/EliminarCertificacion/' + id,
+            type: 'POST',  
+            success: function (response) {
+                if (!response.success) {
+                    alert(response.message);
+                } else {
+                    $('.cerficacion1_container[data-id="' + id + '"]').remove();
+                    if ($('.certificacion1_container').length === 0) {
+                        var noEducacionHtml = `
+                            <div class="educacion-container">
+                        <div class="icon-container">
+                            <i class="fa-solid fa-graduation-cap icon-educacion"></i>
+                        </div>
+                        <a data-bs-toggle="modal" data-bs-target="#ModalEducacion">
+                            <img class="img_educacion" src="../img/componente/educacion.png" alt="Educación">
+                        </a>
+                        </div>`;
+                        $('#listaCertificacionContainer').html(noEducacionHtml);
+                    }
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al eliminar la certificacion: ", error);
+            }
+        });
+    });
+});
+
+$(document).on('click', '.mas-icono-certificacion', function () {
+    $('#ModalCertificadoForm').find('input[type="text"], input[type="hidden"], select').val('');
+    $('#ModalCertificadoForm').find('textarea').val('');
+    $('#ModalCertificacion').modal('show');
+});
+
+//IDIOMA
+$(document).on('click', '.editar-icono-idioma', function () {
+    var id = $(this).data('id');
+
+    $.ajax({
+        url: '/Home/ObtenerDatosIdioma/' + id,
+        type: 'GET',
+        success: function (response) {
+            if (response.success === false) {
+                alert(response.message);
+            } else {
+                console.log("ID obtenido: ", response.id); 
+                $('input[name="id"]').val(response.id); 
+                $('input[name="nombre"]').val(response.nombre);
+                $('#ModalIdioma').modal('show');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error al obtener los datos: ", error);
+        }
+    });
+});
+
+$(document).on('click', '.eliminar-icono-idioma', function () {
+    var id = $(this).data('id');
+
+    $(document).on('click', '.eliminar-icono-idioma', function () {
+        var id = $(this).data('id');
+    
+        $.ajax({
+            url: '/Home/EliminarIdioma/' + id,
+            type: 'POST',  
+            success: function (response) {
+                if (!response.success) {
+                    alert(response.message);
+                } else {
+                    // Elimina el contenedor de la educación del DOM
+                    $('.idioma1_container[data-id="' + id + '"]').remove();
+    
+                    // Verifica si quedan elementos de educación
+                    if ($('.idioma1_container').length === 0) {
+                        var noEducacionHtml = `
+                            <div class="adaptacion-container">
+                        <div class="icon-container">
+                            <i class="fa-solid fa-person-walking-with-cane icon-educacion"></i>
+                            <i class="fa-solid fa-wheelchair icon-educacion" style="margin-left: 10px;"></i>
+                        </div>
+                        <a data-bs-toggle="modal" data-bs-target="#ModalAdaptacion">
+                                <img class="img_adaptacion" src="../img/componente/adaptacion.jpg" alt="Adaptación">
+                            </a>
+                    </div>
+`;
+                        $('#IdiomaContainer').html(noEducacionHtml);
+                    }
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al eliminar el idioma: ", error);
+            }
+        });
+    });
+});
