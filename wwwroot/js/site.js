@@ -190,47 +190,45 @@ $(document).on('click', '.editar-icono', function () {
 
 $(document).on('click', '.eliminar-icono', function () {
     var id = $(this).data('id');
+    var idInfoEmpleado = $('.card-container').data('info-empleado');
 
-    $(document).on('click', '.eliminar-icono', function () {
-        var id = $(this).data('id');
-    
-        $.ajax({
-            url: '/Home/EliminarEducacion/' + id,
-            type: 'POST',  
-            success: function (response) {
-                if (!response.success) {
-                    alert(response.message);
-                } else {
-                    // Elimina el contenedor de la educación del DOM
-                    $('.educacion1_container[data-id="' + id + '"]').remove();
-    
-                    // Verifica si quedan elementos de educación
-                    if ($('.educacion1_container').length === 0) {
-                        var noEducacionHtml = `
-                            <div class="educacion-container">
-                        <div class="icon-container">
-                            <i class="fa-solid fa-graduation-cap icon-educacion"></i>
+    $.ajax({
+        url: '/Home/EliminarEducacion',
+        type: 'POST',
+        data: { Id_Info_Empleado: idInfoEmpleado, id: id },
+        success: function (response) {
+            if (!response.success) {
+                alert(response.message);
+            } else {
+                $('.educacion1_container[data-id="' + id + '"]').remove();
+                
+                if ($('.educacion1_container').length === 0) {
+                    $('#listaEducacionContainer').html(`
+                        <div class="educacion-container">
+                            <div class="icon-container">
+                                <i class="fa-solid fa-graduation-cap icon-educacion"></i>
+                            </div>
+                            <a data-bs-toggle="modal" data-bs-target="#ModalEducacion">
+                                <img class="img_educacion" src="../img/componente/educacion.png" alt="Educación">
+                            </a>
                         </div>
-                        <a data-bs-toggle="modal" data-bs-target="#ModalEducacion">
-                            <img class="img_educacion" src="../img/componente/educacion.png" alt="Educación">
-                        </a>
-                        </div>`;
-                        $('#listaEducacionContainer').html(noEducacionHtml);
-                    }
+                    `);
                 }
-            },
-            error: function (xhr, status, error) {
-                console.error("Error al eliminar la educación: ", error);
             }
-        });
+        },
+        error: function (xhr, status, error) {
+            console.error("Error al eliminar la educación: ", error);
+        }
     });
 });
+
 
 $(document).on('click', '.mas-icono', function () {
     $('#ModalEducacionForm').find('input[type="text"], input[type="hidden"], select').val('');
     $('#ModalEducacionForm').find('textarea').val('');
     $('#ModalEducacion').modal('show');
 });
+
 
 
 //ADAPTACION
@@ -256,8 +254,7 @@ $(document).on('click', '.editar-icono-adaptacion', function () {
     });
 });
 
-$(document).on('click', '.eliminar-icono-adaptacion', function () {
-    var id = $(this).data('id');
+
 
     $(document).on('click', '.eliminar-icono-adaptacion', function () {
         var id = $(this).data('id');
@@ -290,11 +287,11 @@ $(document).on('click', '.eliminar-icono-adaptacion', function () {
                 }
             },
             error: function (xhr, status, error) {
-                console.error("Error al eliminar la educación: ", error);
+                console.error("Error al eliminar la adaptación: ", error);
             }
         });
     });
-});
+
 
 //CUD
 $(document).on('click', '.editar-icono-cud', function () {
@@ -323,8 +320,7 @@ $(document).on('click', '.editar-icono-cud', function () {
 });
 
 
-$(document).on('click', '.eliminar-icono-cud', function () {
-    var id = $(this).data('id');
+
    
     $(document).on('click', '.eliminar-icono-cud', function () {
         var id = $(this).data('id');
@@ -360,35 +356,42 @@ $(document).on('click', '.eliminar-icono-cud', function () {
             }
         });
     });
-});
-document.addEventListener('DOMContentLoaded', (event) => {
-    document.querySelectorAll('.eliminar-archivo').forEach(button => {
-        button.addEventListener('click', function() {
-            const url = this.getAttribute('data-url');
-            const itemToDelete = this.closest('.carousel-item');
+    $(document).on('click', '.eliminar-icono', function () {
+    var id = $(this).data('id');
+    var idInfoEmpleado = $('.card-container').data('info-empleado');
 
-            fetch('/tu-ruta/eliminar-archivo', {
-                method: 'POST',
-                body: JSON.stringify({ fileUrl: url, Id_Empleado: /* tu valor de Id_Empleado */ }),
-                headers: {
-                    'Content-Type': 'application/json'
+    $.ajax({
+        url: '/Home/EliminarEducacion',
+        type: 'POST',
+        data: { Id_Info_Empleado: idInfoEmpleado, id: id },
+        success: function (response) {
+            if (!response.success) {
+                alert(response.message);
+            } else {
+                $('.educacion1_container[data-id="' + id + '"]').remove();
+                
+                if ($('.educacion1_container').length === 0) {
+                    $('#listaEducacionContainer').html(`
+                        <div class="educacion-container">
+                            <div class="icon-container">
+                                <i class="fa-solid fa-graduation-cap icon-educacion"></i>
+                            </div>
+                            <a data-bs-toggle="modal" data-bs-target="#ModalEducacion">
+                                <img class="img_educacion" src="../img/componente/educacion.png" alt="Educación">
+                            </a>
+                        </div>
+                    `);
                 }
-            }).then(response => response.json()).then(data => {
-                if (data.success) {
-                    itemToDelete.remove();
-                } else {
-                    alert("Error al eliminar el archivo: " + data.message);
-                }
-            }).catch(error => {
-                console.error("Error:", error);
-                alert("Error al eliminar el archivo.");
-            });
-        });
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error al eliminar la educación: ", error);
+        }
     });
 });
 
 //CERTIFICACION
-$(document).on('click', '.editar-icono', function () {
+$(document).on('click', '.editar-icono-certificacion', function () {
     var id = $(this).data('id');
 
     $.ajax({
@@ -404,7 +407,9 @@ $(document).on('click', '.editar-icono', function () {
                 $('input[name="empresa_emisora"]').val(response.empresa_emisora);
                 $('input[name="id_credencial"]').val(response.id_credencial);
                 $('input[name="url_credencial"]').val(response.url_credencial);
-                $('#ModalCertificacion').modal('show');
+                $('input[name="fecha_caducidad"]').val(response.fecha_caducidad);
+                $('input[name="fecha_expedicion"]').val(response.fecha_expedicion);
+                $('#modal_certificaciones').modal('show');
             }
         },
         error: function (xhr, status, error) {
@@ -413,45 +418,42 @@ $(document).on('click', '.editar-icono', function () {
     });
 });
 
-$(document).on('click', '.eliminar-icono-certificacion', function () {
-    var id = $(this).data('id');
 
-    $(document).on('click', '.eliminar-icono-certificacion', function () {
-        var id = $(this).data('id');
-    
+
+$(document).on('click', '.eliminar-icono-certificacion', function () {
+    var id = $(this).data('id'); // Obtener el ID del elemento que se clicó
+    var idInfoEmpleado = $('.card-container').data('info-empleado');
+    console.log("ID Eliminar Certificación: ", id); // Para depuración
         $.ajax({
-            url: '/Home/EliminarCertificacion/' + id,
+            url: '/Home/EliminarCertificacion/',
             type: 'POST',  
+            data: { Id_Info_Empleado: idInfoEmpleado, id: id },
             success: function (response) {
                 if (!response.success) {
                     alert(response.message);
                 } else {
-                    $('.cerficacion1_container[data-id="' + id + '"]').remove();
+                    // Remover el contenedor de la certificación
+                    $('.certificacion1_container[data-id="' + id + '"]').remove();
+                    
+                    // Verificar si no hay más certificaciones
                     if ($('.certificacion1_container').length === 0) {
-                        var noEducacionHtml = `
-                            <div class="educacion-container">
-                        <div class="icon-container">
-                            <i class="fa-solid fa-graduation-cap icon-educacion"></i>
-                        </div>
-                        <a data-bs-toggle="modal" data-bs-target="#ModalEducacion">
-                            <img class="img_educacion" src="../img/componente/educacion.png" alt="Educación">
-                        </a>
-                        </div>`;
                         $('#listaCertificacionContainer').html(noEducacionHtml);
                     }
                 }
             },
             error: function (xhr, status, error) {
-                console.error("Error al eliminar la certificacion: ", error);
+                console.error("Error al eliminar la certificación: ", error);
             }
         });
-    });
+    
 });
+
+
 
 $(document).on('click', '.mas-icono-certificacion', function () {
     $('#ModalCertificadoForm').find('input[type="text"], input[type="hidden"], select').val('');
     $('#ModalCertificadoForm').find('textarea').val('');
-    $('#ModalCertificacion').modal('show');
+    $('#modal_certificaciones').modal('show');
 });
 
 //IDIOMA

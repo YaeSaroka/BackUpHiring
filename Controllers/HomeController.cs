@@ -66,6 +66,7 @@ public class HomeController : Controller
             ViewBag.Lista_educacion = Models.BD.SelectEducacion(usuario.id);
             ViewBag.Adaptacion = Models.BD.SelectAdaptacion(usuario.id);
             ViewBag.cud = Models.BD.SelectCUD(usuario.id);
+            ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(usuario.id);
             return View("PerfilLee", perfil);
         }
         else  {
@@ -77,13 +78,12 @@ public class HomeController : Controller
     public IActionResult RegistrarUsuario(Usuario user){
         const string estilo= "#ABE7DD", foto_perfil="../img/default/foto_Default.png", encabezado="encabezado.png", nombre_apellido = "Tu nombre", telefono = "", mail="";
         Usuario userr = BD.Registro_VerificarExistencia(user.mail);
-
         if(userr == null)
         {
             Models.BD.Registro(user.mail, user.contraseña, user.id_discapacidad);
             userr = Models.BD.Registro_VerificarExistencia(user.mail);
-
-            if(user.id_discapacidad==1) {
+            if(user.id_discapacidad==1) 
+            {
                 Models.BD.CargaPerfilDefault(userr,estilo, foto_perfil, encabezado, nombre_apellido, telefono, mail);
                 Informacion_Personal_Empleado perfil= Models.BD.CargarPerfilLogin(userr.id);
                 return View("PerfilLee", perfil);
@@ -121,7 +121,7 @@ public class HomeController : Controller
         ViewBag.UrlMultimedia=Models.BD.SelectMultimedia(usuario.id);
         ViewBag.Lista_educacion = Models.BD.SelectEducacion(usuario.id);
         ViewBag.Adaptacion = Models.BD.SelectAdaptacion(usuario.id);
-            ViewBag.cud = Models.BD.SelectCUD(usuario.id);
+        ViewBag.cud = Models.BD.SelectCUD(usuario.id);
         return View("PerfilLee", perfil);
         }
 
@@ -135,45 +135,56 @@ public class HomeController : Controller
         ViewBag.UrlMultimedia=Models.BD.SelectMultimedia(usuario.id);
         ViewBag.Lista_educacion = Models.BD.SelectEducacion(usuario.id);
         ViewBag.Adaptacion = Models.BD.SelectAdaptacion(usuario.id);
-            ViewBag.cud = Models.BD.SelectCUD(usuario.id);
+        ViewBag.cud = Models.BD.SelectCUD(usuario.id);
         return View("PerfilLee", perfil);
     }
 
 //EDUCACION
-[HttpPost]
-public IActionResult InsertarEducacion(Educacion educacion, int Id_Info_Empleado, int id)
+    [HttpPost]
+    public IActionResult InsertarEducacion(Educacion educacion, int Id_Info_Empleado, int id = 0)
 {
-    if (id != 0 || id==0)
-    {
-        Models.BD.InsertarEducacion(educacion, Id_Info_Empleado);
+    Console.WriteLine("ID Info Empleado recibido: " + Id_Info_Empleado); // Verifica que el valor sea el correcto
+    if (Id_Info_Empleado == 0) {
+        ViewBag.MensajeError = "ID del empleado no válido.";
+        return RedirectToAction("PerfilLee");
     }
-    else
+    var educacionExistente = Models.BD.SelectEducacion(Id_Info_Empleado);
+    if (educacionExistente.Any(e => e.titulo == educacion.titulo && e.disciplina_academica == educacion.disciplina_academica && e.descripcion == educacion.descripcion)) 
     {
-        var educacionExistente = Models.BD.SelectEducacion(Id_Info_Empleado);
-        if (educacionExistente.Any(e => e.titulo == educacion.titulo && e.disciplina_academica == educacion.disciplina_academica && e.descripcion == educacion.descripcion)) 
-        {
-            ViewBag.MensajeError = "Esta educación ya fue añadida.";
-            Informacion_Personal_Empleado perfil = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
-            ViewBag.Lista_educacion = educacionExistente;
-            return View("PerfilLee", perfil);
-        }
-        Models.BD.InsertarEducacion(educacion, Id_Info_Empleado);
+        ViewBag.MensajeError = "Esta educación ya fue añadida.";
+        Informacion_Personal_Empleado perfil = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+        ViewBag.Lista_educacion = educacionExistente;
+        return View("PerfilLee", perfil);
     }
+    Models.BD.InsertarEducacion(educacion, Id_Info_Empleado);
     List<Educacion> Lista_educacion = Models.BD.SelectEducacion(Id_Info_Empleado);
     ViewBag.Lista_educacion = Lista_educacion;
+    ViewBag.UrlMultimedia = Models.BD.SelectMultimedia(Id_Info_Empleado);
+    ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
+    ViewBag.cud = Models.BD.SelectCUD(Id_Info_Empleado);
+    ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
     Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+
     return View("PerfilLee", perfilActualizado);
 }
-public IActionResult EliminarEducacion(int Id_Info_Empleado, int id)
+
+ public IActionResult EliminarEducacion(int Id_Info_Empleado, int id)
 {
+    if (Id_Info_Empleado == 0)
+    {
+        return Json(new { success = false, message = "Id_Info_Empleado no es válido." });
+    }
+
     try
     {
         Models.BD.EliminarEducacion(id);
         List<Educacion> Lista_educacion = Models.BD.SelectEducacion(Id_Info_Empleado);
         ViewBag.Lista_educacion = Lista_educacion;
         Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
-        ViewBag.Lista_educacion = Models.BD.SelectEducacion(id);
-        ViewBag.Adaptacion = Models.BD.SelectAdaptacion(id);
+        ViewBag.Lista_educacion = Models.BD.SelectEducacion(Id_Info_Empleado);
+        ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
+        ViewBag.cud = Models.BD.SelectCUD(Id_Info_Empleado);
+        ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
         return Json(new { success = true });
     }
     catch (Exception ex)
@@ -182,302 +193,305 @@ public IActionResult EliminarEducacion(int Id_Info_Empleado, int id)
     }
 }
 
-public JsonResult ObtenerDatosEducacion(int id)
-{
-    var educacion = Models.BD.SelectEducacionIdCard(id);
 
-    if (educacion == null)
-    {
-        return Json(new { success = false, message = "Educación no encontrada." });
-    }
-    return Json(new
-    {
-        success = true,
-        id = educacion.id,
-        titulo = educacion.titulo,
-        nombre_institucion = educacion.nombre_institucion,
-        disciplina_academica = educacion.disciplina_academica,
-        actividades_grupo = educacion.actividades_grupo,
-        descripcion = educacion.descripcion,
-        fecha_expedicion = educacion.fecha_expedicion,
-        fecha_caducidad = educacion.fecha_caducidad,
-        mes_expedicion = educacion.mes_expedicion,
-        mes_caducidad = educacion.mes_caducidad
-    });
-}
 
-//MULTIMEDIA
-[HttpPost]
-public async Task<IActionResult> UploadFile(IFormFile file, int Id_Empleado)
-{
-    if (file == null || file.Length == 0)
+    public JsonResult ObtenerDatosEducacion(int id)
     {
-        return Json(new { success = false, message = "No file uploaded." });
-    }
-    try
-    {
-        var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-        string extension = Path.GetExtension(file.FileName).ToLower();
-        string timeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString() + extension;
-        var filePath = Path.Combine(uploads, timeStamp);
-        using (var stream = new FileStream(filePath, FileMode.Create))
+        var educacion = Models.BD.SelectEducacionIdCard(id);
+        if (educacion == null)
         {
-            await file.CopyToAsync(stream);
+            return Json(new { success = false, message = "Educación no encontrada." });
         }
-        // Guarda la URL del archivo en la base de datos
-        var fileUrl = Url.Content($"/uploads/{timeStamp}"); // URL absoluta
-        BD.InsertarMultimedia(fileUrl, Id_Empleado);
-        var UrlMultimedia = BD.SelectMultimedia(Id_Empleado);
-        return Json(new { success = true, data = UrlMultimedia });
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error: {ex.Message}");
-        return Json(new { success = false, message = ex.Message });
-    }
-}
-[HttpPost]
-public IActionResult InsertarAdaptacion(Necesidad adaptacion, int Id_Info_Empleado, int id)
-{
-    if (id != 0 || id==0)
-    {
-        Models.BD.InsertarAdaptacion(adaptacion, Id_Info_Empleado);
-    }
-    Necesidad adaptacion_ = Models.BD.SelectAdaptacion(Id_Info_Empleado);
-    ViewBag.Adaptacion = adaptacion_;
-    Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
-    return View("PerfilLee", perfilActualizado);
-}
-public IActionResult EliminarAdaptacion(int Id_Info_Empleado, int id)
-{
-    try
-    {
-        Models.BD.EliminarAdaptacion(id);
-       Necesidad Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
-        ViewBag.Adaptacion = Adaptacion;
-         Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
-         ViewBag.Lista_educacion = Models.BD.SelectEducacion(id);
-        ViewBag.Adaptacion = Models.BD.SelectAdaptacion(id);
-        return Json(new { success = true });
-    }
-    catch (Exception ex)
-    {
-        return Json(new { success = false, message = "No se pudo eliminar la Adaptacion." });
-    }
-}
-public JsonResult ObtenerDatosAdaptacion(int id)
-{
-    // Llama al método SelectAdaptacion con el parámetro id
-    var necesidad = Models.BD.SelectAdaptacionIdCard(id);
-
-    if (necesidad == null)
-    {
-        return Json(new { success = false, message = "Adpatacion no encontrada." });
-    }
-    return Json(new
-    {
-        success = true,
-        id = necesidad.id,
-        nombre = necesidad.nombre
-    });
-}
-
-//CUD
-[HttpPost]
-public IActionResult InsertarCUD(Cud cud, int Id_Info_Empleado, int id, IFormFile myfile)
-{
-    if (id != 0 || id == 0) 
-    {
-        if(myfile.Length > 0 )
+        return Json(new
         {
-            string ubicacion = this.Environment.ContentRootPath + @"\wwwroot\uploads\" + myfile.FileName;
-            using (var stream = System.IO.File.Create(ubicacion))
+            success = true,
+            id = educacion.id,
+            titulo = educacion.titulo,
+            nombre_institucion = educacion.nombre_institucion,
+            disciplina_academica = educacion.disciplina_academica,
+            actividades_grupo = educacion.actividades_grupo,
+            descripcion = educacion.descripcion,
+            fecha_expedicion = educacion.fecha_expedicion,
+            fecha_caducidad = educacion.fecha_caducidad,
+            mes_expedicion = educacion.mes_expedicion,
+            mes_caducidad = educacion.mes_caducidad
+        });
+    }
+
+    //MULTIMEDIA
+    [HttpPost]
+    public async Task<IActionResult> UploadFile(IFormFile file, int Id_Empleado)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return Json(new { success = false, message = "No file uploaded." });
+        }
+        try
+        {
+            var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+            string extension = Path.GetExtension(file.FileName).ToLower();
+            string timeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString() + extension;
+            var filePath = Path.Combine(uploads, timeStamp);
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                myfile.CopyToAsync(stream);
+                await file.CopyToAsync(stream);
             }
+            var fileUrl = Url.Content($"/uploads/{timeStamp}"); 
+            BD.InsertarMultimedia(fileUrl, Id_Empleado);
+            var UrlMultimedia = BD.SelectMultimedia(Id_Empleado);
+            return Json(new { success = true, data = UrlMultimedia });
         }
-         Models.BD.InsertarCUD(cud, Id_Info_Empleado, myfile.FileName);
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return Json(new { success = false, message = ex.Message });
+        }
     }
-    
-    Cud cud_ = Models.BD.SelectCUD(Id_Info_Empleado);
-    ViewBag.cud = cud_;
-    Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
-    
-    ViewBag.UrlMultimedia=Models.BD.SelectMultimedia(Id_Info_Empleado);
-    ViewBag.Lista_educacion = Models.BD.SelectEducacion(Id_Info_Empleado);
-    ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
-    
-    return View("PerfilLee", perfilActualizado);
-}
-
-public IActionResult EliminarCUD(int Id_Info_Empleado, int id)
-{
-    try
+    [HttpPost]
+    public IActionResult InsertarAdaptacion(Necesidad adaptacion, int Id_Info_Empleado, int id)
     {
-        Models.BD.EliminarCUD(id);
+        if (id != 0 || id==0)
+        {
+            Models.BD.InsertarAdaptacion(adaptacion, Id_Info_Empleado);
+        }
+        Necesidad adaptacion_ = Models.BD.SelectAdaptacion(Id_Info_Empleado);
+        ViewBag.Adaptacion = adaptacion_;
+        ViewBag.UrlMultimedia=Models.BD.SelectMultimedia(Id_Info_Empleado);
+        ViewBag.Lista_educacion = Models.BD.SelectEducacion(Id_Info_Empleado);
+        ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
+        ViewBag.cud = Models.BD.SelectCUD(Id_Info_Empleado);
+        ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
+        Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+        return View("PerfilLee", perfilActualizado);
+    }
+    public IActionResult EliminarAdaptacion(int Id_Info_Empleado, int id)
+    {
+        try
+        {
+            Models.BD.EliminarAdaptacion(id);
+            Necesidad Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
+            ViewBag.Adaptacion = Adaptacion;
+            Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+            ViewBag.UrlMultimedia=Models.BD.SelectMultimedia(id);
+            ViewBag.Lista_educacion = Models.BD.SelectEducacion(id);
+            ViewBag.Adaptacion = Models.BD.SelectAdaptacion(id);
+            ViewBag.cud = Models.BD.SelectCUD(id);
+            ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(id);
+            return Json(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = "No se pudo eliminar la Adaptacion." });
+        }
+    }
+    public JsonResult ObtenerDatosAdaptacion(int id)
+    {
+        var necesidad = Models.BD.SelectAdaptacionIdCard(id);
+        if (necesidad == null)
+        {
+            return Json(new { success = false, message = "Adaptacion no encontrada." });
+        }
+        
+        return Json(new
+        {
+            success = true,
+            id = necesidad.id,
+            nombre = necesidad.nombre
+        });
+    }
+    //CUD
+    [HttpPost]
+    public IActionResult InsertarCUD(Cud cud, int Id_Info_Empleado, int id, IFormFile myfile)
+    {
+        if (id != 0 || id == 0) 
+        {
+            if(myfile.Length > 0 )
+            {
+                string ubicacion = this.Environment.ContentRootPath + @"\wwwroot\uploads\" + myfile.FileName;
+                using (var stream = System.IO.File.Create(ubicacion))
+                {
+                    myfile.CopyToAsync(stream);
+                }
+            }
+            Models.BD.InsertarCUD(cud, Id_Info_Empleado, myfile.FileName);
+        }
         Cud cud_ = Models.BD.SelectCUD(Id_Info_Empleado);
         ViewBag.cud = cud_;
         Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
-        ViewBag.UrlMultimedia=Models.BD.SelectMultimedia(id);
-        ViewBag.Lista_educacion = Models.BD.SelectEducacion(id);
-        ViewBag.Adaptacion = Models.BD.SelectAdaptacion(id);
-        ViewBag.cud = Models.BD.SelectCUD(id);
-        return Json(new { success = true });
+        ViewBag.UrlMultimedia=Models.BD.SelectMultimedia(Id_Info_Empleado);
+        ViewBag.Lista_educacion = Models.BD.SelectEducacion(Id_Info_Empleado);
+        ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
+        ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
+        return View("PerfilLee", perfilActualizado);
     }
-    catch (Exception ex)
+
+    public IActionResult EliminarCUD(int Id_Info_Empleado, int id)
     {
-        return Json(new { success = false, message = "No se pudo eliminar el CUD." });
-    }
-}
-public JsonResult ObtenerDatosCUD(int id)
-{
-    var Cud = Models.BD.SelectCUDIdCard(id);
-    if (Cud == null)
-    {
-        return Json(new { success = false, message = "CUD no encontrado." });
-    }
-    return Json(new
-    {
-        success = true,
-        id = Cud.id,
-        empresa_emisora= Cud.empresa_emisora,
-        fecha_expedicion = Cud.fecha_expedicion,
-        fecha_vencimiento = Cud.fecha_vencimiento,
-        url_= Cud.url_
-    });
-}
-[HttpPost]
-public IActionResult EliminarArchivo(string fileUrl, int Id_Empleado)
-{
-    try
-    {
-        // Elimina el archivo del servidor
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot" + fileUrl);
-        if (System.IO.File.Exists(filePath))
+        try
         {
-            System.IO.File.Delete(filePath);
+            Models.BD.EliminarCUD(id);
+            Cud cud_ = Models.BD.SelectCUD(Id_Info_Empleado);
+            ViewBag.cud = cud_;
+            Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+            ViewBag.UrlMultimedia=Models.BD.SelectMultimedia(id);
+            ViewBag.Lista_educacion = Models.BD.SelectEducacion(id);
+            ViewBag.Adaptacion = Models.BD.SelectAdaptacion(id);
+            ViewBag.cud = Models.BD.SelectCUD(id);
+            ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(id);
+            return Json(new { success = true });
         }
-
-        // Elimina la URL del archivo de la base de datos
-        BD.EliminarMultimedia(fileUrl, Id_Empleado);
-
-        // Obtén la lista actualizada de archivos multimedia
-        var UrlMultimedia = BD.SelectMultimedia(Id_Empleado);
-
-        return Json(new { success = true, data = UrlMultimedia });
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error: {ex.Message}");
-        return Json(new { success = false, message = ex.Message });
-    }
-}
-
-//CERTIFICACIONES
-[HttpPost]
-public IActionResult InsertarCertificaciones(Certificacion certificacion, int Id_Info_Empleado, int id)
-{
-    if (id != 0 || id==0)
-    {
-        Models.BD.InsertarCertificaciones(certificacion, Id_Info_Empleado);
-    }
-    else
-    {
-        var certificacionExistente = Models.BD.SelectCertificacion(Id_Info_Empleado);
-        if (certificacionExistente.Any(c => c.titulo == certificacion.titulo && c.empresa_emisora == certificacion.empresa_emisora && c.id_credencial == certificacion.id_credencial && c.url_credencial= certificacion.url_credencial)) 
+        catch (Exception ex)
         {
-            ViewBag.MensajeError = "Esta certificación ya fue añadida.";
-            Informacion_Personal_Empleado perfil = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
-            ViewBag.Lista_Certificacion = certificacionExistente;
-            return View("PerfilLee", perfil);
+            return Json(new { success = false, message = "No se pudo eliminar el CUD." });
         }
-        Models.BD.InsertarCertificaciones(certificacion, Id_Info_Empleado);
     }
+    public JsonResult ObtenerDatosCUD(int id)
+    {
+        var Cud = Models.BD.SelectCUDIdCard(id);
+        if (Cud == null)
+        {
+            return Json(new { success = false, message = "CUD no encontrado." });
+        }
+        return Json(new
+        {
+            success = true,
+            id = Cud.id,
+            empresa_emisora= Cud.empresa_emisora,
+            fecha_expedicion = Cud.fecha_expedicion,
+            fecha_vencimiento = Cud.fecha_vencimiento,
+            url_= Cud.url_
+        });
+    }
+    [HttpPost]
+    public IActionResult EliminarArchivo(string fileUrl, int Id_Empleado)
+    {
+        try
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot" + fileUrl);
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+            BD.EliminarMultimedia(fileUrl, Id_Empleado);
+            var UrlMultimedia = BD.SelectMultimedia(Id_Empleado);
+            return Json(new { success = true, data = UrlMultimedia });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    //CERTIFICACIONES
+    [HttpPost]
+   public IActionResult InsertarCertificaciones(Certificacion certificacion, int Id_Info_Empleado, int id)
+{
+    var certificacionExistente = Models.BD.SelectCertificacion(Id_Info_Empleado);
+    if (certificacionExistente.Any(c => c.titulo == certificacion.titulo && c.empresa_emisora == certificacion.empresa_emisora && c.id_credencial == certificacion.id_credencial && c.url_credencial == certificacion.url_credencial))
+    {
+        ViewBag.MensajeError = "Esta certificación ya fue añadida.";
+        Informacion_Personal_Empleado perfil = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+        ViewBag.Lista_Certificacion = certificacionExistente;
+        return View("PerfilLee", perfil);
+    }
+    
+    Models.BD.InsertarCertificaciones(certificacion, Id_Info_Empleado, id);
     List<Certificacion> Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
     ViewBag.Lista_Certificacion = Lista_Certificacion;
     Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+    ViewBag.UrlMultimedia = Models.BD.SelectMultimedia(Id_Info_Empleado);
+    ViewBag.Lista_educacion = Models.BD.SelectEducacion(Id_Info_Empleado);
+    ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
+    ViewBag.cud = Models.BD.SelectCUD(Id_Info_Empleado);
+    
     return View("PerfilLee", perfilActualizado);
 }
-public IActionResult EliminarCertificacion(int Id_Info_Empleado, int id)
+   public IActionResult EliminarCertificacion(int Id_Info_Empleado, int id)
 {
+    if (Id_Info_Empleado == 0)
+    {
+        return Json(new { success = false, message = "Id_Info_Empleado no es válido." });
+    }
     try
     {
         Models.BD.EliminarCertificacion(id);
         List<Certificacion> Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
         ViewBag.Lista_Certificacion = Lista_Certificacion;
         Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
-        ViewBag.Lista_educacion = Models.BD.SelectEducacion(id);
-        ViewBag.Adaptacion = Models.BD.SelectAdaptacion(id);
+        ViewBag.Lista_educacion = Models.BD.SelectEducacion(Id_Info_Empleado);
+        ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
+        ViewBag.cud = Models.BD.SelectCUD(Id_Info_Empleado);
         return Json(new { success = true });
     }
     catch (Exception ex)
     {
-        return Json(new { success = false, message = "No se pudo eliminar la educación." });
+        return Json(new { success = false, message = "No se pudo eliminar la certificación." });
     }
 }
 
-public JsonResult ObtenerDatosCertificacion(int id)
-{
-    var certificacion = Models.BD.SelectCertificacionIdCard(id);
+        
+    public JsonResult ObtenerDatosCertificacion(int id)
+    {
+        var certificacion = Models.BD.SelectCertificacionIdCard(id);
+        if (certificacion == null)
+        {
+            return Json(new { success = false, message = "Certificacion no encontrada." });
+        }
+        return Json(new
+        {
+            success = true,
+            id = certificacion.id,
+            titulo = certificacion.titulo,
+            empresa_emisora= certificacion.empresa_emisora,
+            id_credencial= certificacion.id_credencial,
+            url_credencial=certificacion.url_credencial,
+            fecha_caducidad = certificacion.fecha_caducidad,
+            fecha_expedicion = certificacion.fecha_expedicion
+        });
+    }
 
-    if (certificacion == null)
+    //Idioma
+    [HttpPost]
+    public IActionResult InsertarIdioma(Idioma idioma, int Id_Info_Empleado, int id)
     {
-        return Json(new { success = false, message = "Certificacion no encontrada." });
+        if (id != 0 || id==0)
+        {
+            Models.BD.InsertarIdioma(idioma, Id_Info_Empleado);
+        }
+        Idioma idioma_ = Models.BD.SelectIdioma(Id_Info_Empleado);
+        ViewBag.idioma_ = idioma_;
+        Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+        return View("PerfilLee", perfilActualizado);
     }
-    return Json(new
+    public IActionResult EliminarIdioma(int Id_Info_Empleado, int id)
     {
-        success = true,
-        id = certificacion.id,
-        titulo = certificacion.titulo,
-        empresa_emisora= certificacion.empresa_emisora,
-        id_credencial= certificacion.id_credencial,
-        url_credencial=certificacion.url_credencial
-    });
-}
+        try
+        {
+            Models.BD.EliminarIdioma(id);
+            Idioma idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
+            ViewBag.idioma = idioma;
+            Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+            ViewBag.Lista_educacion = Models.BD.SelectEducacion(id);
+            ViewBag.Adaptacion = Models.BD.SelectAdaptacion(id);
+            return Json(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = " ERROR. No se pudo eliminar el Idioma." });
+        }
+    }
+    public JsonResult ObtenerDatosIdioma(int id)
+    {
+        var idioma = Models.BD.SelectIdiomaIdCard(id);
+        if (idioma == null)
+        {return Json(new { success = false, message = "Idioma no encontrado." });}
+        return Json(new
+        {
+            success = true,
+            id = idioma.id,
+            nombre = idioma.nombre
+        });
+    }
 
-//Idioma
-[HttpPost]
-public IActionResult InsertarIdioma(Idioma idioma, int Id_Info_Empleado, int id)
-{
-    if (id != 0 || id==0)
-    {
-        Models.BD.InsertarIdioma(idioma, Id_Info_Empleado);
-    }
-    Idioma idioma_ = Models.BD.SelectIdioma(Id_Info_Empleado);
-    ViewBag.idioma_ = idioma_;
-    Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
-    return View("PerfilLee", perfilActualizado);
-}
-public IActionResult EliminarIdioma(int Id_Info_Empleado, int id)
-{
-    try
-    {
-        Models.BD.EliminarIdioma(id);
-       Idioma idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
-        ViewBag.idioma = idioma;
-         Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
-         ViewBag.Lista_educacion = Models.BD.SelectEducacion(id);
-        ViewBag.Adaptacion = Models.BD.SelectAdaptacion(id);
-        return Json(new { success = true });
-    }
-    catch (Exception ex)
-    {
-        return Json(new { success = false, message = " ERROR. No se pudo eliminar el Idioma." });
-    }
-}
-public JsonResult ObtenerDatosIdioma(int id)
-{
-    var idioma = Models.BD.SelectIdiomaIdCard(id);
-
-    if (idioma == null)
-    {
-        return Json(new { success = false, message = "Idioma no encontrado." });
-    }
-    return Json(new
-    {
-        success = true,
-        id = idioma.id,
-        nombre = idioma.nombre
-    });
-}
 }

@@ -6,9 +6,9 @@
 }
 
 
-
-<div class="container">
-       <div class="card-container">
+<body>
+<div class="container" >
+       <div class="card-container" data-info-empleado="@Model.id">
             <a data-bs-toggle="modal" data-bs-target="#ModalForm">
             <div class="rectangulo-encabezado" style="background-color: @Model.estilo;">
             </div>
@@ -52,8 +52,7 @@
                     <i class="fa-solid fa-circle-plus " style="color: @Model.estilo"></i>
                 </a>
             </div>
-           
-
+            
             @if (ViewBag.Lista_educacion != null && ((List<Educacion>)ViewBag.Lista_educacion).Any())
             {
                 foreach (var item in (List<Educacion>)ViewBag.Lista_educacion)
@@ -96,24 +95,23 @@
                             </a>
                         </div>
                     }
-            
-
         <!--NECESIDADES DE ADAPTACIÓN -->
-        <div id="AdaptacionContainer">
-            @if (ViewBag.Adaptacion != null)
-            {
-                    <div class="adaptacion1_container" data-id="@ViewBag.Adaptacion.id">
-                        <div class="header_adaptacion">
-                            <img src="../img/componente/icono.png" alt="icono" class="icono-adaptacion-img">
-                                <div class="titulo_adaptacion">NECESIDADES DE ADAPTACIÓN 
-                                    <div class="descripcion_adaptacion">@ViewBag.Adaptacion.nombre
-                                    </div>
+            <div id="AdaptacionContainer">
+                    @if (ViewBag.Adaptacion != null)
+                    {
+                        <div class="adaptacion1_container" data-id="@ViewBag.Adaptacion.id">
+                            <div class="header_adaptacion">
+                                <img src="../img/componente/icono.png" alt="icono" class="icono-adaptacion-img">
+                                <div class="titulo_adaptacion">
+                                    NECESIDADES DE ADAPTACIÓN
+                                    <div class="descripcion_adaptacion">@ViewBag.Adaptacion.nombre</div>
                                 </div>
-                            <i class="fa-solid fa-edit editar-icono-adaptacion" data-id="@ViewBag.Adaptacion.id"></i>
-                            <i class="fa-solid fa-trash eliminar-icono-adaptacion" data-id="@ViewBag.Adaptacion.id"></i>
+                                <i class="fa-solid fa-edit editar-icono-adaptacion" data-id="@ViewBag.Adaptacion.id"></i>
+                                <i class="fa-solid fa-trash eliminar-icono-adaptacion" data-id="@ViewBag.Adaptacion.id"></i>
+                            </div>
                         </div>
-                    </div>  
-            }
+                    }
+
                     else
                     {
                         <div class="adaptacion-container">
@@ -131,7 +129,6 @@
         <div id="CUDContainer">
                     @if (ViewBag.cud != null)
                     {
-                       
                             <div class="cud1_container" data-id="@ViewBag.cud.id">
                                 <div class="header_adaptacion">
                                     <img src="../img/componente/CUD.png" alt="icono" class="icono-adaptacion-img">
@@ -161,7 +158,41 @@
                                 </div>
                             }         
             </div>
-       
+
+
+            <!--CERTIFICACIONES-->
+            @if (ViewBag.Lista_Certificacion != null && ((List<Certificacion>)ViewBag.Lista_Certificacion).Any())
+            {
+                foreach (var item in (List<Certificacion>)ViewBag.Lista_Certificacion)
+                {
+                    <div class="certificacion1_container" data-id="@item.id">
+                        <div class="header_educacion">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <div class="titulo_educacion">@item.titulo - @item.empresa_emisora
+                            </div> 
+                            <i class="fa-solid fa-edit editar-icono-certificacion" data-id="@item.id"></i>
+                            <i class="fa-solid fa-trash eliminar-icono-certificacion" data-id="@item.id"></i>
+                        </div>
+                        <div class="fecha_educacion">( @item.fecha_expedicion - @item.fecha_caducidad )</div>
+                        <div class="detalles_educacion">
+                            <div>
+                                <i class="fa-solid fa-circle-info"></i> 
+                                <strong>Id de la Credencial:</strong> @item.id_credencial
+                            </div>
+                            <div>
+                                <i class="fa-solid fa-circle-info"></i> 
+                                <strong>URL de la credencial:</strong> @item.url_credencial
+                            </div>
+                        </div>
+                        <div class="iconos_educacion">
+                            <a data-bs-toggle="modal" data-bs-target="#modal_certificaciones">
+                                <i class="fa-solid fa-circle-plus mas-icono-certificacion" style="color: @Model.estilo"></i>
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+        
         <!-- CAROUSEL MULTIMEDIA*/ -->
     @if (ViewBag.UrlMultimedia != null)
 {
@@ -269,69 +300,75 @@
 
 
      <!--MODAL EDUCACION -->
-    <div class="modal fade" id="ModalEducacion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header-educacion">
-                    <h5 class="modal-title">Educación</h5>
-                </div>
-                <div class="modal-body">
-                    <form action='@Url.Action("InsertarEducacion")' method="post" id="ModalEducacionForm" >
-                        <input type="hidden" name="id" id="id" value="">
-                        <input type="hidden" name="id_info_empleado" id="id_info_empleado" value="@Model.id">
-                        <h1 class="titulos-modal">
-                            <i id="iconos-modal" class="fa-solid fa-id-card"></i> NOMBRE
-                        </h1>
-                        <input type="text" name="titulo">
-                        <h1 class="titulos-modal">
-                            <i id="iconos-modal" class="fa-solid fa-school"></i> INSTITUCIÓN EDUCATIVA
-                        </h1>
-                        <input type="text" name="nombre_institucion">
-                        <div class="modal-separador-educacion">
-                            <h5 class="modal-title-separador">++ INFORMACIÓN</h5>
-                        </div>
+<div class="modal fade" id="ModalEducacion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header-educacion">
+                <h5 class="modal-title">Educación</h5>
+            </div>
+            <div class="modal-body">
+                <form action='@Url.Action("InsertarEducacion")' method="post" id="ModalEducacionForm">
+                    <input type="hidden" name="id" id="id" value="">
+                    <input type="hidden" name="id_info_empleado" id="id_info_empleado" value="@Model.id">
+                    <!-- Campos de Educación -->
+                    <h1 class="titulos-modal">
+                        <i id="iconos-modal" class="fa-solid fa-id-card"></i> NOMBRE
+                    </h1>
+                    <input type="text" name="titulo">
 
-                    <!-- FECHAS -->
-                        <div class="fecha-contenedor">
-                            <div class="fecha-header">
-                                <h3>FECHAS</h3>
-                            </div>
-                            <div class="fecha-campo">
-                                <div class="fecha-titulo">
-                                    <i class="fa fa-calendar"></i> 
-                                    <label for="fecha-inicio">FECHA DE INICIO</label>
-                                </div>
-                                <div class="fecha-selectores">
-                                    <select id="mes-inicio" name="mes_expedicion">
-                                        <option value="">MES</option>
-                                    </select>
-                                    <select id="ano-inicio" name="fecha_expedicion">
-                                        <option value="">AÑO</option>
-                                    </select>
-                                </div>
-                            </div>
+                    <h1 class="titulos-modal">
+                        <i id="iconos-modal" class="fa-solid fa-school"></i> INSTITUCIÓN EDUCATIVA
+                    </h1>
+                    <input type="text" name="nombre_institucion">
 
-                            <div class="fecha-campo">
-                                <div class="fecha-titulo">
-                                    <i class="fa fa-calendar"></i>
-                                    <label for="fecha-fin">FECHA DE FINALIZACIÓN</label>
-                                </div>
-                                <div class="fecha-selectores">
-                                    <select id="mes-fin" name="mes_caducidad">
-                                        <option value="">MES</option>
-                                    </select>
-                                    <select id="ano-fin" name="fecha_caducidad">
-                                        <option value="">AÑO</option>
-                                    </select>
-                                </div>
-                            </div>
+                    <!-- Información Adicional -->
+                    <div class="modal-separador-educacion">
+                        <h5 class="modal-title-separador">++ INFORMACIÓN</h5>
                     </div>
 
-                    <!-- DETALLES -->
+                    <!-- Fechas -->
+                    <div class="fecha-contenedor">
+                        <div class="fecha-header">
+                            <h3>FECHAS</h3>
+                        </div>
+
+                        <div class="fecha-campo">
+                            <div class="fecha-titulo">
+                                <i class="fa fa-calendar"></i> 
+                                <label for="fecha-inicio">FECHA DE INICIO</label>
+                            </div>
+                            <div class="fecha-selectores">
+                                <select id="mes-inicio" name="mes_expedicion">
+                                    <option value="">MES</option>
+                                </select>
+                                <select id="ano-inicio" name="fecha_expedicion">
+                                    <option value="">AÑO</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="fecha-campo">
+                            <div class="fecha-titulo">
+                                <i class="fa fa-calendar"></i>
+                                <label for="fecha-fin">FECHA DE FINALIZACIÓN</label>
+                            </div>
+                            <div class="fecha-selectores">
+                                <select id="mes-fin" name="mes_caducidad">
+                                    <option value="">MES</option>
+                                </select>
+                                <select id="ano-fin" name="fecha_caducidad">
+                                    <option value="">AÑO</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detalles Adicionales -->
                     <div class="fecha-contenedor">
                         <div class="fecha-header">
                             <h3>DETALLES</h3>
                         </div>
+
                         <div class="fecha-campo">
                             <div class="fecha-titulo">
                                 <i class="fa-solid fa-user-graduate"></i> 
@@ -345,7 +382,7 @@
                         <div class="fecha-campo">
                             <div class="fecha-titulo">
                                 <i class="fa-solid fa-users"></i>
-                                <label for="actividades_grupo">ACTIVIDADES DE GRUPO</label>
+                                <label for="actividades-grupo">ACTIVIDADES DE GRUPO</label>
                             </div>
                             <div class="fecha-selectores">
                                 <input id="actividades-grupo" type="text" name="actividades_grupo">
@@ -353,11 +390,13 @@
                         </div>
                     </div>
 
-                        <h1 class="titulos-modal">
+                    <!-- Descripción -->
+                    <h1 class="titulos-modal">
                         <i id="iconos-modal" class="fa-solid fa-pen-nib"></i> DESCRIPCIÓN
-                        </h1>
-                        <input type="text" name="Descripcion">
-                        <input type="hidden" name="id_info_empleado" value="@Model.id" />
+                    </h1>
+                    <input type="text" name="Descripcion">
+
+                    <!-- Modal Footer -->
                     <div class="modal-footer">
                         <button type="submit" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary">Guardar</button>
                     </div>
@@ -368,8 +407,9 @@
 </div>
 
 
+
 <!-- MODAL ADAPTACION -->
-   <div class="modal fade" id="ModalAdaptacion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="ModalAdaptacion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header-educacion">
@@ -383,7 +423,8 @@
                         <i id="iconos-modal" class="fa-solid fa-pen-nib"></i> ESCRIBÍ UN PÁRRAFO ENUMERANDO TUS NECESIDADES DE ADAPTACION
                     </h1>
                     <input type="text" name="nombre" id="nombre" oninput="mostrarSugerencias()" placeholder="TUS NECESIDADES">
-                    <div id="sugerencias-container"></div>
+                    <div id="sugerencias-container">
+                    </div>
                     <div class="modal-footer-adaptacion">
                         <button type="submit" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary">Guardar</button>
                     </div>
@@ -394,7 +435,7 @@
 </div>
 
 <!-- MODAL CUD -->
-   <div class="modal fade" id="ModalCUD" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="ModalCUD" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header-educacion">
@@ -407,7 +448,7 @@
                         <h1 class="titulos-modal">
                             <i id="iconos-modal" class="fa-solid fa-id-card"></i> INSTITUCIÓN EMISORA
                         </h1>
-                        <input type="text" name="empresa_emisora">
+                    <input type="text" name="empresa_emisora">
                         <!-- FECHAS -->
                         <div class="fecha-contenedor">
                             <div class="fecha-header">
@@ -432,14 +473,12 @@
                                     <input type="date" name="fecha_vencimiento">
                                 </div>
                             </div>
-                    </div>
+                        </div>
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" id="myfile" name="myfile">
                         <label class="custom-file-label" for="myfile">Subir Archivo..</label>
                         <div class="invalid-feedback">No fue posible seleccionar ese archivo</div>
-
                     </div>
-
                     <div class="modal-footer">
                         <input type="submit" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary" value="Guardar">
                     </div>
@@ -457,16 +496,88 @@
                 <h5 class="modal-title">DESTACATE</h5>
             </div>
             <div class="modal-body" id="modal-adaptacion">
-             <a data-bs-toggle="modal" data-bs-target="#modal_certificaciones">
-               <button class="btn btn-primary w-100 " id="buton_plus" type="submit"><i class="fa-solid fa-medal" style="font-size: 25px; margin-bottom: 8px;"></i> <br> CERTIFICACIONES</button>
-             </a>
-             <a data-bs-toggle="modal" data-bs-target="#modal_idiomas">   
-                <button class="btn btn-primary w-100 " id="buton_plus2" type="submit"><i class="fa-solid fa-comments" style="font-size: 25px; margin-bottom: 8px;"></i> <br> IDIOMAS</button>
-            </a>
+                <a data-bs-toggle="modal" data-bs-target="#modal_certificaciones">
+                    <button class="btn btn-primary w-100 " id="buton_plus" type="submit"><i class="fa-solid fa-medal" style="font-size: 25px; margin-bottom: 8px;"></i> <br> CERTIFICACIONES</button>
+                </a>
+                <a data-bs-toggle="modal" data-bs-target="#modal_idiomas">   
+                    <button class="btn btn-primary w-100 " id="buton_plus2" type="submit"><i class="fa-solid fa-comments" style="font-size: 25px; margin-bottom: 8px;"></i> <br> IDIOMAS</button>
+                </a>
             </div>
         </div>
     </div>
 </div>
+
+<!--CERTIFICACIONES MODAL -->
+<div class="modal fade" id="modal_certificaciones" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header-educacion">
+                <h5 class="modal-title">Certificaciones</h5>
+            </div>
+            <div class="modal-body">
+                <form action='@Url.Action("InsertarCertificaciones")' method="post" id="ModalCertificacionForm">
+                    <input type="hidden" name="id" id="id" value="">
+                    <input type="hidden" name="id_info_empleado" id="id_info_empleado" value="@Model.id">
+                    <h1 class="titulos-modal">
+                        <i id="iconos-modal" class="fa-solid fa-pen-nib"></i> TITULO
+                    </h1>
+                    <input type="text" name="titulo">
+                    <h1 class="titulos-modal">
+                        <i id="iconos-modal" class="fa-solid fa-id-card"></i> EMPRESA EMISORA
+                    </h1>
+                    <input type="text" name="empresa_emisora">
+                    <div class="fecha-campo">
+                        <div class="fecha-titulo">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <label for="id_credencial">ID DE LA CREDENCIAL</label>
+                        </div>
+                        <div class="fecha-selectores">
+                            <input id="id_credencial" type="text" name="id_credencial">
+                        </div>
+                        <div class="fecha-titulo">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <label for="url_credencial">URL DE LA CREDENCIAL</label>
+                        </div>
+                        <div class="fecha-selectores">
+                            <input id="url_credencial" type="text" name="url_credencial">
+                        </div>
+                    </div>
+                    <div class="fecha-contenedor">
+                        <div class="fecha-header">
+                            <h3>FECHAS</h3>
+                        </div>
+                        <div class="fecha-campo">
+                            <div class="fecha-titulo">
+                                <i class="fa fa-calendar"></i>
+                                <label for="fecha-inicio">FECHA DE EMISIÓN</label>
+                            </div>
+                            <div class="fecha-selectores">
+                                <input type="date" name="fecha_expedicion">
+                            </div>
+                        </div>
+                        <div class="fecha-campo">
+                            <div class="fecha-titulo">
+                                <i class="fa fa-calendar"></i>
+                                <label for="fecha-fin">FECHA DE VENCIMIENTO</label>
+                            </div>
+                            <div class="fecha-selectores">
+                                <input type="date" name="fecha_caducidad">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="submit" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary" value="Guardar">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</body>
+
+
 
 <!-- FUNCIONES JAVA LOCALES -->
     @{
@@ -522,9 +633,10 @@ $('#ModalEducacionForm').submit(function(e) {
     console.log($(this).serialize()); 
     
     var id = $('input[name="id"]').val();
-    var idInfoEmpleado = '@Model.id'; // Asigna el valor manualmente
-    $('input[name="id_info_empleado"]').val(idInfoEmpleado);
-    console.log("ID Info Empleado: ", idInfoEmpleado);
+    var Id_Info_Empleado = '@Model.id'; // Asigna el valor manualmente
+    console.log(Id_Info_Empleado);
+    $('input[name="id_info_empleado"]').val(Id_Info_Empleado);
+    console.log("ID Info Empleado: ", Id_Info_Empleado);
 
     $.ajax({
         type: 'POST',
@@ -546,6 +658,8 @@ $('#ModalEducacionForm').submit(function(e) {
         }
     });
 });
+
+
 $('#ModalAdaptacionForm').submit(function(e) {
     e.preventDefault(); 
     console.log($(this).serialize()); 
@@ -662,9 +776,9 @@ $(document).ready(function () {
         data: $(this).serialize(),
         success: function(response) {
             console.log("Respuesta recibida: ", response);
-            var nuevaListaCertificacion = $(response).find('#CertificacionContainer').html();
+            var nuevaListaCertificacion = $(response).find('#certificacion1_container').html();
             if (nuevaListaCertificacionn) {
-                $('#CertificacionContainer').html(nuevaListaCertificacionn); 
+                $('#certificacion1_container').html(nuevaListaCertificacion); 
                 $('#ModalContainer').modal('hide'); 
                 console.log("Modal cerrado y lista actualizada.");
             } else {
@@ -675,6 +789,12 @@ $(document).ready(function () {
             console.log("Error: ", error);
         }
     });
+});
+$(document).on('click', '.mas-icono-certificacion', function () {
+    $('.modal').modal('hide');
+    setTimeout(function() {
+        $('#modal_certificaciones').modal('show');
+    }, 500);
 });
 
 const sugerencias = [
