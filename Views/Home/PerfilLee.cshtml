@@ -1,0 +1,969 @@
+@using Hiring.Models
+@model Informacion_Personal_Empleado
+
+@{ 
+    ViewData["Title"] = "Lee";
+}
+
+
+<body>
+<div class="container" >
+       <div class="card-container" data-info-empleado="@Model.id">
+            <a data-bs-toggle="modal" data-bs-target="#ModalForm">
+            <div class="rectangulo-encabezado" style="background-color: @Model.estilo;">
+            </div>
+            <div class="perfil-container">
+                <img class="foto-perfil" src="@Model.foto_perfil" alt="Foto de perfil">
+                <div class="info-perfil">
+                    <div class="perfil-header">
+                        <h3 class="nombre-apellido">@Model.nombre_apellido</h3>
+                        <img class="mini-foto" src="../img/logos/HirINg-app.gif" alt="Mini Foto">
+                        <i id="edit-icono" class="fa-solid fa-pen"></i>
+                    </div>
+                    <div class="profesion-container">
+                        <i class="fas fa-briefcase profesion-icon"></i>
+                        <p class="profesion" style="color: rgb(59, 59, 59) !important;">@Model.profesion_actual</p>
+                    </div>
+                </div>
+            </div>
+            <hr style="color: @Model.estilo; margin-top: -35px; opacity: .5;">
+            <div class="contact-info">
+                <h5 class="telefono" style="background-color:@Model.estilo;">
+                    <i class="fa-solid fa-phone"></i> @Model.telefono
+                </h5>
+                <h5 class="mail" style="background-color:@Model.estilo;">
+                    <i class="fa-solid fa-envelope"></i> @Model.mail
+                </h5>
+                <h5 class="ubicacion" style="background-color:@Model.estilo;">
+                    <i class="fa-solid fa-location-dot"></i> @Model.ubicacion
+                </h5>
+            </div>
+            <div class="acerca_de_mi_container">
+                <i  class="fa-solid fa-address-card"></i>
+                <div class="acerca-de-mi"> 
+                @Model.acerca_de_mi
+                </div>
+            </div>  
+            </a>
+           <div class="upload-container" id="fileList" style="position: relative; display: inline-block;">
+                <img class="img_upload_archivos" src="../img/componente/subir_archivo.png" alt="Subir Archivos" class="upload-image" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" multiple style="display: none;" accept=".png, .jpg, .jpeg, .pdf, .txt, .mp3, .mp4" onchange="handleFiles(this.files)">
+                <a data-bs-toggle="modal" data-bs-target="#modal_plus">
+                    <i class="fa-solid fa-circle-plus " style="color: @Model.estilo"></i>
+                </a>
+            </div>
+            
+            @if (ViewBag.Lista_educacion != null && ((List<Educacion>)ViewBag.Lista_educacion).Any())
+            {
+                foreach (var item in (List<Educacion>)ViewBag.Lista_educacion)
+                {
+                    <div class="educacion1_container" data-id="@item.id">
+                        <div class="header_educacion">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <div class="titulo_educacion">@item.titulo - @item.nombre_institucion</div> 
+                            <i class="fa-solid fa-edit editar-icono" data-id="@item.id"></i>
+                            <i class="fa-solid fa-trash eliminar-icono" data-id="@item.id"></i>
+                        </div>
+                        <div class="fecha_educacion">( @item.fecha_expedicion - @item.fecha_caducidad )</div>
+                        <div class="descripcion_educacion">@item.descripcion</div>
+                        <div class="detalles_educacion">
+                            <div>
+                                <i class="fa-solid fa-user-graduate"></i> 
+                                <strong>Disciplina:</strong> @item.disciplina_academica
+                            </div>
+                            <div>
+                                <i class="fa-solid fa-users"></i> 
+                                <strong>Actividades de Grupo:</strong> @item.actividades_grupo
+                            </div>
+                        </div>
+                        <div class="iconos_educacion">
+                            <a data-bs-toggle="modal" data-bs-target="#ModalEducacion">
+                                <i class="fa-solid fa-circle-plus mas-icono-educacion" style="color: @Model.estilo"></i>
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+                    else
+                    {
+                        <div class="educacion-container">
+                            <div class="icon-container">
+                                <i class="fa-solid fa-graduation-cap icon-educacion"></i>
+                            </div>
+                            <a data-bs-toggle="modal" data-bs-target="#ModalEducacion">
+                                <img class="img_educacion" src="../img/componente/educacion.png" alt="Educación">
+                            </a>
+                        </div>
+                    }
+        <!--NECESIDADES DE ADAPTACIÓN -->
+            <div id="AdaptacionContainer">
+                    @if (ViewBag.Adaptacion != null)
+                    {
+                        <div class="adaptacion1_container" data-id="@ViewBag.Adaptacion.id">
+                            <div class="header_adaptacion">
+                                <img src="../img/componente/icono.png" alt="icono" class="icono-adaptacion-img">
+                                <div class="titulo_adaptacion">
+                                    NECESIDADES DE ADAPTACIÓN
+                                    <div class="descripcion_adaptacion">@ViewBag.Adaptacion.nombre</div>
+                                </div>
+                                <i class="fa-solid fa-edit editar-icono-adaptacion" data-id="@ViewBag.Adaptacion.id"></i>
+                                <i class="fa-solid fa-trash eliminar-icono-adaptacion" data-id="@ViewBag.Adaptacion.id"></i>
+                            </div>
+                        </div>
+                    }
+
+                    else
+                    {
+                        <div class="adaptacion-container">
+                            <div class="icon-container">
+                                <i class="fa-solid fa-person-walking-with-cane icon-educacion"></i>
+                                <i class="fa-solid fa-wheelchair icon-educacion" style="margin-left: 10px;"></i>
+                            </div>
+                            <a data-bs-toggle="modal" data-bs-target="#ModalAdaptacion">
+                                <img class="img_adaptacion" src="../img/componente/adaptacion.jpg" alt="Adaptación">
+                            </a>
+                        </div>
+                    }         
+        </div>
+        <!--CUD-->
+        <div id="CUDContainer">
+                    @if (ViewBag.cud != null)
+                    {
+                            <div class="cud1_container" data-id="@ViewBag.cud.id">
+                                <div class="header_adaptacion">
+                                    <img src="../img/componente/CUD.png" alt="icono" class="icono-adaptacion-img">
+                                        <div class="titulo_adaptacion">CERTIFICADO ÚNICO DE DISCAPACIDAD (CUD)
+                                            <div class="fecha_educacion">Expedición: @ViewBag.cud.fecha_expedicion
+                                            </div>
+                                        </div>
+                                    <i class="fa-solid fa-edit editar-icono-cud" data-id="@ViewBag.cud.id"></i>
+                                    <i class="fa-solid fa-trash eliminar-icono-cud" data-id="@ViewBag.cud.id"></i>
+                                </div>
+                                <div class="descargar-archivo" data-id="@ViewBag.cud.id">
+                                    <a href="@ViewBag.cud.url_" download class="btn btn-success descargar " style="background-color:@Model.estilo; border-color: @Model.estilo; margin-top:10px">
+                                        <i class="fa-solid fa-download"></i> Descargar CUD
+                                    </a>
+                                </div>
+                            </div>  
+                    }
+                            else
+                            {
+                                <div class="cud-container">
+                                    <div class="icon-container">
+                                        <i class="fa-solid fa-stamp icon-educacion"></i>
+                                    </div>
+                                    <a data-bs-toggle="modal" data-bs-target="#ModalCUD">
+                                        <img class="img_adaptacion" src="../img/componente/adaptacion.jpg" alt="Adaptación">
+                                    </a>
+                                </div>
+                            }         
+            </div>
+
+
+              <!--CERTIFICACIONES-->
+            @if (ViewBag.Lista_Certificacion != null && ((List<Certificacion>)ViewBag.Lista_Certificacion).Any())
+            {
+                foreach (var item in (List<Certificacion>)ViewBag.Lista_Certificacion)
+                {
+                    <div class="certificacion1_container" data-id="@item.id">
+                        <div class="header_educacion">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <div class="titulo_educacion">@item.titulo - @item.empresa_emisora
+                            </div> 
+                            <i class="fa-solid fa-edit editar-icono-certificacion" data-id="@item.id"></i>
+                            <i class="fa-solid fa-trash eliminar-icono-certificacion" data-id="@item.id"></i>
+                        </div>
+                        <div class="fecha_educacion">( @item.fecha_expedicion - @item.fecha_caducidad )</div>
+                        <div class="detalles_educacion">
+                            <div>
+                                <i class="fa-solid fa-circle-info"></i> 
+                                <strong>Id de la Credencial:</strong> @item.id_credencial
+                            </div>
+                            <div>
+                                <i class="fa-solid fa-circle-info"></i> 
+                                <strong>URL de la credencial:</strong> @item.url_credencial
+                            </div>
+                        </div>
+                        <div class="iconos_educacion">
+                            <a data-bs-toggle="modal" data-bs-target="#modal_certificaciones">
+                                <i class="fa-solid fa-circle-plus mas-icono-certificacion" style="color: @Model.estilo"></i>
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+            <!-- IDIOMA -->
+            <div id="IdiomaContainer">
+            @if (ViewBag.idioma != null)
+            {
+                    <div class="idioma1_container" data-id="@ViewBag.idioma.id">
+                            <div class="header_adaptacion">
+                                <i class="fa-solid fa-comments"></i>
+                                <div class="titulo_adaptacion">
+                                    IDIOMA
+                                    <div class="descripcion_adaptacion">@ViewBag.idioma.nombre</div>
+                                </div>
+                                <i class="fa-solid fa-edit editar-icono-idioma" data-id="@ViewBag.idioma.id"></i>
+                                <i class="fa-solid fa-trash eliminar-icono-idioma" data-id="@ViewBag.idioma.id"></i>
+                            </div>
+                        </div>
+            }
+            </div>
+            
+
+        
+        <!-- CAROUSEL MULTIMEDIA*/ -->
+    @if (ViewBag.UrlMultimedia != null)
+{
+   
+    <div class="container carousel-container">
+    <div id="carouselExampleAutoplaying" class="carousel slide carousel-fotos" data-bs-ride="carousel">
+        <div class="carousel-inner" style="text-align: center; width: 100%;" id="carousel-inner">
+            @{
+                bool Activo = true;
+                @foreach (string item in ViewBag.UrlMultimedia)
+                {
+                    <div class='carousel-item @(Activo ? "active" : "")'>
+                        <div class="row">
+                            <div class="col-md-12 position-relative">
+                                @if (item.EndsWith(".jpg") || item.EndsWith(".jpeg") || item.EndsWith(".png"))
+                                {
+                                    <img src="@item" class="d-block w-100">
+                                }
+                                else if (item.EndsWith(".mp4"))
+                                {
+                                    <video controls class="d-block w-100">
+                                        <source src="@item" type="video/mp4">
+                                    </video>
+                                }
+                                else
+                                {
+                                    <div class="download-button-container">
+                                        <a href="@item" download class="btn btn-primary download-button">Descargar archivo</a>
+                                    </div>
+                                }
+                                <button class="btn btn-danger btn-sm position-absolute top-0 end-0 eliminar-archivo" data-url="@item">Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+                    Activo = false;
+                }
+            }
+        </div>
+        <button class="button_boton carousel-control-prev" style="background-color: @Model.estilo;" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="button_boton carousel-control-next" type="button" style="background-color: @Model.estilo;" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+}
+
+
+        <!-- MODAL INFO PERSONAL -->
+        <div class="modal fade" id="ModalForm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <i id="usuario-header-modal" class="fa-solid fa-user-pen"></i>
+                    <div id="seccion1" class="modal-header">
+                        <h5 class="modal-title">Información Personal </h5>
+                    </div>
+                    <div id="seccion1-body" class="modal-body">
+                        @using(Html.BeginForm("InsertarInformacionPersonal1","Home",  FormMethod.Post, new {id="form-modal"}))
+                        {
+                            <div>
+                                <h1 class="titulos-modal"> <i id="iconos-modal" class="fa-solid fa-id-card"></i> NOMBRE - APELLIDO </h1>
+                                @Html.TextBoxFor(model=>model.nombre_apellido, new {placeholder="Nombre y Apellido"})
+                                <h1 class="titulos-modal"><i id="iconos-modal" class="fa-solid fa-envelope"></i> EMAIL</h1>
+                                @Html.TextBoxFor(model=>model.mail, new {placeholder="Correo electrónico",type="email" })
+                                <h1 class="titulos-modal"><i id="iconos-modal" class="fa-solid fa-phone"></i> NÚMERO CELULAR</h1>
+                                @Html.TextBoxFor(model=>model.telefono, new {placeholder="Teléfono"})
+                                <h1 class="titulos-modal"><i id="iconos-modal" class="fa-solid fa-palette"></i> ESTILO</h1>
+                                <input type="color" id="colorPicker" name="estilo" class="form-control mb-2" value="@Model.estilo" />
+                                @Html.HiddenFor(model => model.id, new { placeholder = "Estilo" })
+                            </div>
+                            <div id="seccion1-footer" class="modal-footer">
+                                <button type="submit" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary">Guardar</button>
+                                <button type="button" style="background-color: @Model.estilo ; border-color: @Model.estilo" class="btn btn-primary" onclick="mostrarSiguienteSeccion(2)">Siguiente</button>
+                            </div>
+                        }
+                    </div>
+                    <div id="seccion2" class="modal-header" style="display: none;">
+                        <h5 class="modal-title">Información Personal </h5>
+                    </div>
+                    <div id="seccion2-body" class="modal-body" style="display: none;">
+                        <form action='@Url.Action("InsertarInformacionPersonal2")' method="post" id="form-modal">
+                    <div>
+                        <h1 class="titulos-modal"><i id="iconos-modal" class="fa-solid fa-user-pen"></i> ACERCA DE MI</h1>
+                        @Html.TextBoxFor(model=>model.acerca_de_mi, new {placeholder="Acerca De Mi"})
+                        <h1 class="titulos-modal"><i id="iconos-modal" class="fa-solid fa-briefcase"></i> PROFESION</h1>
+                        @Html.TextBoxFor(model=>model.profesion_actual, new {placeholder="Profesion"})
+                        <h1 class="titulos-modal"> <i id="iconos-modal" class="fa-solid fa-map-location-dot"></i> UBICACION</h1>
+                        @Html.TextBoxFor(model=>model.ubicacion, new {placeholder="Ubicacion"})
+                        <h1 class="titulos-modal"><i id="iconos-modal" class="fa-solid fa-circle-user"></i> FOTO DE PERFIL</h1>
+                        @Html.TextBoxFor(model=>model.foto_perfil, new {placeholder="URL Foto de Perfil"})
+                        @Html.HiddenFor(model=>model.id)
+                    </div>
+                    <div id="seccion2-footer" class="modal-footer" style="display: none;">
+                        <button type="button" style="background-color: @Model.estilo ; border-color: @Model.estilo" class="btn btn-secondary" onclick="mostrarSiguienteSeccion(1)">Anterior</button>
+                        <button type="submit" style="background-color: @Model.estilo ;border-color: @Model.estilo" class="btn btn-primary">Guardar</button>
+                    </div>
+                        </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+     <!--MODAL EDUCACION -->
+<div class="modal fade" id="ModalEducacion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header-educacion">
+                <h5 class="modal-title">Educación</h5>
+            </div>
+            <div class="modal-body">
+                <form action='@Url.Action("InsertarEducacion")' method="post" id="ModalEducacionForm">
+                    <input type="hidden" name="id" id="id" value="">
+                    <input type="hidden" name="id_info_empleado" id="id_info_empleado" value="@Model.id">
+                    <!-- Campos de Educación -->
+                    <h1 class="titulos-modal">
+                        <i id="iconos-modal" class="fa-solid fa-id-card"></i> NOMBRE
+                    </h1>
+                    <input type="text" name="titulo">
+
+                    <h1 class="titulos-modal">
+                        <i id="iconos-modal" class="fa-solid fa-school"></i> INSTITUCIÓN EDUCATIVA
+                    </h1>
+                    <input type="text" name="nombre_institucion">
+
+                    <!-- Información Adicional -->
+                    <div class="modal-separador-educacion">
+                        <h5 class="modal-title-separador">++ INFORMACIÓN</h5>
+                    </div>
+
+                    <!-- Fechas -->
+                    <div class="fecha-contenedor">
+                        <div class="fecha-header">
+                            <h3>FECHAS</h3>
+                        </div>
+
+                        <div class="fecha-campo">
+                            <div class="fecha-titulo">
+                                <i class="fa fa-calendar"></i> 
+                                <label for="fecha-inicio">FECHA DE INICIO</label>
+                            </div>
+                            <div class="fecha-selectores">
+                                <select id="mes-inicio" name="mes_expedicion">
+                                    <option value="">MES</option>
+                                </select>
+                                <select id="ano-inicio" name="fecha_expedicion">
+                                    <option value="">AÑO</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="fecha-campo">
+                            <div class="fecha-titulo">
+                                <i class="fa fa-calendar"></i>
+                                <label for="fecha-fin">FECHA DE FINALIZACIÓN</label>
+                            </div>
+                            <div class="fecha-selectores">
+                                <select id="mes-fin" name="mes_caducidad">
+                                    <option value="">MES</option>
+                                </select>
+                                <select id="ano-fin" name="fecha_caducidad">
+                                    <option value="">AÑO</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detalles Adicionales -->
+                    <div class="fecha-contenedor">
+                        <div class="fecha-header">
+                            <h3>DETALLES</h3>
+                        </div>
+
+                        <div class="fecha-campo">
+                            <div class="fecha-titulo">
+                                <i class="fa-solid fa-user-graduate"></i> 
+                                <label for="disciplina-academica">DISCIPLINA ACADÉMICA</label>
+                            </div>
+                            <div class="fecha-selectores">
+                                <input id="disciplina-academica" type="text" name="disciplina_academica">
+                            </div>
+                        </div>
+
+                        <div class="fecha-campo">
+                            <div class="fecha-titulo">
+                                <i class="fa-solid fa-users"></i>
+                                <label for="actividades-grupo">ACTIVIDADES DE GRUPO</label>
+                            </div>
+                            <div class="fecha-selectores">
+                                <input id="actividades-grupo" type="text" name="actividades_grupo">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Descripción -->
+                    <h1 class="titulos-modal">
+                        <i id="iconos-modal" class="fa-solid fa-pen-nib"></i> DESCRIPCIÓN
+                    </h1>
+                    <input type="text" name="Descripcion">
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="submit" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL ADAPTACION -->
+<div class="modal fade" id="ModalAdaptacion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header-educacion">
+                <h5 class="modal-title">Necesidades De Adaptación</h5>
+            </div>
+            <div class="modal-body" id="modal-adaptacion">
+                <form action='@Url.Action("InsertarAdaptacion")' method="post" id="ModalAdaptacionForm">
+                    <input type="hidden" name="id" id="id" value="">
+                    <input type="hidden" name="id_info_empleado" id="id_info_empleado" value="@Model.id">
+                    <h1 class="titulos-modal">
+                        <i id="iconos-modal" class="fa-solid fa-pen-nib"></i> ESCRIBÍ UN PÁRRAFO ENUMERANDO TUS NECESIDADES DE ADAPTACION
+                    </h1>
+                    <input type="text" name="nombre" id="nombre" oninput="mostrarSugerencias()" placeholder="TUS NECESIDADES">
+                    <div id="sugerencias-container">
+                    </div>
+                    <div class="modal-footer-adaptacion">
+                        <button type="submit" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CUD -->
+<div class="modal fade" id="ModalCUD" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header-educacion">
+                <h5 class="modal-title">Certificado único de discapacidad (CUD)</h5>
+            </div>
+            <div class="modal-body">
+                <form action='@Url.Action("InsertarCUD")' method="post" id="ModalCudForm" enctype="multipart/form-data">
+                    <input type="hidden" name="id" id="id" value="">
+                    <input type="hidden" name="id_info_empleado" id="id_info_empleado" value="@Model.id">
+                        <h1 class="titulos-modal">
+                            <i id="iconos-modal" class="fa-solid fa-id-card"></i> INSTITUCIÓN EMISORA
+                        </h1>
+                    <input type="text" name="empresa_emisora">
+                        <!-- FECHAS -->
+                        <div class="fecha-contenedor">
+                            <div class="fecha-header">
+                                <h3>FECHAS</h3>
+                            </div>
+                            <div class="fecha-campo">
+                                <div class="fecha-titulo">
+                                    <i class="fa fa-calendar"></i> 
+                                    <label for="fecha-inicio">FECHA DE EMISIÓN</label>
+                                </div>
+                                <div class="fecha-selectores">
+                                    <input type="date" name="fecha_expedicion">
+                                </div>
+                            </div>
+
+                            <div class="fecha-campo">
+                                <div class="fecha-titulo">
+                                    <i class="fa fa-calendar"></i>
+                                    <label for="fecha-fin">FECHA DE VENCIMIENTO</label>
+                                </div>
+                                <div class="fecha-selectores">
+                                    <input type="date" name="fecha_vencimiento">
+                                </div>
+                            </div>
+                        </div>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="myfile" name="myfile">
+                        <label class="custom-file-label" for="myfile">Subir Archivo..</label>
+                        <div class="invalid-feedback">No fue posible seleccionar ese archivo</div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="submit" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary" value="Guardar">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PLUS -->
+<div class="modal fade" id="modal_plus" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header-educacion">
+                <h5 class="modal-title">DESTACATE</h5>
+            </div>
+            <div class="modal-body" id="modal-adaptacion">
+                <a data-bs-toggle="modal" data-bs-target="#modal_certificaciones">
+                    <button class="btn btn-primary w-100 " id="buton_plus" type="submit"><i class="fa-solid fa-medal" style="font-size: 25px; margin-bottom: 8px;"></i> <br> CERTIFICACIONES</button>
+                </a>
+                <a data-bs-toggle="modal" data-bs-target="#ModalIdioma">   
+                    <button class="btn btn-primary w-100 " id="buton_plus2" type="submit"><i class="fa-solid fa-comments" style="font-size: 25px; margin-bottom: 8px;"></i> <br> IDIOMAS</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--CERTIFICACIONES MODAL -->
+<div class="modal fade" id="modal_certificaciones" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header-educacion">
+                <h5 class="modal-title">Certificaciones</h5>
+            </div>
+            <div class="modal-body">
+                <form action='@Url.Action("InsertarCertificaciones")' method="post" id="ModalCertificacionForm">
+                    <input type="hidden" name="id" id="id" value="">
+                    <input type="hidden" name="id_info_empleado" id="id_info_empleado" value="@Model.id">
+                    <h1 class="titulos-modal">
+                        <i id="iconos-modal" class="fa-solid fa-pen-nib"></i> TITULO
+                    </h1>
+                    <input type="text" name="titulo">
+                    <h1 class="titulos-modal">
+                        <i id="iconos-modal" class="fa-solid fa-id-card"></i> EMPRESA EMISORA
+                    </h1>
+                    <input type="text" name="empresa_emisora">
+                    <div class="fecha-campo">
+                        <div class="fecha-titulo">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <label for="id_credencial">ID DE LA CREDENCIAL</label>
+                        </div>
+                        <div class="fecha-selectores">
+                            <input id="id_credencial" type="text" name="id_credencial">
+                        </div>
+                        <div class="fecha-titulo">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <label for="url_credencial">URL DE LA CREDENCIAL</label>
+                        </div>
+                        <div class="fecha-selectores">
+                            <input id="url_credencial" type="text" name="url_credencial">
+                        </div>
+                    </div>
+                    <div class="fecha-contenedor">
+                        <div class="fecha-header">
+                            <h3>FECHAS</h3>
+                        </div>
+                        <div class="fecha-campo">
+                            <div class="fecha-titulo">
+                                <i class="fa fa-calendar"></i>
+                                <label for="fecha-inicio">FECHA DE EMISIÓN</label>
+                            </div>
+                            <div class="fecha-selectores">
+                                <input type="date" name="fecha_expedicion">
+                            </div>
+                        </div>
+                        <div class="fecha-campo">
+                            <div class="fecha-titulo">
+                                <i class="fa fa-calendar"></i>
+                                <label for="fecha-fin">FECHA DE VENCIMIENTO</label>
+                            </div>
+                            <div class="fecha-selectores">
+                                <input type="date" name="fecha_caducidad">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="submit" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary" value="Guardar">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL IDIOMA -->
+<div class="modal fade" id="ModalIdioma" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header-educacion">
+                <h5 class="modal-title">IDIOMAS</h5>
+            </div>
+            <div class="modal-body">
+                <form action='@Url.Action("InsertarIdioma")' method="post" id="ModalIdiomaForm">
+                    <input type="hidden" name="id" id="id" value="">
+                    <input type="hidden" name="id_info_empleado" id="id_info_empleado" value="@Model.id">
+                    <h1 class="titulos-modal">
+                        <i id="iconos-modal" class="fa-solid fa-pen-nib"></i> INSERTÁ TUS IDIOMAS
+                    </h1>
+                    <input type="text" name="nombre" id="nombre" oninput="mostrarSugerenciasIdioma()" placeholder="IDIOMAS">
+                    <div id="sugerencias-container">
+                    </div>
+                    <div class="modal-footer-adaptacion">
+                        <button type="submit" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+</body>
+
+
+
+<!-- FUNCIONES JAVA LOCALES -->
+    @{
+        var modelId = Model.id;
+    }
+    <script>
+    function handleFiles(files) {
+    console.log('handleFiles function called');
+    const fileList = document.getElementById('fileList');
+    var modelId = '@modelId';
+
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('Id_Empleado', modelId);
+
+        // Enviar el archivo al servidor
+        $.ajax({
+            url: '/Home/UploadFile',
+            method: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                console.log('Archivo subido correctamente');
+                console.log(response);
+                
+                // Actualiza el carrusel con la nueva imagen o video
+                let text = "";
+                for (let i = 0; i < response.data.length; i++) {
+                    if (response.data[i].endsWith('.mp4')) {
+                        text += "<div class='carousel-item " + (i == 0 ? "active" : "") + "'><div class='row'><div class='col-md-12'><div class='carousel-content'><video controls class='d-block w-100'><source src='" + response.data[i] + "' type='video/mp4'></video><a href='" + response.data[i] + "' download class='btn btn-primary'>Descargar</a></div></div></div>";
+                    } else if (response.data[i].endsWith('.jpg') || response.data[i].endsWith('.jpeg') || response.data[i].endsWith('.png')) {
+                        text += "<div class='carousel-item " + (i == 0 ? "active" : "") + "'><div class='row'><div class='col-md-12'><div class='carousel-content'><img src='" + response.data[i] + "' class='d-block w-100'><a href='" + response.data[i] + "' download class='btn btn-primary'>Descargar</a></div></div></div>";
+                    } else {
+                        text += "<div class='carousel-item " + (i == 0 ? "active" : "") + "'><div class='row'><div class='col-md-12'><div class='carousel-content'><div class='file-placeholder'><a href='" + response.data[i] + "' download class='btn btn-primary'>Descargar archivo</a></div></div></div></div>";
+                    }
+                }
+                $("#carousel-inner").html(text);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al subir el archivo:', status, error);
+                console.log(xhr.responseText);
+            }
+        });
+    }
+}
+
+
+$('#ModalEducacionForm').onclick(function(e) {
+    e.preventDefault(); 
+    console.log($(this).serialize()); 
+    
+    var id = $('input[name="id"]').val();
+    var Id_Info_Empleado = '@Model.id'; // Asigna el valor manualmente
+    console.log(Id_Info_Empleado);
+    $('input[name="id_info_empleado"]').val(Id_Info_Empleado);
+    console.log("ID Info Empleado: ", Id_Info_Empleado);
+
+    $.ajax({
+        type: 'POST',
+        url: '/Home/InsertarEducacion/' + id, 
+        data: $(this).serialize(),
+        success: function(response) {
+            console.log("Respuesta recibida: ", response);
+            var nuevaListaEducacion = $(response).find('#listaEducacionContainer').html();
+            if (nuevaListaEducacion) {
+                $('#listaEducacionContainer').html(nuevaListaEducacion); 
+                $('#ModalEducacion').modal('hide'); 
+                console.log("Modal cerrado y lista actualizada.");
+            } else {
+                console.log("No se encontró la lista de educación en la respuesta.");
+            }
+        },
+        error: function(error) {
+            console.log("Error: ", error);
+        }
+    });
+});
+$(document).on('click', '.mas-icono-educacion', function () {
+    $('.modal').modal('hide');
+    setTimeout(function() {
+        $('#ModalEducacion').modal('show');
+    }, 500);
+});
+
+
+$('#ModalAdaptacionForm').onclick(function(e) {
+    e.preventDefault(); 
+    console.log($(this).serialize()); 
+    
+    var id = $('input[name="id"]').val();
+    var idInfoEmpleado = '@Model.id'; // Asigna el valor manualmente
+    $('input[name="id_info_empleado"]').val(idInfoEmpleado);
+    console.log("ID Info Empleado: ", idInfoEmpleado);
+
+    $.ajax({
+        type: 'POST',
+        url: '/Home/InsertarAdaptacion/' + id, 
+        data: $(this).serialize(),
+        success: function(response) {
+            console.log("Respuesta recibida: ", response);
+            var nuevaListaEducacion = $(response).find('#AdaptacionContainer').html();
+            if (nuevaListaEducacion) {
+                $('#AdaptacionContainer').html(nuevaListaEducacion); 
+                $('#ModalAdaptacion').modal('hide'); 
+                console.log("Modal cerrado y lista actualizada.");
+            } else {
+                console.log("No se encontró la lista de educación en la respuesta.");
+            }
+        },
+        error: function(error) {
+            console.log("Error: ", error);
+        }
+    });
+});
+
+const sugerencias = [
+    "Acceso a rampas",
+    "Material en braille",
+    "Intérprete de lenguaje de señas",
+    "Software de lectura de pantalla",
+    "Asistencia personal",
+    "Rampa",
+    "Baño adaptado a sillas de ruedas"
+];
+
+function mostrarSugerencias() {
+    const input = document.getElementById('nombre');
+    const sugerenciasContainer = document.getElementById('sugerencias-container');
+    sugerenciasContainer.innerHTML = '';
+    
+    const valor = input.value.toLowerCase();
+    if (valor) {
+        const sugerenciasFiltradas = sugerencias.filter(sugerencia => 
+            sugerencia.toLowerCase().includes(valor)
+        );
+        
+        sugerenciasFiltradas.forEach(sugerencia => {
+            const div = document.createElement('div');
+            div.classList.add('sugerencia');
+            div.textContent = sugerencia;
+            div.onclick = () => {
+                input.value = sugerencia;
+                sugerenciasContainer.innerHTML = '';
+            };
+            sugerenciasContainer.appendChild(div);
+        });
+    }
+}
+
+
+$('#ModalCudForm').onclick(function(e) {
+    e.preventDefault(); 
+    console.log($(this).serialize()); 
+    
+    var id = $('input[name="id"]').val();
+    var idInfoEmpleado = '@Model.id'; // Asigna el valor manualmente
+    $('input[name="id_info_empleado"]').val(idInfoEmpleado);
+    console.log("ID Info Empleado: ", idInfoEmpleado);
+
+    $.ajax({
+        type: 'POST',
+        url: '/Home/InsertarCUD/' + id, 
+        data: $(this).serialize(),
+        success: function(response) {
+            console.log("Respuesta recibida: ", response);
+            var nuevaListaEducacion = $(response).find('#CUDContainer').html();
+            if (nuevaListaEducacion) {
+                $('#CUDContainer').html(nuevaListaEducacion); 
+                $('#ModalCUD').modal('hide'); 
+                console.log("Modal cerrado y lista actualizada.");
+            } else {
+                console.log("No se encontró la lista de educación en la respuesta.");
+            }
+        },
+        error: function(error) {
+            console.log("Error: ", error);
+        }
+    });
+});
+$(document).ready(function () {
+    $('.custom-file-input').on('change', function () {
+        var fileName = $(this).val().split('\\').pop();
+        $(this).next('.custom-file-label').addClass("selected").html(fileName);
+    });
+});
+  
+  $('#ModalCertificacionForm').onclick(function(e) {
+    e.preventDefault(); 
+    console.log($(this).serialize()); 
+    
+    var id = $('input[name="id"]').val();
+    var idInfoEmpleado = '@Model.id'; // Asigna el valor manualmente
+    $('input[name="id_info_empleado"]').val(idInfoEmpleado);
+    console.log("ID Info Empleado: ", idInfoEmpleado);
+
+    $.ajax({
+        type: 'POST',
+        url: '/Home/InsertarCertificaciones/' + id, 
+        data: $(this).serialize(),
+        success: function(response) {
+            console.log("Respuesta recibida: ", response);
+            var nuevaListaCertificacion = $(response).find('#certificacion1_container').html();
+            if (nuevaListaCertificacionn) {
+                $('#certificacion1_container').html(nuevaListaCertificacion); 
+                $('#ModalContainer').modal('hide'); 
+                console.log("Modal cerrado y lista actualizada.");
+            } else {
+                console.log("No se encontró la lista de educación en la respuesta.");
+            }
+        },
+        error: function(error) {
+            console.log("Error: ", error);
+        }
+    });
+});
+$(document).on('click', '.mas-icono-certificacion', function () {
+    $('.modal').modal('hide');
+    setTimeout(function() {
+        $('#modal_certificaciones').modal('show');
+    }, 500);
+});
+
+$('#ModalIdiomaForm').onclick(function(e) {
+    e.preventDefault(); 
+    console.log($(this).serialize()); 
+    
+    var id = $('input[name="id"]').val();
+    var idInfoEmpleado = '@Model.id'; // Asigna el valor manualmente
+    $('input[name="id_info_empleado"]').val(idInfoEmpleado);
+    console.log("ID Info Empleado: ", idInfoEmpleado);
+
+    $.ajax({
+        type: 'POST',
+        url: '/Home/InsertarIdioma/' + id, 
+        data: $(this).serialize(),
+        success: function(response) {
+            console.log("Respuesta recibida: ", response);
+            var nuevoIdioma = $(response).find('#IdiomaContainer').html();
+            if (nuevoIdioma) {
+                $('#IdiomaContainer').html(nuevoIdioma); 
+                $('#ModalIdioma').modal('hide'); 
+                console.log("Modal cerrado y lista actualizada.");
+            } else {
+                console.log("No se encontró la lista de educación en la respuesta.");
+            }
+        },
+        error: function(error) {
+            console.log("Error: ", error);
+        }
+    });
+});
+
+
+
+
+const sugerencias = [
+    "Acceso a rampas",
+    "Material en braille",
+    "Intérprete de lenguaje de señas",
+    "Software de lectura de pantalla",
+    "Asistencia personal",
+    "Rampa",
+    "Baño adaptado a sillas de ruedas"
+];
+
+function mostrarSugerencias() {
+    const input = document.getElementById('nombre');
+    const sugerenciasContainer = document.getElementById('sugerencias-container');
+    sugerenciasContainer.innerHTML = '';
+    
+    const valor = input.value.toLowerCase();
+    if (valor) {
+        const sugerenciasFiltradas = sugerencias.filter(sugerencia => 
+            sugerencia.toLowerCase().includes(valor)
+        );
+        
+        sugerenciasFiltradas.forEach(sugerencia => {
+            const div = document.createElement('div');
+            div.classList.add('sugerencia');
+            div.textContent = sugerencia;
+            div.onclick = () => {
+                input.value = sugerencia;
+                sugerenciasContainer.innerHTML = '';
+            };
+            sugerenciasContainer.appendChild(div);
+        });
+    }
+}
+
+  
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<style>
+/*profesion */
+.profesion-container {
+    display: flex; 
+    align-items: center; 
+    margin-top: 10px; 
+    color:black;
+}
+
+.profesion-icon {
+    font-size: 20px; 
+    margin-right: 8px; 
+    color: @Model.estilo; 
+}
+
+.profesion {
+    margin: 0; 
+    color: rgb(59, 59, 59) !important;
+    font-family: 'Sura', sans-serif;
+}
+.rectangulo-encabezado {
+  height: 150px;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  margin: 0;
+  background-color: var(--user-selected-color); 
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.1) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+}
+
+
+</style>
+
