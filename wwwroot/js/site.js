@@ -479,42 +479,58 @@ $(document).on('click', '.editar-icono-idioma', function () {
     });
 });
 
+
+
 $(document).on('click', '.eliminar-icono-idioma', function () {
     var id = $(this).data('id');
 
-    $(document).on('click', '.eliminar-icono-idioma', function () {
-        var id = $(this).data('id');
-    
-        $.ajax({
-            url: '/Home/EliminarIdioma/' + id,
-            type: 'POST',  
-            success: function (response) {
-                if (!response.success) {
-                    alert(response.message);
-                } else {
-                    // Elimina el contenedor de la educación del DOM
-                    $('.idioma1_container[data-id="' + id + '"]').remove();
-    
-                    // Verifica si quedan elementos de educación
-                    if ($('.idioma1_container').length === 0) {
-                        var noEducacionHtml = `
-                            <div class="adaptacion-container">
-                        <div class="icon-container">
-                            <i class="fa-solid fa-person-walking-with-cane icon-educacion"></i>
-                            <i class="fa-solid fa-wheelchair icon-educacion" style="margin-left: 10px;"></i>
-                        </div>
-                        <a data-bs-toggle="modal" data-bs-target="#ModalAdaptacion">
-                                <img class="img_adaptacion" src="../img/componente/adaptacion.jpg" alt="Adaptación">
-                            </a>
-                    </div>
-`;
-                        $('#IdiomaContainer').html(noEducacionHtml);
-                    }
+    $.ajax({
+        url: '/Home/EliminarIdioma/' + id,
+        type: 'POST',
+        success: function (response) {
+            if (!response.success) {
+                alert(response.message);
+            } else {
+                // Elimina el contenedor de la educación del DOM
+                $('.idioma1_container[data-id="' + id + '"]').remove();
+
+                // Verifica si quedan elementos de educación
+                if ($('.idioma1_container').length === 0) {
+                    $('#IdiomaContainer').html(noEducacionHtml);
                 }
-            },
-            error: function (xhr, status, error) {
-                console.error("Error al eliminar el idioma: ", error);
             }
-        });
+        },
+        error: function (xhr, status, error) {
+            console.error("Error al eliminar el idioma: ", error);
+        }
     });
 });
+
+
+function AgregarIdioma(){
+    alert("HOLA");
+    e.preventDefault(); 
+    console.log($(this).serialize()); 
+    
+    var idInfoEmpleado = $("#id_info_empleado").val(); // Asigna el valor manualmente
+    var nombreIdioma = $("#nombreIdioma").val(); // Asigna el valor manualmente
+    
+    console.log("ID Info Empleado: ", idInfoEmpleado);
+
+    $.ajax({
+        url: '/Home/InsertarIdioma/', 
+        data: new {idEmpleado: idInfoEmpleado, nombre: nombreIdioma },
+        success: function(response) {
+           let textohtml = '<div class="idioma1_container" data-id="' + response.ididioma + '">';
+           textohtml += '<div class="header_adaptacion"><i class="fa-solid fa-comments"></i><div class="titulo_adaptacion">IDIOMA';
+           textohtml += '<div class="descripcion_adaptacion">' + nombreIdioma + '</div>';
+           textohtml += '</div>';
+           textohtml += '<i class="fa-solid fa-edit editar-icono-idioma" data-id="' + response.ididioma + '"></i>';
+           textohtml += '<i class="fa-solid fa-trash eliminar-icono-idioma" data-id="' + response.ididioma +'"></i></div></div>';
+           $("#IdiomaContainer").html(textohtml);
+        },
+        error: function(error) {
+            console.log("Error: ", error);
+        }
+    });
+};

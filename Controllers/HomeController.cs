@@ -67,6 +67,7 @@ public class HomeController : Controller
             ViewBag.Adaptacion = Models.BD.SelectAdaptacion(usuario.id);
             ViewBag.cud = Models.BD.SelectCUD(usuario.id);
             ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(usuario.id);
+            ViewBag.idioma = Models.BD.SelectIdioma(usuario.id);
             return View("PerfilLee", perfil);
         }
         else  {
@@ -122,6 +123,8 @@ public class HomeController : Controller
         ViewBag.Lista_educacion = Models.BD.SelectEducacion(usuario.id);
         ViewBag.Adaptacion = Models.BD.SelectAdaptacion(usuario.id);
         ViewBag.cud = Models.BD.SelectCUD(usuario.id);
+        ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(usuario.id);
+        ViewBag.idioma = Models.BD.SelectIdioma(usuario.id);
         return View("PerfilLee", perfil);
         }
 
@@ -136,6 +139,8 @@ public class HomeController : Controller
         ViewBag.Lista_educacion = Models.BD.SelectEducacion(usuario.id);
         ViewBag.Adaptacion = Models.BD.SelectAdaptacion(usuario.id);
         ViewBag.cud = Models.BD.SelectCUD(usuario.id);
+        ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(usuario.id);
+        ViewBag.idioma = Models.BD.SelectIdioma(usuario.id);
         return View("PerfilLee", perfil);
     }
 
@@ -163,7 +168,9 @@ public class HomeController : Controller
     ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
     ViewBag.cud = Models.BD.SelectCUD(Id_Info_Empleado);
     ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
+    ViewBag.idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
     Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+    
 
     return View("PerfilLee", perfilActualizado);
 }
@@ -185,6 +192,7 @@ public class HomeController : Controller
         ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
         ViewBag.cud = Models.BD.SelectCUD(Id_Info_Empleado);
         ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
+        ViewBag.idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
         return Json(new { success = true });
     }
     catch (Exception ex)
@@ -261,6 +269,7 @@ public class HomeController : Controller
         ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
         ViewBag.cud = Models.BD.SelectCUD(Id_Info_Empleado);
         ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
+        ViewBag.idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
         Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
         return View("PerfilLee", perfilActualizado);
     }
@@ -277,6 +286,7 @@ public class HomeController : Controller
             ViewBag.Adaptacion = Models.BD.SelectAdaptacion(id);
             ViewBag.cud = Models.BD.SelectCUD(id);
             ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(id);
+            ViewBag.idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
             return Json(new { success = true });
         }
         catch (Exception ex)
@@ -322,6 +332,7 @@ public class HomeController : Controller
         ViewBag.Lista_educacion = Models.BD.SelectEducacion(Id_Info_Empleado);
         ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
         ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
+        ViewBag.idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
         return View("PerfilLee", perfilActualizado);
     }
 
@@ -338,6 +349,7 @@ public class HomeController : Controller
             ViewBag.Adaptacion = Models.BD.SelectAdaptacion(id);
             ViewBag.cud = Models.BD.SelectCUD(id);
             ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(id);
+            ViewBag.idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
             return Json(new { success = true });
         }
         catch (Exception ex)
@@ -404,6 +416,7 @@ public class HomeController : Controller
     ViewBag.Lista_educacion = Models.BD.SelectEducacion(Id_Info_Empleado);
     ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
     ViewBag.cud = Models.BD.SelectCUD(Id_Info_Empleado);
+    ViewBag.idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
     
     return View("PerfilLee", perfilActualizado);
 }
@@ -422,6 +435,7 @@ public class HomeController : Controller
         ViewBag.Lista_educacion = Models.BD.SelectEducacion(Id_Info_Empleado);
         ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
         ViewBag.cud = Models.BD.SelectCUD(Id_Info_Empleado);
+        ViewBag.idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
         return Json(new { success = true });
     }
     catch (Exception ex)
@@ -453,16 +467,17 @@ public class HomeController : Controller
 
     //Idioma
     [HttpPost]
-    public IActionResult InsertarIdioma(Idioma idioma, int Id_Info_Empleado, int id)
+    public JsonResult InsertarIdioma(string nombre, int idEmpleado)
     {
+        int IdiomaElegido =0;
         if (id != 0 || id==0)
         {
-            Models.BD.InsertarIdioma(idioma, Id_Info_Empleado);
+            Idioma idiomaaBuscar = new Idioma();
+            idiomaaBuscar.nombre = nombre;
+            IdiomaElegido = Models.BD.InsertarIdioma(idioma, Id_Info_Empleado);
         }
-        Idioma idioma_ = Models.BD.SelectIdioma(Id_Info_Empleado);
-        ViewBag.idioma_ = idioma_;
-        Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
-        return View("PerfilLee", perfilActualizado);
+
+        return Json(new { success = true,  ididioma = IdiomaElegido});
     }
     public IActionResult EliminarIdioma(int Id_Info_Empleado, int id)
     {
@@ -472,8 +487,11 @@ public class HomeController : Controller
             Idioma idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
             ViewBag.idioma = idioma;
             Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
+            ViewBag.UrlMultimedia=Models.BD.SelectMultimedia(id);
             ViewBag.Lista_educacion = Models.BD.SelectEducacion(id);
             ViewBag.Adaptacion = Models.BD.SelectAdaptacion(id);
+            ViewBag.cud = Models.BD.SelectCUD(id);
+            ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(id);
             return Json(new { success = true });
         }
         catch (Exception ex)

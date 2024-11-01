@@ -1033,7 +1033,7 @@ hr{
   font-size: 0.9rem;
   flex: 1;
 }
-.educacion-container, .adaptacion-container , .cud-container, .certificacion_container{
+.educacion-container, .adaptacion-container , .cud-container, .certificacion_container, .IdiomaContainer{
   display: flex; 
   flex-direction: column; 
   align-items: center; /* Centra la imagen horizontalmente */
@@ -1146,7 +1146,7 @@ font-size: 25px;}
 }
 
 /*EDUCACION CONTAINER*/
-  .educacion1_container, .adaptacion1_container, .cud1_container, .certificacion1_container {
+  .educacion1_container, .adaptacion1_container, .cud1_container, .certificacion1_container, .idioma1_container {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
     border-radius: 8px;
     padding: 15px;
@@ -1205,11 +1205,11 @@ font-size: 25px;}
     margin-top: 10px; 
 }
 
-.editar-icono, .editar-icono-adaptacion, .editar-icono-cud, .editar-icono-certificacion {
+.editar-icono, .editar-icono-adaptacion, .editar-icono-cud, .editar-icono-certificacio, .editar-icono-idioma {
     margin-left: 10px; 
     font-size: 18px;
 }
-.eliminar-icono, .eliminar-icono-adaptacion, .eliminar-icono-cud, .eliminar-icono-certificacion{
+.eliminar-icono, .eliminar-icono-adaptacion, .eliminar-icono-cud, .eliminar-icono-certificacion, .eliminar-icono-idioma{
   margin-left: 8px;
   font-size: 18px;
 }
