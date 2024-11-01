@@ -479,7 +479,8 @@ $(document).on('click', '.editar-icono-idioma', function () {
     });
 });
 
-
+$(document).on('click', '.eliminar-icono-idioma', function () {
+    var id = $(this).data('id');
 
     $(document).on('click', '.eliminar-icono-idioma', function () {
         var id = $(this).data('id');
@@ -516,4 +517,4 @@ $(document).on('click', '.editar-icono-idioma', function () {
             }
         });
     });
-
+});
