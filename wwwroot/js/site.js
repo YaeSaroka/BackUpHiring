@@ -507,10 +507,9 @@ $(document).on('click', '.eliminar-icono-idioma', function () {
 });
 
 
-function AgregarIdioma(){
-    alert("HOLA");
-    e.preventDefault(); 
-    console.log($(this).serialize()); 
+function AgregarIdioma()
+{
+    
     
     var idInfoEmpleado = $("#id_info_empleado").val(); // Asigna el valor manualmente
     var nombreIdioma = $("#nombreIdioma").val(); // Asigna el valor manualmente
@@ -519,7 +518,8 @@ function AgregarIdioma(){
 
     $.ajax({
         url: '/Home/InsertarIdioma/', 
-        data: new {idEmpleado: idInfoEmpleado, nombre: nombreIdioma },
+        type: 'POST',
+        data: {idEmpleado: idInfoEmpleado, nombre: nombreIdioma },
         success: function(response) {
            let textohtml = '<div class="idioma1_container" data-id="' + response.ididioma + '">';
            textohtml += '<div class="header_adaptacion"><i class="fa-solid fa-comments"></i><div class="titulo_adaptacion">IDIOMA';

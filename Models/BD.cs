@@ -381,8 +381,9 @@ public  class BD
     }
 
     //IDIOMAS
-    public static void InsertarIdioma(Idioma Idioma, int id_info_empleado)
+    public static int InsertarIdioma(Idioma Idioma, int id_info_empleado)
     {
+        int id=-1;
         try
         {
             using (SqlConnection db = new SqlConnection(ConnectionString))
@@ -390,12 +391,12 @@ public  class BD
                 string sp = "InsertarIdioma";
                 var parameters = new 
                 { 
-                    id = Idioma.id == 0 ? 0 : Idioma.id, 
                     nombre = Idioma.nombre, 
-                    id_info_empleado= Idioma.id_info_empleado
+                    id_info_empleado= id_info_empleado
                 };
-                db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
+                id=db.QueryFirstOrDefault<int>(sp, parameters, commandType: CommandType.StoredProcedure);
             }
+            return id;
         }
         catch (Exception ex)
         {

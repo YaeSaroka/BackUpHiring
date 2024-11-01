@@ -470,12 +470,10 @@ public class HomeController : Controller
     public JsonResult InsertarIdioma(string nombre, int idEmpleado)
     {
         int IdiomaElegido =0;
-        if (id != 0 || id==0)
-        {
-            Idioma idiomaaBuscar = new Idioma();
-            idiomaaBuscar.nombre = nombre;
-            IdiomaElegido = Models.BD.InsertarIdioma(idioma, Id_Info_Empleado);
-        }
+        Idioma idiomaaBuscar = new Idioma();
+        idiomaaBuscar.nombre = nombre;
+        
+        IdiomaElegido = Models.BD.InsertarIdioma(idiomaaBuscar, idEmpleado);
 
         return Json(new { success = true,  ididioma = IdiomaElegido});
     }
