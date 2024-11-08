@@ -374,26 +374,40 @@ public class HomeController : Controller
             url_= Cud.url_
         });
     }
-    [HttpPost]
-    public IActionResult EliminarArchivo(string fileUrl, int Id_Empleado)
+   
+   [HttpGet]
+[HttpPost]
+public JsonResult EliminarArchivo(int id)
+{
+    try
     {
-        try
+        var fileUrl = BD.ObtenerUrlArchivoPorId(id); // Asumiendo que tienes un método para obtener la URL del archivo por ID
+        if (string.IsNullOrEmpty(fileUrl) || !fileUrl.StartsWith("/wwwroot"))
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot" + fileUrl);
-            if (System.IO.File.Exists(filePath))
-            {
-                System.IO.File.Delete(filePath);
-            }
-            BD.EliminarMultimedia(fileUrl, Id_Empleado);
-            var UrlMultimedia = BD.SelectMultimedia(Id_Empleado);
-            return Json(new { success = true, data = UrlMultimedia });
+            return Json(new { success = false, message = "URL de archivo no válida." });
         }
-        catch (Exception ex)
+
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", fileUrl.TrimStart('/'));
+        if (System.IO.File.Exists(filePath))
         {
-            Console.WriteLine($"Error: {ex.Message}");
-            return Json(new { success = false, message = ex.Message });
+            System.IO.File.Delete(filePath);
         }
+        else
+        {
+            return Json(new { success = false, message = "El archivo no existe en el sistema." });
+        }
+
+        BD.EliminarMultimedia(fileUrl, id);
+        var UrlMultimedia = BD.SelectMultimedia(id);
+        return Json(new { success = true, data = UrlMultimedia });
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error: {ex.Message}");
+        return Json(new { success = false, message = "Ocurrió un error al eliminar el archivo." });
+    }
+}
+
 
     //CERTIFICACIONES
     [HttpPost]

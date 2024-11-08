@@ -1215,14 +1215,17 @@ font-size: 25px;}
 }
 
 /*ADAPTACION*/
-#sugerencias-container {
+#sugerencias-container-adaptacion , #sugerencias-container-idioma {
   max-height: 150px;
   overflow-y: auto;
   position: absolute;
   background-color: white;
   z-index: 1000;
   width: calc(100% - 20px);
+  border: 1px solid #ccc;
+  margin-top: 5px; /* Añadir un poco de margen superior */
 }
+
 
 .sugerencia {
   padding: 10px;
@@ -1231,6 +1234,10 @@ font-size: 25px;}
 
 .sugerencia:hover {
   background-color: #f0f0f0;
+}
+.modal-body {
+  position: relative;
+  z-index: 10;
 }
 .descripcion_adaptacion{
   font-weight: initial;

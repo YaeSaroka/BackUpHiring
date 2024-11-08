@@ -528,9 +528,124 @@ function AgregarIdioma()
            textohtml += '<i class="fa-solid fa-edit editar-icono-idioma" data-id="' + response.ididioma + '"></i>';
            textohtml += '<i class="fa-solid fa-trash eliminar-icono-idioma" data-id="' + response.ididioma +'"></i></div></div>';
            $("#IdiomaContainer").html(textohtml);
+           $('#ModalIdioma').modal('hide');
         },
         error: function(error) {
             console.log("Error: ", error);
         }
     });
 };
+
+//SUGERENCIAS IDIOMAS
+const sugerenciasIdioma = [
+    "Inglés",
+    "Español",
+    "Francés",
+    "Alemán",
+    "Italiano",
+    "Portugués",
+    "Chino",
+    "Japonés",
+    "Ruso"
+];
+
+function mostrarSugerenciasIdioma() {
+    const input = document.getElementById('nombreIdioma');
+    const sugerenciasContainer = document.getElementById('sugerencias-container-idioma');
+    sugerenciasContainer.innerHTML = '';
+
+    const valor = input.value.split(/[,|-]/).pop().trim().toLowerCase();
+    if (valor) {
+        const sugerenciasFiltradas = sugerenciasIdioma.filter(sugerencia => 
+            sugerencia.toLowerCase().includes(valor)
+        );
+
+        sugerenciasFiltradas.forEach(sugerencia => {
+            const div = document.createElement('div');
+            div.classList.add('sugerencia');
+            div.textContent = sugerencia;
+            div.onclick = () => {
+                agregarSugerenciaIdioma(sugerencia);
+                sugerenciasContainer.innerHTML = '';
+            };
+            sugerenciasContainer.appendChild(div);
+        });
+    }
+}
+
+function agregarSugerenciaIdioma(sugerencia) {
+    const input = document.getElementById('nombreIdioma');
+    const valoresActuales = input.value.split(/[,|-]/);
+    valoresActuales.pop(); // Elimina el último valor que está incompleto
+    valoresActuales.push(sugerencia); // Añade la sugerencia seleccionada
+    input.value = valoresActuales.join(', ') + ', ';
+    if (input.value.endsWith(', ')) { input.value = input.value.slice(0, -2);
+}}
+
+//SUGERENCIAS ADAPTACIONES
+const sugerenciasAdaptacion = [
+    "Acceso a rampas",
+    "Material en braille",
+    "Intérprete de lenguaje de señas",
+    "Software de lectura de pantalla",
+    "Asistencia personal",
+    "Rampa",
+    "Baño adaptado a sillas de ruedas"
+];
+
+function mostrarSugerenciasAdaptacion() {
+    const input = document.getElementById('nombre');
+    const sugerenciasContainer = document.getElementById('sugerencias-container-adaptacion');
+    sugerenciasContainer.innerHTML = '';
+
+    const valor = input.value.split(/[,|-]/).pop().trim().toLowerCase();
+    if (valor) {
+        const sugerenciasFiltradas = sugerenciasAdaptacion.filter(sugerencia => 
+            sugerencia.toLowerCase().includes(valor)
+        );
+
+        sugerenciasFiltradas.forEach(sugerencia => {
+            const div = document.createElement('div');
+            div.classList.add('sugerencia');
+            div.textContent = sugerencia;
+            div.onclick = () => {
+                agregarSugerenciaAdaptacion(sugerencia);
+                sugerenciasContainer.innerHTML = '';
+            };
+            sugerenciasContainer.appendChild(div);
+        });
+    }
+}
+
+function agregarSugerenciaAdaptacion(sugerencia) {
+    const input = document.getElementById('nombre');
+    const valoresActuales = input.value.split(/[,|-]/);
+    valoresActuales.pop(); // Elimina el último valor que está incompleto
+    valoresActuales.push(sugerencia); // Añade la sugerencia seleccionada
+    input.value = valoresActuales.join(', ') + ', ';
+    if (input.value.endsWith(', ')) { input.value = input.value.slice(0, -2);
+}}
+
+
+function EliminarElemento(button) {
+    const id = button.getAttribute('data-id');
+    $.ajax({
+        url: '/Home/EliminarArchivo',
+        type: 'POST',
+        data: { id: id },
+        success: function (response) {
+            if (response.success) {
+                // Lógica adicional si es necesario, como eliminar el elemento del DOM
+                // Ocultar el modal si es necesario
+                $('#ModalEliminar').modal('hide');
+                alert('Archivo eliminado exitosamente.');
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error al eliminar el archivo: ", error);
+            alert('Ocurrió un error al eliminar el archivo.');
+        }
+    });
+}

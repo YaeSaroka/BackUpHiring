@@ -170,14 +170,14 @@ public  class BD
     }
 
     //MULTIMEDIA
-    public static List<string> SelectMultimedia(int Id_Info_Empleado)
+    public static List<Multimedia> SelectMultimedia(int Id_Info_Empleado)
     {
-        List<string> UrlMultimedia = new List<string>(); 
+        List<Multimedia> UrlMultimedia = new List<Multimedia>(); 
 
         using (SqlConnection db = new SqlConnection(ConnectionString))
         {
             string sp = "SelectMultimedia";
-            UrlMultimedia = db.Query<string>(sp, new { id_info_empleado = Id_Info_Empleado }, commandType: CommandType.StoredProcedure).ToList();
+            UrlMultimedia = db.Query<Multimedia>(sp, new { id_info_empleado = Id_Info_Empleado }, commandType: CommandType.StoredProcedure).ToList();
         }
 
         return UrlMultimedia;

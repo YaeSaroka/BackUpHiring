@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\devandroid\\Downloads\\BackUpHiring-main\\BackUpHiring-main\\Hiring.csproj": {}
+    "C:\\Users\\devandroid\\BackUpHiring\\Hiring.csproj": {}
   },
   "projects": {
-    "C:\\Users\\devandroid\\Downloads\\BackUpHiring-main\\BackUpHiring-main\\Hiring.csproj": {
+    "C:\\Users\\devandroid\\BackUpHiring\\Hiring.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\devandroid\\Downloads\\BackUpHiring-main\\BackUpHiring-main\\Hiring.csproj",
+        "projectUniqueName": "C:\\Users\\devandroid\\BackUpHiring\\Hiring.csproj",
         "projectName": "Hiring",
-        "projectPath": "C:\\Users\\devandroid\\Downloads\\BackUpHiring-main\\BackUpHiring-main\\Hiring.csproj",
+        "projectPath": "C:\\Users\\devandroid\\BackUpHiring\\Hiring.csproj",
         "packagesPath": "C:\\Users\\devandroid\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\devandroid\\Downloads\\BackUpHiring-main\\BackUpHiring-main\\obj\\",
+        "outputPath": "C:\\Users\\devandroid\\BackUpHiring\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

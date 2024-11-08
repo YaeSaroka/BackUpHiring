@@ -220,28 +220,28 @@
         <div class="carousel-inner" style="text-align: center; width: 100%;" id="carousel-inner">
             @{
                 bool Activo = true;
-                @foreach (string item in ViewBag.UrlMultimedia)
+                @foreach (Multimedia item in ViewBag.UrlMultimedia)
                 {
                     <div class='carousel-item @(Activo ? "active" : "")'>
                         <div class="row">
                             <div class="col-md-12 position-relative">
-                                @if (item.EndsWith(".jpg") || item.EndsWith(".jpeg") || item.EndsWith(".png"))
+                                @if (item.url.EndsWith(".jpg") || item.url.EndsWith(".jpeg") || item.url.EndsWith(".png"))
                                 {
-                                    <img src="@item" class="d-block w-100">
+                                    <img src="@item.url" class="d-block w-100">
                                 }
-                                else if (item.EndsWith(".mp4"))
+                                else if (item.url.EndsWith(".mp4"))
                                 {
                                     <video controls class="d-block w-100">
-                                        <source src="@item" type="video/mp4">
+                                        <source src="@item.url" type="video/mp4">
                                     </video>
                                 }
                                 else
                                 {
                                     <div class="download-button-container">
-                                        <a href="@item" download class="btn btn-primary download-button">Descargar archivo</a>
+                                        <a href="@item.url" download class="btn btn-primary download-button">Descargar archivo</a>
                                     </div>
                                 }
-                                <button class="btn btn-danger btn-sm position-absolute top-0 end-0 eliminar-archivo" data-url="@item">Eliminar</button>
+                                <button class="btn btn-danger btn-sm position-absolute top-0 end-0 eliminar-archivo"  onclick="EliminarElemento(@item.id)" data-url="@item.url" id="EliminarElemento">Eliminar</button>
                             </div>
                         </div>
                     </div>
@@ -440,8 +440,8 @@
                     <h1 class="titulos-modal">
                         <i id="iconos-modal" class="fa-solid fa-pen-nib"></i> ESCRIBÍ UN PÁRRAFO ENUMERANDO TUS NECESIDADES DE ADAPTACION
                     </h1>
-                    <input type="text" name="nombre" id="nombre" oninput="mostrarSugerencias()" placeholder="TUS NECESIDADES">
-                    <div id="sugerencias-container">
+                    <input type="text" name="nombre" id="nombre" oninput="mostrarSugerenciasAdaptacion()" placeholder="TUS NECESIDADES">
+                    <div id="sugerencias-container-adaptacion">
                     </div>
                     <div class="modal-footer-adaptacion">
                         <button type="submit" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary">Guardar</button>
@@ -599,23 +599,30 @@
                 <h5 class="modal-title">IDIOMAS</h5>
             </div>
             <div class="modal-body">
-                <form  id="ModalIdiomaForm">
+                <form id="ModalIdiomaForm">
                     <input type="hidden" name="id" id="id" value="">
                     <input type="hidden" name="id_info_empleado" id="id_info_empleado" value="@Model.id">
                     <h1 class="titulos-modal">
                         <i id="iconos-modal" class="fa-solid fa-pen-nib"></i> INSERTÁ TUS IDIOMAS
                     </h1>
                     <input type="text" name="nombre" id="nombreIdioma" oninput="mostrarSugerenciasIdioma()" placeholder="IDIOMAS">
-                    <div id="sugerencias-container">
-                    </div>
+                    <div id="sugerencias-container-idioma"></div>
                     <div class="modal-footer-adaptacion">
-                        <button type="button" onclick="AgregarIdioma()" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary">GUARDAR </button>
+                        <button type="button" onclick="AgregarIdioma()" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary">GUARDAR</button>
+                        
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+
+</script>
+
+
+
 </div>
 </div>
 </div>
@@ -648,7 +655,7 @@
             processData: false,
             success: function(response) {
                 console.log('Archivo subido correctamente');
-                console.log(response);
+                console.log(response.id);
                 
                 // Actualiza el carrusel con la nueva imagen o video
                 let text = "";
@@ -740,40 +747,8 @@ $('#ModalAdaptacionForm').onclick(function(e) {
     });
 });
 
-const sugerencias = [
-    "Acceso a rampas",
-    "Material en braille",
-    "Intérprete de lenguaje de señas",
-    "Software de lectura de pantalla",
-    "Asistencia personal",
-    "Rampa",
-    "Baño adaptado a sillas de ruedas"
-];
 
-function mostrarSugerencias() {
-    const input = document.getElementById('nombre');
-    const sugerenciasContainer = document.getElementById('sugerencias-container');
-    sugerenciasContainer.innerHTML = '';
-    
-    const valor = input.value.toLowerCase();
-    if (valor) {
-        const sugerenciasFiltradas = sugerencias.filter(sugerencia => 
-            sugerencia.toLowerCase().includes(valor)
-        );
-        
-        sugerenciasFiltradas.forEach(sugerencia => {
-            const div = document.createElement('div');
-            div.classList.add('sugerencia');
-            div.textContent = sugerencia;
-            div.onclick = () => {
-                input.value = sugerencia;
-                sugerenciasContainer.innerHTML = '';
-            };
-            sugerenciasContainer.appendChild(div);
-        });
-    }
-}
-
+document.getElementById('nombre').addEventListener('input', mostrarSugerencias);
 
 $('#ModalCudForm').onclick(function(e) {
     e.preventDefault(); 
@@ -847,75 +822,8 @@ $(document).on('click', '.mas-icono-certificacion', function () {
     }, 500);
 });
 
-$('#ModalIdiomaForm').onclick(function(e) {
-    alert("HOLA");
-    e.preventDefault(); 
-    console.log($(this).serialize()); 
-    
-    var id = $('input[name="id"]').val();
-    var idInfoEmpleado = '@Model.id'; // Asigna el valor manualmente
-    $('input[name="id_info_empleado"]').val(idInfoEmpleado);
-    console.log("ID Info Empleado: ", idInfoEmpleado);
-
-    $.ajax({
-        type: 'POST',
-        url: '/Home/InsertarIdioma/' + id, 
-        data: $(this).serialize(),
-        success: function(response) {
-            console.log("Respuesta recibida: ", response);
-            var nuevoIdioma = $(response).find('#IdiomaContainer').html();
-            if (nuevoIdioma) {
-                $('#IdiomaContainer').html(nuevoIdioma); 
-                $('#ModalIdioma').modal('hide'); 
-                console.log("Modal cerrado y lista actualizada.");
-            } else {
-                console.log("No se encontró la lista de educación en la respuesta.");
-            }
-        },
-        error: function(error) {
-            console.log("Error: ", error);
-        }
-    });
-});
 
 
-
-
-const sugerencias = [
-    "Acceso a rampas",
-    "Material en braille",
-    "Intérprete de lenguaje de señas",
-    "Software de lectura de pantalla",
-    "Asistencia personal",
-    "Rampa",
-    "Baño adaptado a sillas de ruedas"
-];
-
-function mostrarSugerencias() {
-    const input = document.getElementById('nombre');
-    const sugerenciasContainer = document.getElementById('sugerencias-container');
-    sugerenciasContainer.innerHTML = '';
-    
-    const valor = input.value.toLowerCase();
-    if (valor) {
-        const sugerenciasFiltradas = sugerencias.filter(sugerencia => 
-            sugerencia.toLowerCase().includes(valor)
-        );
-        
-        sugerenciasFiltradas.forEach(sugerencia => {
-            const div = document.createElement('div');
-            div.classList.add('sugerencia');
-            div.textContent = sugerencia;
-            div.onclick = () => {
-                input.value = sugerencia;
-                sugerenciasContainer.innerHTML = '';
-            };
-            sugerenciasContainer.appendChild(div);
-        });
-    }
-}
-
-  
 </script>
 
 

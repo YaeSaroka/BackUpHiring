@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ta7HRm/lRoE=",
+  "dgSpecHash": "s8qPIy2CdV4=",
   "success": true,
-  "projectFilePath": "C:\\Users\\devandroid\\Downloads\\BackUpHiring-main\\BackUpHiring-main\\Hiring.csproj",
+  "projectFilePath": "C:\\Users\\devandroid\\BackUpHiring\\Hiring.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\devandroid\\.nuget\\packages\\dapper\\2.1.35\\dapper.2.1.35.nupkg.sha512",
     "C:\\Users\\devandroid\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
