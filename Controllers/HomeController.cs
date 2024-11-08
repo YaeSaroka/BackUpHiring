@@ -395,7 +395,7 @@ public JsonResult EliminarArchivo(int id)
         {
             return Json(new { success = false, message = "El archivo no existe en el sistema." });
         }
-        BD.EliminarMultimedia(fileUrl, id);
+        BD.EliminarMultimedia(id);
         var UrlMultimedia = BD.SelectMultimedia(id);
         return Json(new { success = true, data = UrlMultimedia });
     }

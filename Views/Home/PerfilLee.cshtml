@@ -825,7 +825,7 @@ $(document).on('click', '.mas-icono-certificacion', function () {
 function EliminarElemento(button) {
     const id = button.getAttribute('data-id');
     $.ajax({
-        url: '/Home/EliminarArchivo',
+        url: '/Home/EliminarMultimedia',
         type: 'POST', // Asegurarse de que el tipo de contenido sea JSON
         data: { id: id },  // Convertir los datos a JSON
         success: function (response) {

@@ -319,12 +319,12 @@ public  class BD
                 db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
             }
         }
-    public static void EliminarMultimedia(string url, int id)
+    public static void EliminarMultimedia(int id)
             {
                 using (SqlConnection db = new SqlConnection(ConnectionString))
                 {
                     string sp = "EliminarMultimedia";
-                    var parameters = new { id = id, url=url};
+                    var parameters = new { id = id};
                     db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
                 }
             }
