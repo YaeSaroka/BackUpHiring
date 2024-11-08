@@ -182,6 +182,18 @@ public  class BD
 
         return UrlMultimedia;
     }
+    public static string SelectURL(int id)
+    {
+        string url = "";
+
+        using (SqlConnection db = new SqlConnection(ConnectionString))
+        {
+            string sp = "SelectURL";
+            url = db.QueryFirstOrDefault<string>(sp, new { id = id }, commandType: CommandType.StoredProcedure);
+        }
+
+        return url;
+    }
 
     public static void InsertarMultimedia(string URL, int Id_Empleado)
     {

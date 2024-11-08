@@ -375,18 +375,17 @@ public class HomeController : Controller
         });
     }
    
-   [HttpGet]
+   
 [HttpPost]
 public JsonResult EliminarArchivo(int id)
 {
     try
     {
-        var fileUrl = BD.ObtenerUrlArchivoPorId(id); // Asumiendo que tienes un método para obtener la URL del archivo por ID
+        var fileUrl = BD.SelectURL(id); 
         if (string.IsNullOrEmpty(fileUrl) || !fileUrl.StartsWith("/wwwroot"))
         {
             return Json(new { success = false, message = "URL de archivo no válida." });
         }
-
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", fileUrl.TrimStart('/'));
         if (System.IO.File.Exists(filePath))
         {
@@ -396,7 +395,6 @@ public JsonResult EliminarArchivo(int id)
         {
             return Json(new { success = false, message = "El archivo no existe en el sistema." });
         }
-
         BD.EliminarMultimedia(fileUrl, id);
         var UrlMultimedia = BD.SelectMultimedia(id);
         return Json(new { success = true, data = UrlMultimedia });

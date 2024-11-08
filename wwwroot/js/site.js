@@ -627,25 +627,3 @@ function agregarSugerenciaAdaptacion(sugerencia) {
 }}
 
 
-function EliminarElemento(button) {
-    const id = button.getAttribute('data-id');
-    $.ajax({
-        url: '/Home/EliminarArchivo',
-        type: 'POST',
-        data: { id: id },
-        success: function (response) {
-            if (response.success) {
-                // Lógica adicional si es necesario, como eliminar el elemento del DOM
-                // Ocultar el modal si es necesario
-                $('#ModalEliminar').modal('hide');
-                alert('Archivo eliminado exitosamente.');
-            } else {
-                alert(response.message);
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error al eliminar el archivo: ", error);
-            alert('Ocurrió un error al eliminar el archivo.');
-        }
-    });
-}

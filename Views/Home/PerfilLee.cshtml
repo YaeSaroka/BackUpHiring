@@ -822,6 +822,24 @@ $(document).on('click', '.mas-icono-certificacion', function () {
     }, 500);
 });
 
+function EliminarElemento(button) {
+    const id = button.getAttribute('data-id');
+    $.ajax({
+        url: '/Home/EliminarArchivo',
+        type: 'POST', // Asegurarse de que el tipo de contenido sea JSON
+        data: { id: id },  // Convertir los datos a JSON
+        success: function (response) {
+            if (response.success) { 
+                alert('Archivo eliminado exitosamente.');
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            alert('Ocurrió un error al eliminar el archivo.');
+        }
+    });
+}
 
 
 </script>
