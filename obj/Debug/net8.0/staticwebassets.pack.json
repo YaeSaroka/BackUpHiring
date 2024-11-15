@@ -57,6 +57,14 @@
       "PackagePath": "staticwebassets\\img\\default\\foto_Default.png"
     },
     {
+      "Id": "C:\\Users\\devandroid\\BackUpHiring\\wwwroot\\img\\descubre-como-se-comporta-un-gato.jpg",
+      "PackagePath": "staticwebassets\\img\\descubre-como-se-comporta-un-gato.jpg"
+    },
+    {
+      "Id": "C:\\Users\\devandroid\\BackUpHiring\\wwwroot\\img\\images.jfif",
+      "PackagePath": "staticwebassets\\img\\images.jfif"
+    },
+    {
       "Id": "C:\\Users\\devandroid\\BackUpHiring\\wwwroot\\img\\logos\\HirINg-app.gif",
       "PackagePath": "staticwebassets\\img\\logos\\HirINg-app.gif"
     },
@@ -67,6 +75,10 @@
     {
       "Id": "C:\\Users\\devandroid\\BackUpHiring\\wwwroot\\img\\perfiles\\sarah.png",
       "PackagePath": "staticwebassets\\img\\perfiles\\sarah.png"
+    },
+    {
+      "Id": "C:\\Users\\devandroid\\BackUpHiring\\wwwroot\\img\\perro.jfif",
+      "PackagePath": "staticwebassets\\img\\perro.jfif"
     },
     {
       "Id": "C:\\Users\\devandroid\\BackUpHiring\\wwwroot\\js\\site.js",

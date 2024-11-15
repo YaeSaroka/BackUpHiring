@@ -46,6 +46,34 @@ body {
     background: linear-gradient(#569c92, #b5e2db);
 }
 
+#botonCamara {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 20px;
+  border: 2px solid ;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+#botonCamara i {
+  margin-right: 8px; 
+}
+#botonCamara:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #569c92; /* Sombra para mostrar que el botón está en foco */
+}
+
+/* Efecto activo (click) */
+#botonCamara:active {
+  background-color: #569c92; /* Fondo aún más oscuro cuando se hace clic */
+  border-color: #569c92; /* Borde más oscuro cuando se hace clic */
+  transform: translateY(0); /* Vuelve a la posición normal después de hacer clic */
+}
 .background {
     width: 430px;
     height: 520px;
@@ -241,7 +269,7 @@ input:focus {
 }
 
 /* Estilos para los botones de opciones */
-.opciones {
+.opciones, #botonCamara {
   display: flex;
   justify-content: center; 
   margin-top: 20px;
@@ -777,7 +805,7 @@ hr{
 
 /* Estilo del título */
 .modal-title {
-  font-size: 1.85rem;
+  font-size: 1.5rem;
   font-weight: 500;
   color: #000000;
   margin: 0; 
@@ -1253,6 +1281,8 @@ font-size: 25px;}
   align-items: flex-start;
   gap: 10px;
   width: 100%;
+  position: relative;
+  top: 15px;
 }
 
 .custom-file-input {

@@ -206,8 +206,9 @@ public  class BD
     }
 
 //ADAPTACION
-    public static void InsertarAdaptacion(Necesidad Necesidad, int id_info_empleado)
+    public static int InsertarAdaptacion(Necesidad Necesidad, int id_info_empleado)
     {
+        int id= -1;
         try
         {
             using (SqlConnection db = new SqlConnection(ConnectionString))
@@ -215,17 +216,17 @@ public  class BD
                 string sp = "InsertarAdaptacion";
                 var parameters = new 
                 { 
-                    id = Necesidad.id == 0 ? 0 : Necesidad.id, 
                     nombre = Necesidad.nombre, 
-                    id_info_empleado= Necesidad.id_info_empleado
+                    id_info_empleado= id_info_empleado
                 };
-                db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
+                id= db.QueryFirstOrDefault<int>(sp, parameters, commandType: CommandType.StoredProcedure);
             }
         }
         catch (Exception ex)
         {
             throw new Exception("Error al insertar la necesidad de adaptacion en la base de datos.", ex);
         }
+        return id;
     }
 
     public static Necesidad SelectAdaptacion(int Id_Info_Empleado)

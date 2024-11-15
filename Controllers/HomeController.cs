@@ -130,17 +130,30 @@ public class HomeController : Controller
 
 
     [HttpPost]
-    public IActionResult InsertarInformacionPersonal2(Informacion_Personal_Empleado usuario)
+    public IActionResult InsertarInformacionPersonal2(Informacion_Personal_Empleado usuario, IFormFile foto_perfil)
     {
-        Models.BD.InsertarInformacionPersonalEmpleado2(usuario);
-        Informacion_Personal_Empleado perfil= Models.BD.CargarPerfilLogin(usuario.id);
-        List<string> UrlMultimedia = new List<string>(); 
-        ViewBag.UrlMultimedia=Models.BD.SelectMultimedia(usuario.id);
-        ViewBag.Lista_educacion = Models.BD.SelectEducacion(usuario.id);
-        ViewBag.Adaptacion = Models.BD.SelectAdaptacion(usuario.id);
-        ViewBag.cud = Models.BD.SelectCUD(usuario.id);
-        ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(usuario.id);
-        ViewBag.idioma = Models.BD.SelectIdioma(usuario.id);
+        if (foto_perfil != null)
+        {
+            if(foto_perfil.Length > 0 )
+            {
+                string ubicacion = this.Environment.ContentRootPath + @"\wwwroot\img\" + foto_perfil.FileName;
+                using (var stream = System.IO.File.Create(ubicacion))
+                {
+                    foto_perfil.CopyToAsync(stream);
+                }
+                usuario.foto_perfil=foto_perfil.FileName;
+            }
+
+        }
+            Models.BD.InsertarInformacionPersonalEmpleado2(usuario);
+            Informacion_Personal_Empleado perfil= Models.BD.CargarPerfilLogin(usuario.id);
+            List<string> UrlMultimedia = new List<string>(); 
+            ViewBag.UrlMultimedia=Models.BD.SelectMultimedia(usuario.id);
+            ViewBag.Lista_educacion = Models.BD.SelectEducacion(usuario.id);
+            ViewBag.Adaptacion = Models.BD.SelectAdaptacion(usuario.id);
+            ViewBag.cud = Models.BD.SelectCUD(usuario.id);
+            ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(usuario.id);
+            ViewBag.idioma = Models.BD.SelectIdioma(usuario.id);
         return View("PerfilLee", perfil);
     }
 
@@ -256,12 +269,12 @@ public class HomeController : Controller
         }
     }
     [HttpPost]
-    public JsonResult InsertarAdaptacion(string nombre_adaptacion, int Id_Info_Empleado)
+    public JsonResult InsertarAdaptacion(string nombre, int idEmpleado)
     {
         int AdaptacionElegida =0;
         Necesidad adaptacionaBuscar = new Necesidad();
-        adaptacionaBuscar.nombre= nombre_adaptacion;
-        AdaptacionElegida = Models.BD.InsertarAdaptacion(adaptacionaBuscar, Id_Info_Empleado);
+        adaptacionaBuscar.nombre= nombre;
+        AdaptacionElegida = Models.BD.InsertarAdaptacion(adaptacionaBuscar, idEmpleado);
         return Json(new {success=true, idadaptacion=AdaptacionElegida});
     }
     public IActionResult EliminarAdaptacion(int Id_Info_Empleado, int id)
