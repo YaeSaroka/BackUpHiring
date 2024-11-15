@@ -322,7 +322,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header-educacion">
-                <h5 class="modal-title">Educación</h5>
+                <h5 class="modal-title">EDUCACIÓN</h5>
             </div>
             <div class="modal-body">
                 <form action='@Url.Action("InsertarEducacion")' method="post" id="ModalEducacionForm">
@@ -341,7 +341,7 @@
                         <i id="iconos-modal" class="fa-solid fa-school"></i> INSTITUCIÓN EDUCATIVA
                     </h1>
                     <div class="input-container-micro"> 
-                        <input type="text" name="nombre_institucion" placeholder="NOMBRE" id="Nombre_Institucion" class="Input_con_micro">
+                        <input type="text" name="nombre_institucion" placeholder="Nombre Institucion" id="Nombre_Institucion" class="Input_con_micro">
                         <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('Nombre_Institucion')"></i>
                     </div>
                     <!-- Información Adicional -->
@@ -398,7 +398,7 @@
                                 <label for="disciplina-academica">DISCIPLINA ACADÉMICA</label>
                             </div>
                             <div class="fecha-selectores">  
-                                <input id="disciplina-academica" type="text" name="disciplina_academica" placeholder="Institucion" class="Input_con_micro">
+                                <input id="disciplina-academica" type="text" name="disciplina_academica" placeholder="disciplina academica" class="Input_con_micro">
                                 <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('disciplina-academica')"></i>
                             </div>
                         </div>
@@ -409,7 +409,7 @@
                                 <label for="actividades-grupo">ACTIVIDADES DE GRUPO</label>
                             </div>
                             <div class="fecha-selectores">
-                                <input id="actividades-grupo" type="text" name="actividades_grupo" placeholder="Institucion" class="Input_con_micro">
+                                <input id="actividades-grupo" type="text" name="actividades_grupo" placeholder="actividades grupo" class="Input_con_micro">
                                 <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('actividades-grupo')"></i>
                             </div>
                         </div>
@@ -419,7 +419,10 @@
                     <h1 class="titulos-modal">
                         <i id="iconos-modal" class="fa-solid fa-pen-nib"></i> DESCRIPCIÓN
                     </h1>
-                    <input type="text" name="Descripcion">
+                    <div class="input-container-micro"> 
+                        <input type="text" name="Descripcion" placeholder="Descripcion" id="Descripcion" class="Input_con_micro">
+                        <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('Descripcion')"></i>
+                    </div>
 
                     <!-- Modal Footer -->
                     <div class="modal-footer">
@@ -478,7 +481,7 @@
                             <i id="iconos-modal" class="fa-solid fa-id-card"></i> INSTITUCIÓN EMISORA
                         </h1>
                     <div class="input-container-micro"> 
-                        <input type="text" name="empresa_emisora" placeholder="Certificado" id="cud" class="Input_con_micro">
+                        <input type="text" name="empresa_emisora" placeholder="Institucion emisora" id="cud" class="Input_con_micro">
                         <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('cud')"></i>
                     </div>
 
@@ -510,7 +513,8 @@
                         </div>
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" id="myfile" name="myfile">
-                        <label class="custom-file-label" for="myfile">Subir Archivo..</label>
+                        <label class="custom-file-label" for="myfile" id="subirfile">Subir Archivo..</label>
+                        <p> mouseover
                         <div class="invalid-feedback">No fue posible seleccionar ese archivo</div>
                     </div>
                     <div class="modal-footer">
@@ -546,7 +550,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header-educacion">
-                <h5 class="modal-title">Certificaciones</h5>
+                <h5 class="modal-title">CERTIFICACIONES</h5>
             </div>
             <div class="modal-body">
                 <form action='@Url.Action("InsertarCertificaciones")' method="post" id="ModalCertificacionForm">
@@ -668,21 +672,25 @@
     
     <script>
     window.onload = () => {
-    console.log("Página cargada!");
-    setTimeout(function() {
-        console.log("Iniciando el text-to-speech...");
-        text_to_speech('Bienvenido @Model.nombre_apellido');
-        setupPersonalListeners();
-        setupEducacionListeners();
-        setupAdaptacionListeners();
-        setupCUDListeners();
-        setupIdiomaListeners();
-        setupCertificacionesListeners();
-        setupPlussListeners();
-        AbrirFiles();
-        BorrarVoz(item);
-    }, 200); // 4.5 segundos
-};
+        console.log("Página cargada!");
+        setTimeout(function() {
+            console.log("Iniciando el text-to-speech...");
+            text_to_speech('Bienvenido @Model.nombre_apellido');
+            setupPersonalListeners();
+            setupEducacionListeners();
+            setupAdaptacionListeners();
+            setupCUDListeners();
+            setupIdiomaListeners();
+            setupCertificacionesListeners();
+            setupPlussListeners();
+            AbrirFiles();
+            BorrarVoz(item);
+            document.getElementById('subirfile').addEventListener('mouseover', function() {
+                text_to_speech('Subir archivo ');
+                console.log("sbir file") // arreglar esto
+            });
+        }, 200); // 4.5 segundos
+    };
     function handleFiles(files) {
     console.log('handleFiles function called');
     const fileList = document.getElementById('fileList');
@@ -927,6 +935,7 @@ function setupEducacionListeners() {
 
         document.querySelectorAll('#ModalEducacionForm input').forEach(input => {
             input.removeEventListener('focus', handleInputFocus);
+            console.log(input, " listener");
             input.addEventListener('focus', handleInputFocus);
         });
 
@@ -957,10 +966,12 @@ function setupAdaptacionListeners() {
 
 function setupCUDListeners() {
     const modalcudd = document.getElementById('ModalCUD');
+    console.log("hola");
 
     $(modalcudd).on('shown.bs.modal', function () {
         text_to_speech('Certificacion de discapacidad');
-        document.querySelectorAll('#form-modal-personal input').forEach(input => {
+
+        document.querySelectorAll('#ModalCudForm input').forEach(input => {
             input.removeEventListener('focus', handleInputFocus); 
             input.addEventListener('focus', handleInputFocus);
         });
@@ -971,7 +982,7 @@ function setupIdiomaListeners() {
 
     $(modalIdioma).on('shown.bs.modal', function () {
         text_to_speech('Idioma');
-        document.querySelectorAll('#form-modal-personal input').forEach(input => {
+        document.querySelectorAll('#ModalIdiomaForm input').forEach(input => {
             input.removeEventListener('focus', handleInputFocus); 
             input.addEventListener('focus', handleInputFocus);
         });
@@ -1000,6 +1011,7 @@ function setupPlussListeners() {
     });
 }
 
+            
 function AbrirFiles() {
     text_to_speech("Seleccionar archivos deseados!");
 }
