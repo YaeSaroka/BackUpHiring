@@ -45,7 +45,7 @@
                 </div>
             </div>  
             </a>
-           <div class="upload-container" id="fileList" style="position: relative; display: inline-block;">
+           <div class="upload-container" id="fileList" style="position: relative; display: inline-block;" onclick="AbrirFiles()">
                 <img class="img_upload_archivos" src="../img/componente/subir_archivo.png" alt="Subir Archivos" class="upload-image" onclick="document.getElementById('fileInput').click()">
                 <input type="file" id="fileInput" multiple style="display: none;" accept=".png, .jpg, .jpeg, .pdf, .txt, .mp3, .mp4" onchange="handleFiles(this.files)">
                 <a data-bs-toggle="modal" data-bs-target="#modal_plus">
@@ -62,7 +62,7 @@
                             <i class="fa-solid fa-graduation-cap"></i>
                             <div class="titulo_educacion">@item.titulo - @item.nombre_institucion</div> 
                             <i class="fa-solid fa-edit editar-icono" data-id="@item.id"></i>
-                            <i class="fa-solid fa-trash eliminar-icono" data-id="@item.id"></i>
+                            <i class="fa-solid fa-trash eliminar-icono" data-id="@item.id" onclick="BorrarVoz('educaciones')"></i>
                         </div>
                         <div class="fecha_educacion">( @item.fecha_expedicion - @item.fecha_caducidad )</div>
                         <div class="descripcion_educacion">@item.descripcion</div>
@@ -107,7 +107,7 @@
                                     <div class="descripcion_adaptacion">@ViewBag.Adaptacion.nombre</div>
                                 </div>
                                 <i class="fa-solid fa-edit editar-icono-adaptacion" data-id="@ViewBag.Adaptacion.id"></i>
-                                <i class="fa-solid fa-trash eliminar-icono-adaptacion" data-id="@ViewBag.Adaptacion.id"></i>
+                                <i class="fa-solid fa-trash eliminar-icono-adaptacion" data-id="@ViewBag.Adaptacion.id" onclick="BorrarVoz('necesidades')"></i>
                             </div>
                         </div>
                     }
@@ -137,7 +137,7 @@
                                             </div>
                                         </div>
                                     <i class="fa-solid fa-edit editar-icono-cud" data-id="@ViewBag.cud.id"></i>
-                                    <i class="fa-solid fa-trash eliminar-icono-cud" data-id="@ViewBag.cud.id"></i>
+                                    <i class="fa-solid fa-trash eliminar-icono-cud" data-id="@ViewBag.cud.id" onclick="BorrarVoz('cud')"></i>
                                 </div>
                                 <div class="descargar-archivo" data-id="@ViewBag.cud.id">
                                     <a href="@ViewBag.cud.url_" download class="btn btn-success descargar " style="background-color:@Model.estilo; border-color: @Model.estilo; margin-top:10px">
@@ -171,7 +171,7 @@
                             <div class="titulo_educacion">@item.titulo - @item.empresa_emisora
                             </div> 
                             <i class="fa-solid fa-edit editar-icono-certificacion" data-id="@item.id"></i>
-                            <i class="fa-solid fa-trash eliminar-icono-certificacion" data-id="@item.id"></i>
+                            <i class="fa-solid fa-trash eliminar-icono-certificacion" data-id="@item.id" onclick="BorrarVoz('certificaciones')"></i>
                         </div>
                         <div class="fecha_educacion">( @item.fecha_expedicion - @item.fecha_caducidad )</div>
                         <div class="detalles_educacion">
@@ -205,7 +205,7 @@
                                     <div class="descripcion_adaptacion">@ViewBag.idioma.nombre</div>
                                 </div>
                                 <i class="fa-solid fa-edit editar-icono-idioma" data-id="@ViewBag.idioma.id"></i>
-                                <i class="fa-solid fa-trash eliminar-icono-idioma" data-id="@ViewBag.idioma.id"></i>
+                                <i class="fa-solid fa-trash eliminar-icono-idioma" data-id="@ViewBag.idioma.id" onclick="BorrarVoz('idioma')"></i>
                             </div>
                         </div>
             }
@@ -332,13 +332,18 @@
                     <h1 class="titulos-modal">
                         <i id="iconos-modal" class="fa-solid fa-id-card"></i> NOMBRE
                     </h1>
-                    <input type="text" name="titulo">
+                    <div class="input-container-micro"> 
+                        <input type="text" name="titulo" placeholder="NOMBRE" id="NOMBRE" class="Input_con_micro">
+                        <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('NOMBRE')"></i>
+                    </div>
 
                     <h1 class="titulos-modal">
                         <i id="iconos-modal" class="fa-solid fa-school"></i> INSTITUCIÓN EDUCATIVA
                     </h1>
-                    <input type="text" name="nombre_institucion">
-
+                    <div class="input-container-micro"> 
+                        <input type="text" name="nombre_institucion" placeholder="NOMBRE" id="Nombre_Institucion" class="Input_con_micro">
+                        <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('Nombre_Institucion')"></i>
+                    </div>
                     <!-- Información Adicional -->
                     <div class="modal-separador-educacion">
                         <h5 class="modal-title-separador">++ INFORMACIÓN</h5>
@@ -392,8 +397,9 @@
                                 <i class="fa-solid fa-user-graduate"></i> 
                                 <label for="disciplina-academica">DISCIPLINA ACADÉMICA</label>
                             </div>
-                            <div class="fecha-selectores">
-                                <input id="disciplina-academica" type="text" name="disciplina_academica">
+                            <div class="fecha-selectores">  
+                                <input id="disciplina-academica" type="text" name="disciplina_academica" placeholder="Institucion" class="Input_con_micro">
+                                <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('disciplina-academica')"></i>
                             </div>
                         </div>
 
@@ -403,7 +409,8 @@
                                 <label for="actividades-grupo">ACTIVIDADES DE GRUPO</label>
                             </div>
                             <div class="fecha-selectores">
-                                <input id="actividades-grupo" type="text" name="actividades_grupo">
+                                <input id="actividades-grupo" type="text" name="actividades_grupo" placeholder="Institucion" class="Input_con_micro">
+                                <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('actividades-grupo')"></i>
                             </div>
                         </div>
                     </div>
@@ -440,7 +447,11 @@
                     <h1 class="titulos-modal">
                         <i id="iconos-modal" class="fa-solid fa-pen-nib"></i> ESCRIBÍ UN PÁRRAFO ENUMERANDO TUS NECESIDADES DE ADAPTACION
                     </h1>
-                    <input type="text" name="nombre" id="nombre" oninput="mostrarSugerenciasAdaptacion()" placeholder="TUS NECESIDADES">
+                    <div class="input-container-micro"> 
+                        <input type="text" name="nombre" id="nombre" oninput="mostrarSugerenciasAdaptacion()" placeholder="TUS NECESIDADES" class="Input_con_micro">
+                        <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('nombre')"></i>
+                    </div>
+                    
                     <div id="sugerencias-container-adaptacion">
                     </div>
                     <div class="modal-footer-adaptacion">
@@ -466,7 +477,12 @@
                         <h1 class="titulos-modal">
                             <i id="iconos-modal" class="fa-solid fa-id-card"></i> INSTITUCIÓN EMISORA
                         </h1>
-                    <input type="text" name="empresa_emisora">
+                    <div class="input-container-micro"> 
+                        <input type="text" name="empresa_emisora" placeholder="Certificado" id="cud" class="Input_con_micro">
+                        <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('cud')"></i>
+                    </div>
+
+                    
                         <!-- FECHAS -->
                         <div class="fecha-contenedor">
                             <div class="fecha-header">
@@ -539,25 +555,35 @@
                     <h1 class="titulos-modal">
                         <i id="iconos-modal" class="fa-solid fa-pen-nib"></i> TITULO
                     </h1>
-                    <input type="text" name="titulo">
+                    <div class="input-container-micro"> 
+                        <input type="text" name="titulo" placeholder="Certificado" id="titulo_" class="Input_con_micro">
+                        <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('titulo_')"></i>
+                    </div>
+
+                    
                     <h1 class="titulos-modal">
                         <i id="iconos-modal" class="fa-solid fa-id-card"></i> EMPRESA EMISORA
                     </h1>
-                    <input type="text" name="empresa_emisora">
+                    <div class="input-container-micro"> 
+                        <input type="text" name="empresa_emisora" placeholder="Empresa emisora" id="empresa_emisora_cert" class="Input_con_micro">
+                        <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('empresa_emisora_cert')"></i>
+                    </div>
                     <div class="fecha-campo">
                         <div class="fecha-titulo">
                             <i class="fa-solid fa-circle-info"></i>
                             <label for="id_credencial">ID DE LA CREDENCIAL</label>
                         </div>
                         <div class="fecha-selectores">
-                            <input id="id_credencial" type="text" name="id_credencial">
+                            <input id="id_credencial" type="text" name="id_credencial" class="Input_con_micro">
+                            <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('empresa_emisora_cert')"></i>
                         </div>
                         <div class="fecha-titulo">
                             <i class="fa-solid fa-circle-info"></i>
                             <label for="url_credencial">URL DE LA CREDENCIAL</label>
                         </div>
                         <div class="fecha-selectores">
-                            <input id="url_credencial" type="text" name="url_credencial">
+                            <input id="url_credencial" type="text" name="url_credencial" class="Input_con_micro">
+                            <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('empresa_emisora_cert')"></i>
                         </div>
                     </div>
                     <div class="fecha-contenedor">
@@ -605,7 +631,11 @@
                     <h1 class="titulos-modal">
                         <i id="iconos-modal" class="fa-solid fa-pen-nib"></i> INSERTÁ TUS IDIOMAS
                     </h1>
-                    <input type="text" name="nombre" id="nombreIdioma" oninput="mostrarSugerenciasIdioma()" placeholder="IDIOMAS">
+                    <div class="input-container-micro"> 
+                        <input type="text" name="nombre" id="nombreIdioma" oninput="mostrarSugerenciasIdioma()" placeholder="IDIOMAS" class="Input_con_micro">
+                        <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('nombreIdioma')"></i>
+                    </div>
+                    
                     <div id="sugerencias-container-idioma"></div>
                     <div class="modal-footer-adaptacion">
                         <button type="button" onclick="AgregarIdioma()" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary">GUARDAR</button>
@@ -634,7 +664,25 @@
     @{
         var modelId = Model.id;
     }
+
+    
     <script>
+    window.onload = () => {
+    console.log("Página cargada!");
+    setTimeout(function() {
+        console.log("Iniciando el text-to-speech...");
+        text_to_speech('Bienvenido @Model.nombre_apellido');
+        setupPersonalListeners();
+        setupEducacionListeners();
+        setupAdaptacionListeners();
+        setupCUDListeners();
+        setupIdiomaListeners();
+        setupCertificacionesListeners();
+        setupPlussListeners();
+        AbrirFiles();
+        BorrarVoz(item);
+    }, 200); // 4.5 segundos
+};
     function handleFiles(files) {
     console.log('handleFiles function called');
     const fileList = document.getElementById('fileList');
@@ -840,6 +888,241 @@ function EliminarElemento(button) {
         }
     });
 }
+
+
+/////////////////////api nativa web speech, text-to-speech y viceversa//////////////////////
+
+
+function text_to_speech(text) {
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = 'es-ES'; 
+    window.speechSynthesis.speak(speech);
+}
+
+function BorrarVoz(item){
+    console.log(item);
+    text_to_speech("Idiomas borrados")
+}
+
+
+
+function setupPersonalListeners() {
+    const modalForm = document.getElementById('ModalForm');
+
+    $(modalForm).on('shown.bs.modal', function () {
+        text_to_speech('Información Personal');
+        document.querySelectorAll('#form-modal-personal input').forEach(input => {
+            input.removeEventListener('focus', handleInputFocus); 
+            input.addEventListener('focus', handleInputFocus);
+        });
+    });
+}
+
+function setupEducacionListeners() {
+    const modalEducacion = document.getElementById('ModalEducacion');
+    console.log("modal education");
+    $('#ModalEducacion').on('shown.bs.modal', function () {
+        text_to_speech('Educación');
+        console.log("setupEducacionListeners")
+
+        document.querySelectorAll('#ModalEducacionForm input').forEach(input => {
+            input.removeEventListener('focus', handleInputFocus);
+            input.addEventListener('focus', handleInputFocus);
+        });
+
+        document.querySelectorAll('#modal-educacion select').forEach(select => {
+            select.removeEventListener('focus', handlesFechasFocus);
+            select.addEventListener('focus', handlesFechasFocus);
+        });
+    });
+}
+
+function setupAdaptacionListeners() {
+    const modalAdaptacion = document.getElementById('ModalAdaptacion');
+    $(modalAdaptacion).on('shown.bs.modal', function () {
+        console.log('Modal Adaptacion shown');  
+        text_to_speech('Adaptación');
+
+        document.querySelectorAll('#modal-adaptacion input').forEach(input => {
+            input.removeEventListener('focus', handleInputFocus);
+            input.addEventListener('focus', handleInputFocus);
+        });
+
+        document.querySelectorAll('#modal-adaptacion select').forEach(select => {
+            select.removeEventListener('focus', handlesFechasFocus);
+            select.addEventListener('focus', handlesFechasFocus);
+        });
+    });
+}
+
+function setupCUDListeners() {
+    const modalcudd = document.getElementById('ModalCUD');
+
+    $(modalcudd).on('shown.bs.modal', function () {
+        text_to_speech('Certificacion de discapacidad');
+        document.querySelectorAll('#form-modal-personal input').forEach(input => {
+            input.removeEventListener('focus', handleInputFocus); 
+            input.addEventListener('focus', handleInputFocus);
+        });
+    });
+}
+function setupIdiomaListeners() {
+    const modalIdioma = document.getElementById('ModalIdioma');
+
+    $(modalIdioma).on('shown.bs.modal', function () {
+        text_to_speech('Idioma');
+        document.querySelectorAll('#form-modal-personal input').forEach(input => {
+            input.removeEventListener('focus', handleInputFocus); 
+            input.addEventListener('focus', handleInputFocus);
+        });
+    });
+}
+function setupCertificacionesListeners() {
+    const modalcert = document.getElementById('modal_certificaciones');
+
+    $(modalcert).on('shown.bs.modal', function () {
+        text_to_speech('Certificaciones');
+        document.querySelectorAll('#form-modal-personal input').forEach(input => {
+            input.removeEventListener('focus', handleInputFocus); 
+            input.addEventListener('focus', handleInputFocus);
+        });
+    });
+}
+function setupPlussListeners() {
+    const modalpluss = document.getElementById('modal_plus');
+
+    $(modalpluss).on('shown.bs.modal', function () {
+        text_to_speech('MÁS OPCIONES, DESTACATE');
+        document.querySelectorAll('#form-modal-personal input').forEach(input => {
+            input.removeEventListener('focus', handleInputFocus); 
+            input.addEventListener('focus', handleInputFocus);
+        });
+    });
+}
+
+function AbrirFiles() {
+    text_to_speech("Seleccionar archivos deseados!");
+}
+
+// GENERAL HANDLES
+function handleInputFocus(event) {
+    const input = event.target;
+    const placeholder = input.getAttribute('placeholder');
+    console.log('Focus on input:', placeholder); 
+    if (placeholder) {
+        const message = `Ingresa. ${placeholder}. Si desea hablar, toque el micrófono`;
+        text_to_speech(message);
+    }
+}
+
+function handlesFechasFocus(event) {
+    const select = event.target;
+    const placeholder = select.getAttribute('placeholder');
+    console.log('Focus on select:', placeholder); 
+    if (placeholder) {
+        const message = `Ingresa. ${placeholder}`;
+        text_to_speech(message);
+    }
+}
+
+
+
+function setUpMic(inputId) {
+    console.log("debug: función setUpMic para el input", inputId);
+    text_to_speech("Hable");
+    let transcriptToConfirm = '';
+    const hasSpeechRecognition = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window; 
+    if (hasSpeechRecognition) {
+        // Crear nueva instancia de reconocimiento cada vez
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'es-ES';
+        recognition.interimResults = false;
+         setTimeout(function() {
+                recognition.start();
+            }, 1000); //2 segunditos
+        
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript.toLowerCase();
+            console.log("holis")
+            transcriptToConfirm = transcript; // Guardar la transcripción para confirmación
+
+            text_to_speech(`El texto transcrito es: ${transcript}. ¿Es correcto? Diga "sí" para confirmar o "no" para repetir.`);
+            console.log(transcriptToConfirm);
+            recognition.stop();
+
+            setTimeout(function() {
+                startConfirmationMic(inputId, transcriptToConfirm); // Iniciar confirmación
+            }, 8000); //10 segunditos
+        }; // Aquí termina onresult
+
+        recognition.onspeechend = function() {
+            recognition.stop(); 
+        };
+
+        recognition.onerror = function(event) {
+            console.error('Error de reconocimiento:', event.error);
+            text_to_speech('Error al reconocer la voz. Inténtelo de nuevo.');
+        };
+    } // Cierre del if
+} 
+
+function startConfirmationMic(inputId, transcriptToConfirm) {
+    const confirmationRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    confirmationRecognition.lang = 'es-ES';
+    confirmationRecognition.interimResults = false;
+
+    confirmationRecognition.start();
+
+    confirmationRecognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        const afirmativo = ['si', 'correcto.', 'sí.', 'sí', 'sí sí']; 
+        const negativo = ['no', 'incorrecto.', 'no.', 'no no'];
+
+        console.log(transcript);
+
+        // Confirmación positiva
+       if (afirmativo.includes(transcript)) {
+            text_to_speech('Gracias. Continuamos.');
+            //rreeeemplazar el texto q se escuchó
+            const inputField = document.getElementById(inputId);
+            console.log("fuera del if ",transcriptToConfirm);
+            if (inputField) {
+                console.log("dentro del if ",transcriptToConfirm);
+                inputField.value = transcriptToConfirm; // asignar el valor confirmado al input
+            }
+
+            confirmationRecognition.stop();  // Detener el reconocimiento de confirmación (la api de voz)
+
+        } else if (negativo.includes(transcript)) {
+            text_to_speech('Entendido, repita su respuesta.');
+            confirmationRecognition.stop(); 
+
+            setTimeout(function() {
+                console.log(transcriptToConfirm, " antes del setup del no");
+                setUpMic(inputId); 
+            }, 3000);
+        } else if(!negativo.includes(transcript) || !afirmativo.includes(transcript)) {
+            text_to_speech('No entendí su respuesta. Por favor, repita, "si" o "no"');
+            confirmationRecognition.stop();
+
+            setTimeout(function() {
+                startConfirmationMic(inputId); 
+            }, 3000);
+        }
+    }; // Aquí termina onresult
+
+    confirmationRecognition.onspeechend = function() {
+        confirmationRecognition.stop();
+    };
+
+    confirmationRecognition.onerror = function(event) {
+        console.error('Error de reconocimiento en la confirmación:', event.error);
+        text_to_speech('Error al reconocer la voz. Inténtelo de nuevo.');
+    };
+}  // fin confirmacionnn
+
+document.querySelector("#record-icon").addEventListener("click", setUpMic);
 
 
 </script>
