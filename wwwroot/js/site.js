@@ -626,4 +626,35 @@ function agregarSugerenciaAdaptacion(sugerencia) {
     if (input.value.endsWith(', ')) { input.value = input.value.slice(0, -2);
 }}
 
+function AgregarAdaptacion()
+{
+    
+    
+    var idInfoEmpleado = $("#id_info_empleado").val(); // Asigna el valor manualmente
+    var nombreAdaptacion = $("#nombreAdaptacion").val(); // Asigna el valor manualmente
+    
+    console.log("ID Info Empleado: ", idInfoEmpleado);
 
+    $.ajax({
+        url: '/Home/InsertarAdaptacion/', 
+        type: 'POST',
+        data: {idEmpleado: idInfoEmpleado, nombre: nombreAdaptacion },
+        success: function(response) {
+            var textohtml = '<div class="adaptacion1_container" data-id="' + response.idadaptacion + '">';
+            textohtml += '<div class="header_adaptacion">';
+            textohtml += '<img src="../img/componente/icono.png" alt="icono" class="icono-adaptacion-img">';
+            textohtml += '<div class="titulo_adaptacion">NECESIDADES DE ADAPTACIÓN';
+            textohtml += '<div class="descripcion_adaptacion">' + nombreAdaptacion + '</div>';
+            textohtml += '</div>';
+            textohtml += '<i class="fa-solid fa-edit editar-icono-adaptacion" data-id="' + response.idadaptacion + '"></i>';
+            textohtml += '<i class="fa-solid fa-trash eliminar-icono-adaptacion" data-id="' + response.idadaptacion + '"></i>';
+            textohtml += '</div>';
+            textohtml += '</div>';
+            $("#AdaptacionContainer").html(textohtml);
+            $('#ModalAdaptacion').modal('hide');
+        },
+        error: function(error) {
+            console.log("Error: ", error);
+        }
+    });
+};

@@ -434,17 +434,17 @@
                 <h5 class="modal-title">Necesidades De Adaptación</h5>
             </div>
             <div class="modal-body" id="modal-adaptacion">
-                <form action='@Url.Action("InsertarAdaptacion")' method="post" id="ModalAdaptacionForm">
+                <form  id="ModalAdaptacionForm">
                     <input type="hidden" name="id" id="id" value="">
                     <input type="hidden" name="id_info_empleado" id="id_info_empleado" value="@Model.id">
                     <h1 class="titulos-modal">
                         <i id="iconos-modal" class="fa-solid fa-pen-nib"></i> ESCRIBÍ UN PÁRRAFO ENUMERANDO TUS NECESIDADES DE ADAPTACION
                     </h1>
-                    <input type="text" name="nombre" id="nombre" oninput="mostrarSugerenciasAdaptacion()" placeholder="TUS NECESIDADES">
+                    <input type="text" name="nombre" id="nombreAdaptacion" oninput="mostrarSugerenciasAdaptacion()" placeholder="TUS NECESIDADES">
                     <div id="sugerencias-container-adaptacion">
                     </div>
                     <div class="modal-footer-adaptacion">
-                        <button type="submit" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary">Guardar</button>
+                        <button type="button" onclick="AgregarAdaptacion()" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary">GUARDAR</button>
                     </div>
                 </form>
             </div>

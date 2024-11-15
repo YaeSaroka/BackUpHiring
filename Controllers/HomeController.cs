@@ -256,22 +256,13 @@ public class HomeController : Controller
         }
     }
     [HttpPost]
-    public IActionResult InsertarAdaptacion(Necesidad adaptacion, int Id_Info_Empleado, int id)
+    public JsonResult InsertarAdaptacion(string nombre_adaptacion, int Id_Info_Empleado)
     {
-        if (id != 0 || id==0)
-        {
-            Models.BD.InsertarAdaptacion(adaptacion, Id_Info_Empleado);
-        }
-        Necesidad adaptacion_ = Models.BD.SelectAdaptacion(Id_Info_Empleado);
-        ViewBag.Adaptacion = adaptacion_;
-        ViewBag.UrlMultimedia=Models.BD.SelectMultimedia(Id_Info_Empleado);
-        ViewBag.Lista_educacion = Models.BD.SelectEducacion(Id_Info_Empleado);
-        ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
-        ViewBag.cud = Models.BD.SelectCUD(Id_Info_Empleado);
-        ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
-        ViewBag.idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
-        Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
-        return View("PerfilLee", perfilActualizado);
+        int AdaptacionElegida =0;
+        Necesidad adaptacionaBuscar = new Necesidad();
+        adaptacionaBuscar.nombre= nombre_adaptacion;
+        AdaptacionElegida = Models.BD.InsertarAdaptacion(adaptacionaBuscar, Id_Info_Empleado);
+        return Json(new {success=true, idadaptacion=AdaptacionElegida});
     }
     public IActionResult EliminarAdaptacion(int Id_Info_Empleado, int id)
     {
@@ -482,9 +473,7 @@ public JsonResult EliminarArchivo(int id)
     public JsonResult InsertarIdioma(string nombre, int idEmpleado)
     {
         int IdiomaElegido =0;
-        Idioma idiomaaBuscar = new Idioma();
-        idiomaaBuscar.nombre = nombre;
-        
+        Idioma idiomaaBuscar = new Idioma{nombre=nombre};
         IdiomaElegido = Models.BD.InsertarIdioma(idiomaaBuscar, idEmpleado);
 
         return Json(new { success = true,  ididioma = IdiomaElegido});
