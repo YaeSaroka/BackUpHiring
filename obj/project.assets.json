@@ -555,11 +555,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\devandroid\\BackUpHiring\\Hiring.csproj",
+      "projectUniqueName": "C:\\Users\\devandroid\\Documents\\BackUpHiring\\Hiring.csproj",
       "projectName": "Hiring",
-      "projectPath": "C:\\Users\\devandroid\\BackUpHiring\\Hiring.csproj",
+      "projectPath": "C:\\Users\\devandroid\\Documents\\BackUpHiring\\Hiring.csproj",
       "packagesPath": "C:\\Users\\devandroid\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\devandroid\\BackUpHiring\\obj\\",
+      "outputPath": "C:\\Users\\devandroid\\Documents\\BackUpHiring\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -629,7 +629,11 @@
             "privateAssets": "all"
           }
         },
+<<<<<<< HEAD
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
+=======
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+>>>>>>> 83f7b05eb77c32d271ece8c1d4fb4e4d9759115e
       }
     }
   }

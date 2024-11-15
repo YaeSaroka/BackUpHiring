@@ -1,8 +1,4 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-
-
+﻿
 <body id="fondo_fondo">
     <section id="Box">
         <form action='@Url.Action("Login")' method="post" id="form_login">
@@ -14,7 +10,11 @@
                 <div class="input-container">
                     <i class="fas fa-envelope"></i>
                     <label for="email">Email</label>
-                    <input type="email" name="Mail" id="email" placeholder="Mail" value="sarah_maqui@gmail.com" required />
+                    <div class="input-container-micro"> 
+                        <input type="email" name="Mail" id="email" placeholder="Mail" value="sarah_maqui@gmail.com" class="Input_con_micro" required />
+                        <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('email')"></i>
+                    </div>
+                    
                     <span id="emailError" class="error"> 
                         @if (ViewBag.MensajeError != null)
                         {
@@ -25,45 +25,182 @@
                 <div class="input-container">
                     <i class="fas fa-lock"></i>
                     <label for="password">Contraseña</label>
-                    <div class="password-container">
-                        <input type="password" name="Contraseña" id="password" placeholder="Contraseña" value="123645" required />
+                    <div class="password-container"> 
+                        <input type="password" name="Contraseña" id="password" placeholder="Contraseña" value="123645" class="Input_con_micro" required />
+                        <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('password')"></i>
+                    
                         <span id="toggle-password" class="password-toggle">
-                            <p class="mostrar_login"> Mostrar </p>
+                            <p class="mostrar_login">Mostrar</p>
                         </span>     
                     </div>
                     <p class="forgot-password">
-                        <a href='@Url.Action("OlvideContrasena")' onclick="toggleForm();">¿Olvidaste la contraseña?</a>
+                        <a href='@Url.Action("OlvideContrasena")' id="forgot-password">¿Olvidaste la contraseña?</a>
                     </p>
                 </div>
 
                 <button id="butttt">Inicia sesión</button>
-               <div id="sign-up-box">
-                  <p class="cuenta">¿No tienes cuenta? <a href='@Url.Action("Registro")' onclick="toggleForm();" class="sign-up-link">Regístrate aquí</a></p>
+                <div id="sign-up-box">
+                    <p class="cuenta">¿No tienes cuenta? <a href='@Url.Action("Registro")' id="sign-up">Regístrate aquí</a></p>
                 </div>
             </div>
         </form>
     </section>
-
     
+    <script>
+        
+        function text_to_speech(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'es-ES'; 
+            window.speechSynthesis.speak(speech);
+        }
+
+        window.onload = () => {
+            console.log("window.onload");
+            setTimeout(function() {
+                text_to_speech('Bienvenido a Hiring');
+                console.log("timeout")
+            }, 4500); //4,5 segunditos
+        
+            
+
+            document.getElementById('toggle-password').addEventListener('click', function () {
+                const passwordField = document.getElementById('password');
+                const passwordToggle = document.getElementById('toggle-password').querySelector('p');
+
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    passwordToggle.textContent = 'Ocultar';
+                } else {
+                    passwordField.type = 'password';
+                    passwordToggle.textContent = 'Mostrar';
+                }
+            });
+
+            document.querySelectorAll('#form_login input').forEach(input => { // dice cada que vex que tocas un inputt, a la hora de poenr algo
+                input.addEventListener('focus', function(event) {
+                    const placeholder = input.getAttribute('placeholder');
+                    if (placeholder) {
+                        text_to_speech(`Ingresa ${placeholder}`);
+                        console.log(placeholder)
+                    }
+                });
+            });
+
+            document.getElementById('forgot-password').addEventListener('mouseover', function() {
+                text_to_speech('Recuperar contraseña? ');
+                console.log("recup?")
+            });
+            document.getElementById('sign-up').addEventListener('mouseover', function() {
+                text_to_speech('Registro? ');
+                console.log("regsitro?")
+            });
+             document.getElementById('butttt').addEventListener('mouseover', function() {
+                text_to_speech('¿Iniciar sesión?');
+                console.log("inciar sesion?")
+            });
+        };
+
+
+
+
+        // SPEECH-TO-TEXT
+        
+function setUpMic(inputId) {
+    console.log("debug: función setUpMic para el input", inputId);
+    text_to_speech("Hable");
+    let transcriptToConfirm = '';
+    const hasSpeechRecognition = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window; 
+    if (hasSpeechRecognition) {
+        // Crear nueva instancia de reconocimiento cada vez
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'es-ES';
+        recognition.interimResults = false;
+         setTimeout(function() {
+                recognition.start();
+            }, 1000); //2 segunditos
+        
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript.toLowerCase();
+            console.log("holis")
+            transcriptToConfirm = transcript; // Guardar la transcripción para confirmación
+
+            text_to_speech(`El texto transcrito es: ${transcript}. ¿Es correcto? Diga "sí" para confirmar o "no" para repetir.`);
+            console.log(transcriptToConfirm);
+            recognition.stop();
+
+            setTimeout(function() {
+                startConfirmationMic(inputId, transcriptToConfirm); // Iniciar confirmación
+            }, 8000); //10 segunditos
+        }; // Aquí termina onresult
+
+        recognition.onspeechend = function() {
+            recognition.stop(); 
+        };
+
+        recognition.onerror = function(event) {
+            console.error('Error de reconocimiento:', event.error);
+            text_to_speech('Error al reconocer la voz. Inténtelo de nuevo.');
+        };
+    } // Cierre del if
+} 
+
+function startConfirmationMic(inputId, transcriptToConfirm) {
+    const confirmationRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    confirmationRecognition.lang = 'es-ES';
+    confirmationRecognition.interimResults = false;
+
+    confirmationRecognition.start();
+
+    confirmationRecognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        const afirmativo = ['si', 'correcto.', 'sí.', 'sí', 'sí sí']; 
+        const negativo = ['no', 'incorrecto.', 'no.', 'no no'];
+
+        console.log(transcript);
+
+        // Confirmación positiva
+       if (afirmativo.includes(transcript)) {
+            text_to_speech('Gracias. Continuamos.');
+            //rreeeemplazar el texto q se escuchó
+            const inputField = document.getElementById(inputId);
+            console.log("fuera del if ",transcriptToConfirm);
+            if (inputField) {
+                if(inputId === 'password'){
+                    transcriptToConfirm = transcriptToConfirm.replaceAll(" ", "");
+                }
+                console.log("dentro del if ",transcriptToConfirm);
+                inputField.value = transcriptToConfirm; // asignar el valor confirmado al input
+            }
+
+            confirmationRecognition.stop();  // Detener el reconocimiento de confirmación (la api de voz)
+
+        } else if (negativo.includes(transcript)) {
+            text_to_speech('Entendido, repita su respuesta.');
+            confirmationRecognition.stop(); 
+            setTimeout(function() {
+                console.log(transcriptToConfirm, " antes del setup del no");
+                setUpMic(inputId); 
+            }, 3000);
+        } else if(!negativo.includes(transcript) || !afirmativo.includes(transcript)) {
+            text_to_speech('No entendí su respuesta. Por favor, repita, "si" o "no"');
+            confirmationRecognition.stop();
+
+            setTimeout(function() {
+                startConfirmationMic(inputId); 
+            }, 3000);
+        }
+    }; // Aquí termina onresult
+
+    confirmationRecognition.onspeechend = function() {
+        confirmationRecognition.stop();
+    };
+
+    confirmationRecognition.onerror = function(event) {
+        console.error('Error de reconocimiento en la confirmación:', event.error);
+        text_to_speech('Error al reconocer la voz. Inténtelo de nuevo.');
+    };
+}  // fin confirmacionnn
+
+    </script>
 </body>
-
-
- 
-<script>
-    document.getElementById('toggle-password').addEventListener('click', function () {
-    const passwordField = document.getElementById('password');
-    const passwordToggle = document.getElementById('toggle-password').querySelector('i');
-
-    if (passwordField.type === 'password') {
-        passwordField.type = 'text';
-        passwordToggle.classList.remove('fa-eye');
-        passwordToggle.classList.add('fa-eye-slash');
-    } else {
-        passwordField.type = 'password';
-        passwordToggle.classList.remove('fa-eye-slash');
-        passwordToggle.classList.add('fa-eye');
-    }
-});
-
-
-</script>

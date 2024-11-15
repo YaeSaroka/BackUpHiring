@@ -1,8 +1,12 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "ItZelNcsmU4=",
+=======
+  "dgSpecHash": "I8iSatV8M1GwtrsJqHw0aNDmRJ8fwkylMh7u3VknTJLei7jalC5GHliDYIDY4razfyV4EgchfFYxqFnD6lKZig==",
+>>>>>>> 83f7b05eb77c32d271ece8c1d4fb4e4d9759115e
   "success": true,
-  "projectFilePath": "C:\\Users\\devandroid\\BackUpHiring\\Hiring.csproj",
+  "projectFilePath": "C:\\Users\\devandroid\\Documents\\BackUpHiring\\Hiring.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\devandroid\\.nuget\\packages\\dapper\\2.1.35\\dapper.2.1.35.nupkg.sha512",
     "C:\\Users\\devandroid\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
