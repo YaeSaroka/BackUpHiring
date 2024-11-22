@@ -1,0 +1,490 @@
+@using Hiring.Models
+@model Informacion_Personal_Empleado
+
+@{ 
+    ViewData["Title"] = "PerfilNoLee";
+}
+
+<script>
+function text_to_speech(text) {
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = 'es-ES'; 
+    window.speechSynthesis.speak(speech);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    text_to_speech('Bienvenido a Hiring.... Inicio');
+    setTimeout(function() {
+        text_to_speech('Izquierda Información Personal, abajo experiencia. Derecha educación, abajo necesidades de adaptación.');
+    }, 4000);
+});
+
+document.querySelectorAll('.cuadro span').forEach(span => { 
+    span.addEventListener('focus', function() {
+        const propiedad = span.textContent.trim();
+        if (propiedad) {
+            text_to_speech(`${propiedad}, ¿entrar?`);
+        }
+    });
+});
+
+let usandoOpcionesAlternativas = false;
+
+function cambiarOpciones() {
+    const cuadros = document.querySelectorAll('.cuadro span');
+    const opciones = [
+        { texto: "Certificaciones", modal: "#Modal_Certificaciones" },
+        { texto: "Certificado Único de discapacidad (CUD)", modal: "#Modal_CUD" },
+        { texto: "Idiomas", modal: "#Modal_Idiomas" },
+        { texto: "Solicitar Recomendación", modal: "#Modal_Recomendacion" },
+        { texto: "Volver", modal: "#Modal_Volver" }
+    ];
+    const opcionesDefault = [
+        { texto: "Informacion Personal", modal: "#Modal_InformacionPersonal" },
+        { texto: "Educacion", modal: "#Modal_Educacion" },
+        { texto: "Experiencia", modal: "#Modal_Experiencia" },
+        { texto: "Necesidades de adaptación", modal: "#Modal_Necesidades" },
+        { texto: "Otras Opciones", modal: "#Modal_OtrasOpciones" }
+    ];
+
+    cuadros.forEach((opcion, index) => {
+        const config = usandoOpcionesAlternativas ? opcionesDefault[index] : opciones[index];
+        opcion.textContent = config.texto;
+        opcion.parentNode.setAttribute('data-bs-target', config.modal);
+    });
+
+    usandoOpcionesAlternativas = !usandoOpcionesAlternativas;
+}
+
+
+function repetirTexto() {
+    if (usandoOpcionesAlternativas) {
+        text_to_speech('Ahora las opciones disponibles son Certificaciones, Certificado Único de discapacidad, Idiomas, Solicitar Recomendación, y Volver.');
+    } else {
+        text_to_speech('Izquierda Información Personal, abajo experiencia. Derecha educación, abajo necesidades de adaptación.');
+    }
+}
+
+function confirmarEntrada(texto) {
+    text_to_speech(texto);
+
+    const modalActual = bootstrap.Modal.getInstance(document.querySelector('.modal.show'));
+    if (modalActual) {
+        modalActual.hide(); 
+    }
+
+    const modalMap = {
+        'Entrando a Información Personal': '#Modal_RecibirNombre',
+        'Entrando a Certificaciones': '#Modal_Certificaciones',
+        'Entrando a Educación': '#Modal_Educacion',
+        'Entrando a Experiencia': '#Modal_Experiencia',
+        'Entrando a Necesidades de adaptación': '#Modal_Necesidades',
+        'Solicitando Recomendación': '#Modal_Recomendacion',
+        'Volviendo': '#Modal_Volver'
+    };
+
+    const modalId = modalMap[texto];
+    if (modalId) {
+        const modal = new bootstrap.Modal(document.getElementById(modalId));
+        modal.show();
+    }
+}
+
+
+function iniciarReconocimientoVoz() {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'es-ES';
+    recognition.start();
+
+    recognition.onresult = function(event) {
+        const nombre = event.results[0][0].transcript;
+        document.getElementById('inputNombre').value = nombre;
+        text_to_speech(`Has dicho: ${nombre}`);
+    };
+
+    recognition.onerror = function(event) {
+        console.error("Error de reconocimiento de voz:", event.error);
+    };
+}
+
+// guradar datos con controller
+function GuardarDatos() {
+        const nombre_ = document.getElementById('inputNombre').value;
+        const mail_ = document.getElementById('inputMail').value;
+        const telefono_ = document.getElementById('inputTel').value;
+        const acerca_ = document.getElementById('inputAcerca').value;
+        const profesion_ = document.getElementById('inputProfesion').value;
+        const est_ = document.getElementById('inputEstilo').value;
+        const ubicacion_ = document.getElementById('inputUbicacion').value;
+        const id_ = document.getElementById('inputId').value;
+        $.ajax({
+            url: '/Home/InsertarUsuario/',
+            type: 'POST',
+            data: {id: id_,nombre: nombre_, mail:mail_, telefono: telefono_, acercademi: acerca_, profesion: profesion_, estilo: est_, ubicacion: ubicacion_},
+            success: function (response) {
+                alert("ok");
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al obtener los datos: ", error);
+            }
+    });
+        console.log(nombre_, " - nombre ingresado"); // debugggg
+    }
+
+</script>
+
+
+<div class="container-no-lee">
+    <a data-bs-toggle="modal" data-bs-target="#Modal_InformacionPersonal" class="cuadro"><div  id="cuadro1"> <span>Informacion Personal</span></div></a>
+    <div class="cuadro" id="cuadro2"><a data-bs-toggle="modal" data-bs-target="#Modal_Educacion"> <span>Educacion</span></a></div>
+    <div class="cuadro" id="cuadro3"><a data-bs-toggle="modal" data-bs-target="#Modal_Experiencia"><span>Experiencia</span></a></div>
+    <div class="cuadro" id="cuadro4"><a data-bs-toggle="modal" data-bs-target="#Modal_Necesidades"> <span>Necesidades de adaptación</span></a></div>
+    <div class="cuadro" id="cuadro5"> <button onclick="repetirTexto()"> Repetir </button></div>
+    <div class="cuadro" id="cuadro6"> <button onclick="cambiarOpciones()"><span>Otras Opciones</span></button></div>
+</div>
+
+<!-- Modal INFO PERSONAL -->
+<div class="modal" tabindex="-1" id="Modal_InformacionPersonal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">¿Desea entrar en la sección de Información Personal?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <button type="button" class="cuadro_conf grande" onclick="$('#Modal_RecibirNombre').modal('show'); $('#Modal_InformacionPersonal').modal('hide');">Si</button>
+                <button type="button" class="cuadro_conf grande" data-bs-dismiss="modal" onclick="confirmarEntrada('Cancelado')">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- DATOS -->
+                <!-- Modal NOMBRE -->
+                <div class="modal" tabindex="-1" id="Modal_RecibirNombre" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Por favor, diga su nombre y apellido</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputNombre" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Modal_RecibirMail').modal('show'); $('#Modal_RecibirNombre').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" tabindex="-1" id="Modal_RecibirMail" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Por favor, diga su mail</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputMail" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Modal_RecibirTelefono').modal('show'); $('#Modal_RecibirMail').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" tabindex="-1" id="Modal_RecibirTelefono" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Por favor, diga su telefono</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputTel" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Modal_RecibirAcerca').modal('show'); $('#Modal_RecibirTelefono').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" tabindex="-1" id="Modal_RecibirAcerca" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Por favor, diga acerca de ti</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputAcerca" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Modal_RecibirProfesion').modal('show'); $('#Modal_RecibirAcerca').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" tabindex="-1" id="Modal_RecibirProfesion" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Por favor, diga su profesion actual</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputProfesion" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Modal_RecibirEstilo').modal('show'); $('#Modal_RecibirProfesion').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" tabindex="-1" id="Modal_RecibirEstilo" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Por favor, diga el estilo que prefiere</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputEstilo" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Modal_RecibirUbicacion').modal('show'); $('#Modal_RecibirEstilo').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" tabindex="-1" id="Modal_RecibirUbicacion" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Por favor, diga su ubicacion</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputUbicacion" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Final').modal('show'); $('#Modal_RecibirUbicacion').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FIN -->
+                <div class="modal" tabindex="-1" id="Final" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">No hay más información que agregar</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                            <input type="hidden" id="inputId" value="@Model.id">
+                                <button onclick="GuardarDatos()">Finalizar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+<!--
+<div class="modal" tabindex="-1" id="Modal_RecibirNombre" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Por favor, diga su mail</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="inputNombre" class="form-control" >
+        <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar para ingresar Mail</button>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<!-- Modal Certificaciones -->
+<div class="modal fade" id="Modal_Certificaciones" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modalCont">
+            <h5 class="modal-title">¿Desea entrar en la sección de Certificaciones?</h5>
+            <div class="modal-body">
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Entrando a Certificaciones');" data-bs-dismiss="modal">Sí</div>
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Cancelado');" data-bs-dismiss="modal">No</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Educación -->
+<div class="modal fade" id="Modal_Educacion" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modalCont">
+            <h5 class="modal-title">¿Desea entrar en la sección de Educación?</h5>
+            <div class="modal-body">
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Entrando a Educación');" data-bs-dismiss="modal">Sí</div>
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Cancelado');" data-bs-dismiss="modal">No</div>
+            </div>
+        </div>
+    </div>
+</div>
+            <!-- DATOS-->
+
+
+<!-- Modal Experiencia -->
+<div class="modal fade" id="Modal_Experiencia" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modalCont">
+            <h5 class="modal-title">¿Desea entrar en la sección de Experiencia?</h5>
+            <div class="modal-body">
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Entrando a Experiencia');" data-bs-dismiss="modal">Sí</div>
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Cancelado');" data-bs-dismiss="modal">No</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Necesidades de adaptación -->
+<div class="modal fade" id="Modal_Necesidades" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modalCont">
+            <h5 class="modal-title">¿Desea entrar en la sección de Necesidades de adaptación?</h5>
+            <div class="modal-body">
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Entrando a Necesidades de adaptación');" data-bs-dismiss="modal">Sí</div>
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Cancelado');" data-bs-dismiss="modal">No</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal CUD -->
+<div class="modal fade" id="Modal_CUD" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modalCont">
+            <h5 class="modal-title">¿Desea entrar en la sección de Certificado Único de Discapacidad?</h5>
+            <div class="modal-body">
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Entrando a CUD');" data-bs-dismiss="modal">Sí</div>
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Cancelado');" data-bs-dismiss="modal">No</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Idiomas -->
+<div class="modal fade" id="Modal_Idiomas" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modalCont">
+            <h5 class="modal-title">¿Desea entrar en la sección de Idiomas?</h5>
+            <div class="modal-body">
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Entrando a Idiomas');" data-bs-dismiss="modal">Sí</div>
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Cancelado');" data-bs-dismiss="modal">No</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Recomendación -->
+<div class="modal fade" id="Modal_Recomendacion" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modalCont">
+            <h5 class="modal-title">¿Desea solicitar una Recomendación?</h5>
+            <div class="modal-body">
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Solicitando Recomendación');" data-bs-dismiss="modal">Sí</div>
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Cancelado');" data-bs-dismiss="modal">No</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Volver -->
+<div class="modal fade" id="Modal_Volver" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modalCont">
+            <h5 class="modal-title">¿Desea volver?</h5>
+            <div class="modal-body">
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Volviendo');" data-bs-dismiss="modal">Sí</div>
+                <div class="cuadro_conf grande" onclick="confirmarEntrada('Cancelado');" data-bs-dismiss="modal">No</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+.container-no-lee {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100vh;
+}
+.cuadro, .cuadro_conf {
+    flex: 1 0 50%;
+    height: 40%;
+    border: 1px solid white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+.grande {
+    font-size: 3rem;  
+    margin: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+    height: 100%; 
+}
+.cuadro_conf {
+    background-color: #48B1A1;
+    color: white;
+    font-size: 2rem;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 5px;
+}
+.cuadro_conf.grande {
+    background-color: #4CAF50;
+    width: 45%; 
+    height: 80%; 
+}
+.cuadro_conf.grande:last-child {
+    background-color: #F44336;
+    width: 45%; 
+    height: 80%; 
+}
+.modal-body {
+    display: flex;
+    flex-direction: row; 
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 20px;
+}
+.modalCont {
+    background-color: white;
+    text-align: center;
+    padding: 20px;
+}
+#cuadro1 { background-color: #D6F4EF; }
+#cuadro2 { background-color: #ABE7DD; }
+#cuadro3 { background-color: #7ECCC0; }
+#cuadro4 { background-color: #48B1A1; }
+#cuadro5 { color: white; background-color: #16544B; height: 20%; }
+#cuadro6 { color: white; background-color: #09302A; height: 20%; }
+</style>

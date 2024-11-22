@@ -71,8 +71,8 @@ public class HomeController : Controller
             return View("PerfilLee", perfil);
         }
         else  {
-            BD.user = usuario;
-            return RedirectToAction("PerfilNoLee");
+            Informacion_Personal_Empleado perfil= Models.BD.CargarPerfilLogin(usuario.id);
+            return View("PerfilNoLee", perfil);
         }
     }
     [HttpPost]
@@ -112,6 +112,33 @@ public class HomeController : Controller
         }
     }
  
+   [HttpPost]
+   public bool InsertarUsuario(int id, string nombre, string mail, string telefono, string acerca, string profesion, string estilo, string ubicacion)
+    {
+        Informacion_Personal_Empleado usuario = new Informacion_Personal_Empleado
+        {
+            id = id,
+            nombre_apellido = nombre,
+            mail = mail,
+            telefono = telefono,
+            acerca_de_mi = acerca,
+            profesion_actual = profesion,
+            estilo = estilo,
+            ubicacion = ubicacion
+        };
+        //try{
+            Models.BD.InsertarInformacionPersonalEmpleado1(usuario);
+            Models.BD.InsertarInformacionPersonalEmpleado2(usuario);
+        //}
+        /*catch {
+            return false;
+        }*/
+        
+
+        // Insertar en la BD los datos
+        return true;
+    }
+
  //INFO PERSONAL
     [HttpPost]
     public IActionResult InsertarInformacionPersonal1(Informacion_Personal_Empleado usuario)
@@ -126,7 +153,7 @@ public class HomeController : Controller
         ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(usuario.id);
         ViewBag.idioma = Models.BD.SelectIdioma(usuario.id);
         return View("PerfilLee", perfil);
-        }
+    }
 
 
     [HttpPost]

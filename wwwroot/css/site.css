@@ -222,6 +222,7 @@ input:focus {
     font-weight: bold;
     color: #5CA0A0 !important;
     margin-top: 15px;
+    margin-right: 20px;
 }
 .mostrar_login2 {
   font-size: 16px;
@@ -1314,4 +1315,18 @@ font-size: 25px;}
       width: 100%;
       margin-left: 0;
   }
+}
+
+.input-container-micro {
+  display: flex;
+  align-items: center;
+}
+
+.input-container-micro input {
+  flex: 1;
+}
+
+.microphone-icon {
+  margin-left: 8px;
+  cursor: pointer;
 }
