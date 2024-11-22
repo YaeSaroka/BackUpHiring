@@ -263,30 +263,38 @@ public  class BD
         }
 
 //CUD
-    public static void InsertarCUD(Cud cud, int id_info_empleado, string myfile)
+    public static int InsertarCUD(Cud cud, int idEmpleado, string filePath)
+{
+    int id = -1;
+    try
     {
-        try
+        using (SqlConnection db = new SqlConnection(ConnectionString))
         {
-            using (SqlConnection db = new SqlConnection(ConnectionString))
-            {
-                string sp = "InsertarCUD";
-                var parameters = new 
-                { 
-                    id = cud.id == 0 ? 0 : cud.id, 
-                    fecha_expedicion = cud.fecha_expedicion, 
-                    url_= myfile,
-                    id_info_empleado= cud.id_info_empleado,
-                    empresa_emisora= cud.empresa_emisora,
-                    fecha_vencimiento= cud.fecha_vencimiento
-                };
-                db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Error al insertar el cud en la base de datos.", ex);
+            string sp = "InsertarCUD";
+            var parameters = new 
+            { 
+                empresa_emisora = cud.empresa_emisora,
+                id_info_empleado = idEmpleado,
+                fecha_expedicion = cud.fecha_expedicion,
+                fecha_vencimiento = cud.fecha_vencimiento,
+                filePath = filePath
+            };
+            Console.WriteLine("Llamando al SP con los siguientes parámetros:"); 
+            Console.WriteLine("empresa_emisora: " + cud.empresa_emisora); 
+            Console.WriteLine("id_info_empleado: " + idEmpleado); 
+            Console.WriteLine("fecha_expedicion: " + cud.fecha_expedicion); 
+            Console.WriteLine("fecha_vencimiento: " + cud.fecha_vencimiento); 
+            id = db.QueryFirstOrDefault<int>(sp, parameters, commandType: CommandType.StoredProcedure);
         }
     }
+    catch (Exception ex)
+    {
+        throw new Exception("Error al insertar el CUD en la base de datos.", ex);
+    }
+    return id;
+}
+
+
 
     public static Cud SelectCUD(int Id_Info_Empleado)
     {

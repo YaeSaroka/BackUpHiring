@@ -655,68 +655,43 @@ function openCamera() {
 }
 
 
-function    captureImage(stream) {
+function captureImage(stream) {
     const video = document.getElementById('cameraPreview');
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
-    
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    // Obtener la imagen en formato base64
     const image = canvas.toDataURL('image/png');
-    
-    // Mostrar la imagen capturada
     const preview = document.getElementById('fotoVistaPrevia');
     preview.src = image;
     preview.style.display = 'block';
-
-    // Asignar un nombre a la imagen (por ejemplo, 'imagen.png')
-    const imageName = 'imagen.png';  // O usa un nombre dinámico como 'usuario123.png'
-
-    // Crear un enlace de descarga
-    const downloadLink = document.createElement('a');
-    downloadLink.href = image;  // La URL en base64 de la imagen
-    downloadLink.download = imageName;  // Asigna el nombre al archivo descargado
-    downloadLink.click();  // Ejecutar la descarga
 
     // Detener el flujo de la cámara
     const tracks = stream.getTracks();
     tracks.forEach(track => track.stop());
 
-    // Ocultar el video
+    // Ocultar el video después de tomar la foto
     video.style.display = 'none';
+
+    // Convertir la imagen base64 a un Blob
+    const byteCharacters = atob(image.split(',')[1]);
+    const byteArray = new Uint8Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteArray[i] = byteCharacters.charCodeAt(i);
+    }
+    const blob = new Blob([byteArray], { type: 'image/png' });
+
+    // Crear un archivo (File) con el Blob, necesario para enviarlo con el formulario
+    const file = new File([blob], 'foto_perfil.png', { type: 'image/png' });
+
+    // Asignar el archivo al input de tipo file
+    const inputFile = document.getElementById('fotoPerfil');
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    inputFile.files = dataTransfer.files;
 }
 
-// Función para capturar la imagen desde la cámara
-function captureImage2(stream) {
-    const video = document.getElementById('cameraPreview');
-    const canvas = document.getElementById('canvas');
-    const context = canvas.getContext('2d');
-    
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    const image = canvas.toDataURL('image/png');
-    
-    // Mostrar la imagen capturada
-    const preview = document.getElementById('fotoVistaPrevia');
-    preview.src = image;
-    preview.style.display = 'block';
-alert(preview.src);
-    // Detener el flujo de la cámara
-    const tracks = stream.getTracks();
-    tracks.forEach(track => track.stop());
-
-    // Ocultar el video
-    video.style.display = 'none';
-}
-
-// Función para subir la imagen al servidor
 
 // Función para mostrar la vista previa de la imagen seleccionada desde la galería
 function previewImage(event) {
@@ -832,4 +807,51 @@ function togglePasswordVisibility(toggleId, inputId) {
         passwordField.type = 'password';
         passwordToggle.textContent = "Mostrar";
     }
+}
+
+/************************/
+function AgregarCud() {
+    var idInfoEmpleado = $("#id_info_empleado").val(); 
+    var EmpresaEmisora = $("#empresa_emisora").val();
+    var fechaexpedicion = $("#fecha_expedicion").val();  // Corrección del selector
+    var fechavencimiento = $("#fecha_vencimiento").val();  // Corrección del selector
+    var myfile = $("#myfile")[0].files[0];  // Corrección para seleccionar el archivo correctamente
+
+    var formData = new FormData();
+    formData.append('empresa_emisora', EmpresaEmisora);
+    formData.append('idEmpleado', idInfoEmpleado);
+    formData.append('fecha_expedicion', fechaexpedicion);
+    formData.append('fecha_vencimiento', fechavencimiento);
+    formData.append('myfile', myfile);
+
+    $.ajax({
+        url: '/Home/InsertarCUD/',
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+            var textohtml = '<div class="cud1_container" data-id="' + response.idcud + '">';
+            textohtml += '<div class="header_adaptacion">';
+            textohtml += '<img src="../img/componente/CUD.png" alt="icono" class="icono-adaptacion-img">';
+            textohtml += '<div class="titulo_adaptacion">CERTIFICADO ÚNICO DE DISCAPACIDAD (CUD)';
+            textohtml += '<div class="fecha_educacion">Expedición: ' + fechaexpedicion + '</div>';
+            textohtml += '</div>';
+            textohtml += '<i class="fa-solid fa-edit editar-icono-cud" data-id="' + response.idcud + '"></i>';
+            textohtml += '<i class="fa-solid fa-trash eliminar-icono-cud" data-id="' + response.idcud + '" onclick="BorrarVoz(\'cud\')"></i>';
+            textohtml += '</div>';
+            textohtml += '<div class="descargar-archivo" data-id="' + response.idcud + '">';
+            textohtml += '<a href="' + response.myfileUrl + '" download class="btn btn-success descargar " style="background-color: #21554d'+ '; border-color: #21554d ' + '; margin-top:10px">';
+            textohtml += '<i class="fa-solid fa-download"></i> Descargar CUD';
+            textohtml += '</a>';
+            textohtml += '</div>';
+            textohtml += '</div>';
+            
+            $("#CUDContainer").append(textohtml);
+            $('#ModalCUD').modal('hide');
+        },
+        error: function(error) {
+            console.log("Error: ", error);
+        }
+    });
 }

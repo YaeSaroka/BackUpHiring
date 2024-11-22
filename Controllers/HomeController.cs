@@ -130,33 +130,28 @@ public class HomeController : Controller
 
 
     [HttpPost]
-    public IActionResult InsertarInformacionPersonal2(Informacion_Personal_Empleado usuario, IFormFile foto_perfil)
+    public async Task<IActionResult> InsertarInformacionPersonal2(Informacion_Personal_Empleado usuario, IFormFile foto_perfil)
+{
+    if (foto_perfil != null && foto_perfil.Length > 0)
     {
-        if (foto_perfil != null)
+        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(foto_perfil.FileName);
+        string ubicacion = Path.Combine(this.Environment.WebRootPath, "img", fileName);
+        using (var stream = new FileStream(ubicacion, FileMode.Create))
         {
-            if(foto_perfil.Length > 0 )
-            {
-                string ubicacion = this.Environment.ContentRootPath + @"\wwwroot\img\" + foto_perfil.FileName;
-                using (var stream = System.IO.File.Create(ubicacion))
-                {
-                    foto_perfil.CopyToAsync(stream);
-                }
-                usuario.foto_perfil=foto_perfil.FileName;
-            }
-
+            await foto_perfil.CopyToAsync(stream);
         }
-            Models.BD.InsertarInformacionPersonalEmpleado2(usuario);
-            Informacion_Personal_Empleado perfil= Models.BD.CargarPerfilLogin(usuario.id);
-            List<string> UrlMultimedia = new List<string>(); 
-            ViewBag.UrlMultimedia=Models.BD.SelectMultimedia(usuario.id);
-            ViewBag.Lista_educacion = Models.BD.SelectEducacion(usuario.id);
-            ViewBag.Adaptacion = Models.BD.SelectAdaptacion(usuario.id);
-            ViewBag.cud = Models.BD.SelectCUD(usuario.id);
-            ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(usuario.id);
-            ViewBag.idioma = Models.BD.SelectIdioma(usuario.id);
-        return View("PerfilLee", perfil);
+        usuario.foto_perfil = fileName;
     }
-
+    Models.BD.InsertarInformacionPersonalEmpleado2(usuario);
+    Informacion_Personal_Empleado perfil = Models.BD.CargarPerfilLogin(usuario.id);
+    ViewBag.UrlMultimedia = Models.BD.SelectMultimedia(usuario.id);
+    ViewBag.Lista_educacion = Models.BD.SelectEducacion(usuario.id);
+    ViewBag.Adaptacion = Models.BD.SelectAdaptacion(usuario.id);
+    ViewBag.cud = Models.BD.SelectCUD(usuario.id);
+    ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(usuario.id);
+    ViewBag.idioma = Models.BD.SelectIdioma(usuario.id);
+    return View("PerfilLee", perfil);
+}
 //EDUCACION
     [HttpPost]
     public IActionResult InsertarEducacion(Educacion educacion, int Id_Info_Empleado, int id = 0)
@@ -183,7 +178,6 @@ public class HomeController : Controller
     ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
     ViewBag.idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
     Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
-    
 
     return View("PerfilLee", perfilActualizado);
 }
@@ -314,31 +308,39 @@ public class HomeController : Controller
         });
     }
     //CUD
-    [HttpPost]
-    public IActionResult InsertarCUD(Cud cud, int Id_Info_Empleado, int id, IFormFile myfile)
+   [HttpPost]
+public JsonResult InsertarCUD(string empresa_emisora, int idEmpleado, DateTime fecha_expedicion, DateTime fecha_vencimiento, IFormFile myfile)
+{
+    int CudElegido = 0;
+    Cud cudabuscar = new Cud
     {
-        if (id != 0 || id == 0) 
+        empresa_emisora = empresa_emisora,
+        fecha_expedicion = fecha_expedicion,
+        fecha_vencimiento = fecha_vencimiento
+    };
+
+    string myfileUrl = string.Empty;
+
+    if (myfile != null && myfile.Length > 0)
+    {
+        string uploadsFolder = Path.Combine(this.Environment.ContentRootPath, "wwwroot/uploads");
+        Directory.CreateDirectory(uploadsFolder);
+        string filePath = Path.Combine(uploadsFolder, myfile.FileName);
+        
+        using (var stream = new FileStream(filePath, FileMode.Create))
         {
-            if(myfile.Length > 0 )
-            {
-                string ubicacion = this.Environment.ContentRootPath + @"\wwwroot\uploads\" + myfile.FileName;
-                using (var stream = System.IO.File.Create(ubicacion))
-                {
-                    myfile.CopyToAsync(stream);
-                }
-            }
-            Models.BD.InsertarCUD(cud, Id_Info_Empleado, myfile.FileName);
+            myfile.CopyTo(stream);
         }
-        Cud cud_ = Models.BD.SelectCUD(Id_Info_Empleado);
-        ViewBag.cud = cud_;
-        Informacion_Personal_Empleado perfilActualizado = Models.BD.CargarPerfilLogin(Id_Info_Empleado);
-        ViewBag.UrlMultimedia=Models.BD.SelectMultimedia(Id_Info_Empleado);
-        ViewBag.Lista_educacion = Models.BD.SelectEducacion(Id_Info_Empleado);
-        ViewBag.Adaptacion = Models.BD.SelectAdaptacion(Id_Info_Empleado);
-        ViewBag.Lista_Certificacion = Models.BD.SelectCertificacion(Id_Info_Empleado);
-        ViewBag.idioma = Models.BD.SelectIdioma(Id_Info_Empleado);
-        return View("PerfilLee", perfilActualizado);
+        
+        cudabuscar.url_ = myfile.FileName;
+        myfileUrl = "/uploads/" + myfile.FileName;
     }
+
+    CudElegido = Models.BD.InsertarCUD(cudabuscar, idEmpleado, myfile.FileName);
+
+    return Json(new { success = true, idcud = CudElegido, myfileUrl = myfileUrl });
+}
+
 
     public IActionResult EliminarCUD(int Id_Info_Empleado, int id)
     {

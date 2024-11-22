@@ -485,15 +485,14 @@
                 <h5 class="modal-title">Certificado único de discapacidad (CUD)</h5>
             </div>
             <div class="modal-body">
-                <form action='@Url.Action("InsertarCUD")' method="post" id="ModalCudForm" enctype="multipart/form-data">
+                <form  id="ModalCudForm" enctype="multipart/form-data">
                     <input type="hidden" name="id" id="id" value="">
                     <input type="hidden" name="id_info_empleado" id="id_info_empleado" value="@Model.id">
                         <h1 class="titulos-modal">
                             <i id="iconos-modal" class="fa-solid fa-id-card"></i> INSTITUCIÓN EMISORA
                         </h1>
                     <div class="input-container-micro"> 
-                        <input type="text" name="empresa_emisora" placeholder="Institucion emisora" id="cud" class="Input_con_micro">
-                        <i class="fas fa-microphone microphone-icon" id="record-icon" onclick="setUpMic('cud')"></i>
+                        <input type="text" name="empresa_emisora" placeholder="Institucion emisora" id="cud">
                     </div>
 
                     
@@ -529,7 +528,7 @@
                         <div class="invalid-feedback">No fue posible seleccionar ese archivo</div>
                     </div>
                     <div class="modal-footer">
-                        <input type="submit" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary" value="Guardar">
+                        <input type="submit" onclick="AgregarCud()" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary" value="Guardar">
                     </div>
                 </form>
             </div>
