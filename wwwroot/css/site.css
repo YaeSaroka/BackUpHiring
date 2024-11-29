@@ -673,6 +673,14 @@ hr{
 }
 
 .download-button-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Esto centra el contenedor */
+  width: 100%;  /* Asegura que el contenedor ocupe el 100% del ancho */
+  text-align: center; /* Centra el contenido dentro del contenedor */
+}
+.download-button-container {
   position: absolute; 
   top: 50%;
   left: 50%;
@@ -684,7 +692,7 @@ hr{
   background-color: #9dbebe !important;
   border-color: #9dbebe !important; 
   color: white;
-  padding: 10px 20px !important;
+  padding: 10px 20px;
   border-radius: 5px;
   text-decoration: none;
 }

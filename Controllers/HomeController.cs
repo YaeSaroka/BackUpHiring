@@ -343,7 +343,8 @@ public JsonResult InsertarCUD(int id_info_empleado, string empresa_emisora, Date
     {
         empresa_emisora = empresa_emisora,
         fecha_expedicion = fecha_expedicion,
-        fecha_vencimiento = fecha_vencimiento
+        fecha_vencimiento = fecha_vencimiento,
+        id_info_empleado = id_info_empleado
     };
 
     string myfileUrl = string.Empty;
