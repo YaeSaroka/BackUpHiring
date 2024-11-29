@@ -834,7 +834,7 @@ function AgregarCud() {
         processData: false,  // No procesar los datos
         contentType: false,
         success: function(response) {
-            console.log(response);
+            $("#CUDContainer").empty();
             var textohtml = '<div class="cud1_container" data-id="' + response.idcud + '">';
             textohtml += '<div class="header_adaptacion">';
             textohtml += '<img src="../img/componente/CUD.png" alt="icono" class="icono-adaptacion-img">';
@@ -845,15 +845,15 @@ function AgregarCud() {
             textohtml += '<i class="fa-solid fa-trash eliminar-icono-cud" data-id="' + response.idcud + '" onclick="BorrarVoz(\'cud\')"></i>';
             textohtml += '</div>';
             textohtml += '<div class="descargar-archivo" data-id="' + response.idcud + '">';
-            textohtml += '<a href="' + response.myfileUrl + '" download class="btn btn-success descargar " style="background-color: #21554d'+ '; border-color: #21554d ' + '; margin-top:10px">';
+            textohtml += '<a href="' + response.myfileUrl + '" download class="btn btn-success descargar" style="background-color: #21554d; border-color: #21554d; margin-top:10px">';
             textohtml += '<i class="fa-solid fa-download"></i> Descargar CUD';
             textohtml += '</a>';
             textohtml += '</div>';
             textohtml += '</div>';
-            
-            $("#CUDContainer").append(textohtml);
-            $('#ModalCUD').modal('hide');
-        },
+                
+                $("#CUDContainer").append(textohtml);
+                $('#ModalCUD').modal('hide'); 
+            },
         error: function(error) {
             console.log("Error: ", error);
         }
