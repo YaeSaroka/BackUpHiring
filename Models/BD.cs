@@ -6,7 +6,7 @@ namespace Hiring.Models;
 
 public  class BD
 {
-     private static string ConnectionString { get; set; } = @"Server=A-PHZ2-CIDI-28;DataBase=Hiring;Trusted_Connection=True;";   
+     private static string ConnectionString { get; set; } = @"Server=.;DataBase=Hiring;Trusted_Connection=True;";   
      public static Usuario user;//agarra el usuario loggeado
 
 
@@ -263,7 +263,7 @@ public  class BD
         }
 
 //CUD
-    public static int InsertarCUD(Cud cud, int idEmpleado, string filePath)
+    public static int InsertarCUD(Cud cud)
 {
     int id = -1;
     try
@@ -274,14 +274,14 @@ public  class BD
             var parameters = new 
             { 
                 empresa_emisora = cud.empresa_emisora,
-                id_info_empleado = idEmpleado,
+                id_info_empleado = cud.id_info_empleado,
                 fecha_expedicion = cud.fecha_expedicion,
                 fecha_vencimiento = cud.fecha_vencimiento,
-                filePath = filePath
+                filePath = cud.url_
             };
             Console.WriteLine("Llamando al SP con los siguientes parámetros:"); 
             Console.WriteLine("empresa_emisora: " + cud.empresa_emisora); 
-            Console.WriteLine("id_info_empleado: " + idEmpleado); 
+            Console.WriteLine("id_info_empleado: " + cud.id_info_empleado); 
             Console.WriteLine("fecha_expedicion: " + cud.fecha_expedicion); 
             Console.WriteLine("fecha_vencimiento: " + cud.fecha_vencimiento); 
             id = db.QueryFirstOrDefault<int>(sp, parameters, commandType: CommandType.StoredProcedure);

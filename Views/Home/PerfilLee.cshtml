@@ -492,7 +492,7 @@
                             <i id="iconos-modal" class="fa-solid fa-id-card"></i> INSTITUCIÓN EMISORA
                         </h1>
                     <div class="input-container-micro"> 
-                        <input type="text" name="empresa_emisora" placeholder="Institucion emisora" id="cud">
+                        <input type="text" name="empresa_emisora" placeholder="Institucion emisora" id="empresa_emisora">
                     </div>
 
                     
@@ -507,7 +507,7 @@
                                     <label for="fecha-inicio">FECHA DE EMISIÓN</label>
                                 </div>
                                 <div class="fecha-selectores">
-                                    <input type="date" name="fecha_expedicion">
+                                    <input type="date" name="fecha_expedicion" id="fecha_expedicion">
                                 </div>
                             </div>
 
@@ -517,18 +517,17 @@
                                     <label for="fecha-fin">FECHA DE VENCIMIENTO</label>
                                 </div>
                                 <div class="fecha-selectores">
-                                    <input type="date" name="fecha_vencimiento">
+                                    <input type="date" name="fecha_vencimiento" id="fecha_vencimiento">
                                 </div>
                             </div>
                         </div>
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" id="myfile" name="myfile">
                         <label class="custom-file-label" for="myfile" id="subirfile">Subir Archivo..</label>
-                        <p> mouseover
                         <div class="invalid-feedback">No fue posible seleccionar ese archivo</div>
                     </div>
                     <div class="modal-footer">
-                        <input type="submit" onclick="AgregarCud()" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary" value="Guardar">
+                        <button type="button" onclick="AgregarCud()" style="background-color: @Model.estilo; border-color: @Model.estilo" class="btn btn-primary" value="Guardar">
                     </div>
                 </form>
             </div>

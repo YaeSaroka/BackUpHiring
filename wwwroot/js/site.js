@@ -812,24 +812,27 @@ function togglePasswordVisibility(toggleId, inputId) {
 /************************/
 function AgregarCud() {
     var idInfoEmpleado = $("#id_info_empleado").val(); 
+    console.log(idInfoEmpleado);
     var EmpresaEmisora = $("#empresa_emisora").val();
-    var fechaexpedicion = $("#fecha_expedicion").val();  // Corrección del selector
-    var fechavencimiento = $("#fecha_vencimiento").val();  // Corrección del selector
-    var myfile = $("#myfile")[0].files[0];  // Corrección para seleccionar el archivo correctamente
+    console.log("empresa", EmpresaEmisora);
+    var fechaexpedicion = $("#fecha_expedicion").val();  
+    console.log("FECHA", fechaexpedicion);
+    var fechavencimiento = $("#fecha_vencimiento").val();  
+    var myfile = $("#myfile")[0].files[0];  
 
-    var formData = new FormData();
-    formData.append('empresa_emisora', EmpresaEmisora);
-    formData.append('idEmpleado', idInfoEmpleado);
-    formData.append('fecha_expedicion', fechaexpedicion);
-    formData.append('fecha_vencimiento', fechavencimiento);
-    formData.append('myfile', myfile);
+    if (!myfile) {
+        console.log("No file selected.");
+        return;
+    }
 
+    var formData = new FormData(document.getElementById("ModalCudForm"));
+    console.log(formData);
     $.ajax({
         url: '/Home/InsertarCUD/',
         type: 'POST',
         data: formData,
+        processData: false,  // No procesar los datos
         contentType: false,
-        processData: false,
         success: function(response) {
             var textohtml = '<div class="cud1_container" data-id="' + response.idcud + '">';
             textohtml += '<div class="header_adaptacion">';
