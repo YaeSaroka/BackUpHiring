@@ -713,17 +713,17 @@
             processData: false,
             success: function(response) {
                 console.log('Archivo subido correctamente');
-                console.log(response.id);
+                console.log(response);
                 
                 // Actualiza el carrusel con la nueva imagen o video
                 let text = "";
                 for (let i = 0; i < response.data.length; i++) {
-                    if (response.data[i].endsWith('.mp4')) {
-                        text += "<div class='carousel-item " + (i == 0 ? "active" : "") + "'><div class='row'><div class='col-md-12'><div class='carousel-content'><video controls class='d-block w-100'><source src='" + response.data[i] + "' type='video/mp4'></video><a href='" + response.data[i] + "' download class='btn btn-primary'>Descargar</a></div></div></div>";
-                    } else if (response.data[i].endsWith('.jpg') || response.data[i].endsWith('.jpeg') || response.data[i].endsWith('.png')) {
-                        text += "<div class='carousel-item " + (i == 0 ? "active" : "") + "'><div class='row'><div class='col-md-12'><div class='carousel-content'><img src='" + response.data[i] + "' class='d-block w-100'><a href='" + response.data[i] + "' download class='btn btn-primary'>Descargar</a></div></div></div>";
+                    if (response.data[i].url.endsWith('.mp4')) {
+                        text += "<div class='carousel-item " + (i == 0 ? "active" : "") + "'><div class='row'><div class='col-md-12'><div class='carousel-content'><video controls class='d-block w-100'><source src='" + response.data[i].url + "' type='video/mp4'></video><a href='" + response.data[i].url + "' download class='btn btn-primary'>Descargar</a></div></div></div></div>";
+                    } else if (response.data[i].url.endsWith('.jpg') || response.data[i].url.endsWith('.jpeg') || response.data[i].url.endsWith('.png')) {
+                        text += "<div class='carousel-item " + (i == 0 ? "active" : "") + "'><div class='row'><div class='col-md-12'><div class='carousel-content'><img src='" + response.data[i].url + "' class='d-block w-100'><a href='" + response.data[i].url + "' download class='btn btn-primary'>Descargar</a></div></div></div></div>";
                     } else {
-                        text += "<div class='carousel-item " + (i == 0 ? "active" : "") + "'><div class='row'><div class='col-md-12'><div class='carousel-content'><div class='file-placeholder'><a href='" + response.data[i] + "' download class='btn btn-primary'>Descargar archivo</a></div></div></div></div>";
+                        text += "<div class='carousel-item " + (i == 0 ? "active" : "") + "'><div class='row'><div class='col-md-12'><div class='carousel-content'><div class='file-placeholder'><a href='" + response.data[i].url + "' download class='btn btn-primary'>Descargar archivo</a></div></div></div></div></div>";
                     }
                 }
                 $("#carousel-inner").html(text);

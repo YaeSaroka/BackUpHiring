@@ -88,11 +88,11 @@ public  class BD
     return perfil;}
     
     //INFO PERSONAL
-    public static void InsertarInformacionPersonalEmpleado1( Informacion_Personal_Empleado usuario)
+   public static void InsertarInformacionPersonalEmpleado1( Informacion_Personal_Empleado usuario)
     {
         using(SqlConnection db = new SqlConnection(ConnectionString)){
-            string sp = "ActualizarInformacionPersonalEmpleado1";
-            var parameters = new {id= usuario.id, estilo=usuario.estilo, nombre_apellido = usuario.nombre_apellido, telefono = usuario.telefono, mail = usuario.mail};
+            string sp = "InsertarInformacionPersonalEmpleado1";
+            var parameters = new { id = usuario.id, estilo=usuario.estilo, nombre_apellido = usuario.nombre_apellido, telefono = usuario.telefono, mail = usuario.mail};
             db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
         }
     }
