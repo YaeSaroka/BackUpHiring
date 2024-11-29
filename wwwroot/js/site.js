@@ -834,6 +834,7 @@ function AgregarCud() {
         processData: false,  // No procesar los datos
         contentType: false,
         success: function(response) {
+            console.log(response);
             var textohtml = '<div class="cud1_container" data-id="' + response.idcud + '">';
             textohtml += '<div class="header_adaptacion">';
             textohtml += '<img src="../img/componente/CUD.png" alt="icono" class="icono-adaptacion-img">';

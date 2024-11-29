@@ -277,13 +277,8 @@ public  class BD
                 id_info_empleado = cud.id_info_empleado,
                 fecha_expedicion = cud.fecha_expedicion,
                 fecha_vencimiento = cud.fecha_vencimiento,
-                filePath = cud.url_
+                url_ = cud.url_
             };
-            Console.WriteLine("Llamando al SP con los siguientes parámetros:"); 
-            Console.WriteLine("empresa_emisora: " + cud.empresa_emisora); 
-            Console.WriteLine("id_info_empleado: " + cud.id_info_empleado); 
-            Console.WriteLine("fecha_expedicion: " + cud.fecha_expedicion); 
-            Console.WriteLine("fecha_vencimiento: " + cud.fecha_vencimiento); 
             id = db.QueryFirstOrDefault<int>(sp, parameters, commandType: CommandType.StoredProcedure);
         }
     }

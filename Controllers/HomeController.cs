@@ -336,7 +336,7 @@ public class HomeController : Controller
     }
     //CUD
    [HttpPost]
-public JsonResult InsertarCUD(int idEmpleado, string empresa_emisora, DateTime fecha_expedicion, DateTime fecha_vencimiento, IFormFile myfile)
+public JsonResult InsertarCUD(int id_info_empleado, string empresa_emisora, DateTime fecha_expedicion, DateTime fecha_vencimiento, IFormFile myfile)
 {
     int CudElegido = 0;
     Cud cudabuscar = new Cud
@@ -363,7 +363,7 @@ public JsonResult InsertarCUD(int idEmpleado, string empresa_emisora, DateTime f
         myfileUrl = "/uploads/" + myfile.FileName;
     }
 
-    CudElegido = Models.BD.InsertarCUD(cudabuscar, idEmpleado, cud);
+    CudElegido = Models.BD.InsertarCUD(cudabuscar);
 
     return Json(new { success = true, idcud = CudElegido, myfileUrl = myfileUrl });
 }
