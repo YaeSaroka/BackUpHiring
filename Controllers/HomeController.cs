@@ -112,6 +112,7 @@ public class HomeController : Controller
         }
     }
  
+ //PERFIL NO LEE
    [HttpPost]
    public bool InsertarUsuario(int id, string nombre, string mail, string telefono, string acerca, string profesion, string estilo, string ubicacion)
     {
@@ -126,33 +127,44 @@ public class HomeController : Controller
             estilo = estilo,
             ubicacion = ubicacion
         };
-        //try{
             Models.BD.InsertarInformacionPersonalEmpleado1(usuario);
             Models.BD.InsertarInformacionPersonalEmpleado2(usuario);
-        //}
-        /*catch {
-            return false;
-        }*/
-        
-
         // Insertar en la BD los datos
         return true;
     }
+    public bool GuardarEduNoLee(string Titulo, string Institucion, string Disciplina, string Actividades, string Descripcion, string AnoInicio, string MesInicio, string AnoFinal, string MesFinal, int id){
+    Educacion educacion_ = new Educacion
+    {
+        titulo = Titulo,
+        nombre_institucion = Institucion,
+        disciplina_academica = Disciplina,
+        actividades_grupo = Actividades,
+        descripcion = Descripcion,
+        mes_expedicion = MesInicio,
+        mes_caducidad = MesFinal,
+        fecha_expedicion = AnoInicio,
+        fecha_caducidad = AnoFinal
+    };
+    Models.BD.InsertarEducacion(educacion_, id);
+    return true;
+    }
 
- //PERFIL NO LEE
-
-    public JsonResult VerificarVacio(int sector, int id)
+  public JsonResult VerificarVacio(int sector, int id)
 {
     Informacion_Personal_Empleado datos_ = null;
-    string mensaje = "DATOS"; // Mensaje predeterminado si todo está bien
-    if (sector == 1)
-        datos_ = Models.BD.CargarPerfilLogin(id);  // Obtener el perfil de la base de datos
+    List<Educacion> datos_2 = null;
+    string mensaje = "DATOS"; // predeterminado
 
-    if (datos_ == null)
-    {
-        mensaje = "No se encontró información personal.";
-    }
-    else
+    // Cargar los datos según el sector
+    if (sector == 1) datos_ = Models.BD.CargarPerfilLogin(id);  // info personal
+    else if (sector == 2) datos_2 = Models.BD.SelectEducacion(id); // educacion
+    
+
+    // Verificar si los datos existen para el sector seleccionado
+    if (sector == 1 && datos_ == null) mensaje = "No se encontraron datos de Información Personal ingresados!";
+    else if (sector == 2 && (datos_2 == null || !datos_2.Any()))  mensaje = "No se encontraron datos de Educación ingresados!";
+    
+    else if (datos_ != null)
     {
         List<string> camposFaltantes = new List<string>();
         var propiedades = datos_.GetType().GetProperties();
@@ -162,24 +174,35 @@ public class HomeController : Controller
             var valor = propiedad.GetValue(datos_);
             if (valor == null || string.IsNullOrEmpty(valor.ToString()))
             {
-                camposFaltantes.Add(propiedad.Name); 
+                camposFaltantes.Add(propiedad.Name);
             }
         }
-
-        if (camposFaltantes.Count > 0)
-        {
-            mensaje = "Faltan datos por ingresar (" + string.Join(", ", camposFaltantes) + ")";
-        }
-        else
-        {
-            mensaje = "Todos los datos están completos.";
-        }
+        if (camposFaltantes.Count > 0) mensaje = "Faltan datos por ingresar (" + string.Join(", ", camposFaltantes) + ")";
+        else mensaje = "Todos los datos están completos.";
     }
-
-    // Devolver los datos del perfil al cliente para rellenar los inputs de los modales
-    return Json(new { mensaje = mensaje, datos = datos_ });
+    else if (datos_2 != null && datos_2.Any())
+    {
+        List<string> camposFaltantes = new List<string>();
+        foreach (var educacion in datos_2)
+        {
+            var propiedades = educacion.GetType().GetProperties();
+            foreach (var propiedad in propiedades)
+            {
+                var valor = propiedad.GetValue(educacion);
+                if (valor == null || string.IsNullOrEmpty(valor.ToString()))
+                {
+                    camposFaltantes.Add(propiedad.Name);
+                }
+            }
+        }
+        if (camposFaltantes.Count > 0) mensaje = "Faltan datos por ingresar en Educación (" + string.Join(", ", camposFaltantes) + ")";
+        else mensaje = "Todos los datos de Educación están completos.";
+    }
+    
+    if (sector == 1) return Json(new { mensaje = mensaje, datos = datos_ });  
+    else if (sector == 2) return Json(new { mensaje = mensaje, datos = datos_2 }); 
+    return Json(new { mensaje = "Sector desconocido", datos = (object)null });
 }
-
 
 
  //INFO PERSONAL

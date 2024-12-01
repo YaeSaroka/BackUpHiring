@@ -93,17 +93,27 @@ function confirmarEntrada(texto) {
 
 function iniciarReconocimientoVoz() {
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'es-ES';
+    recognition.lang = 'es-ES'; // Cambia esto a tu idioma preferido
+
     recognition.start();
 
     recognition.onresult = function(event) {
-        const nombre = event.results[0][0].transcript;
-        document.getElementById('inputNombre').value = nombre;
-        text_to_speech(`Has dicho: ${nombre}`);
+        // Toma lo que se ha dicho, convierte a minúsculas y elimina el punto final si lo tiene
+        let color = event.results[0][0].transcript.toLowerCase().trim();
+
+        // Elimina el punto final si existe
+        color = color.replace(/\.$/, '');
+
+        // Verifica si el color es válido
+        if (["rosa", "verde", "azul", "negro"].includes(color)) {
+            document.getElementById("inputEstilo").value = color; // Muestra el color en el input
+        } else {
+            alert("Por favor, diga un color válido: rosa, verde, azul o negro.");
+        }
     };
 
     recognition.onerror = function(event) {
-        console.error("Error de reconocimiento de voz:", event.error);
+        console.error("Error en el reconocimiento de voz", event);
     };
 }
 
@@ -128,22 +138,69 @@ function GuardarDatos() {
                 console.error("Error al obtener los datos: ", error);
             }
     });
-        console.log(nombre_, " - nombre ingresado"); // debugggg
+    }
+    function GuardarDatos2(){
+    const id_ = document.getElementById('inputId').value;
+    let titulo = $("#inputTitulo").val();
+    let institucion = $("#inputInstitucion").val();
+    let disciplina = $("#inputDisci").val();
+    let actividades = $("#inputActGrupo").val();
+    let descripcion = $("#inputDescripEdu").val();
+    let anoInicio = $("#inputAno1").val();
+    let mesInicio = $("#inputMes1").val();
+    let anoFinal = $("#inputAno2").val();
+    let mesFinal = $("#inputMes2").val();
+
+    $.ajax({
+        type: "POST",
+        url: "/Home/GuardarEduNoLee/", 
+        data: {titulo = titulo, institucion = institucion, Disciplina = disciplina, Actividades = actividades, Descripcion = descripcion, AnoInicio = anoInicio, MesInicio = mesInicio, AnoFinal = anoFinal, MesFinal = mesFinal, id = id_ },
+        contentType: "application/json",
+        success: function(response) {
+            // Manejo de éxito
+            console.log("Datos guardados con éxito");
+        },
+        error: function(error) {
+            // Manejo de error
+            console.log("Error al guardar los datos");
+        }
+    });
     }
 
-   function VerificarVacio(sector_) {
+    function updateInputColor() {
+        var selectedColor = document.getElementById("selectEstilo").value;
+        document.getElementById("inputEstilo").value = selectedColor; // Actualiza el input con el color seleccionado
+    }
+    function validateColorInput() {
+        const validColors = ["rosa", "verde", "azul", "negro"];
+        const inputColor = document.getElementById("inputEstilo").value.toLowerCase().trim();
+
+        // Si el color ingresado no es válido, limpiamos el input
+        if (!validColors.includes(inputColor) && inputColor !== "") {
+            document.getElementById("inputEstilo").setCustomValidity("Por favor, ingrese un color válido: rosa, verde, azul o negro.");
+        } else {
+            document.getElementById("inputEstilo").setCustomValidity(""); // Resetea el mensaje de error
+        }
+    }
+function VerificarVacio(sector_) {
     const id_ = document.getElementById("id_hidden").value;
     console.log(id_); // Verifica el valor de id_
-    
+
     $.ajax({
         url: '/Home/VerificarVacio',
         data: { sector: sector_, id: id_ },
-        type: 'GET',  // Asegúrate de usar el tipo GET si la ruta es de solo lectura
+        type: 'GET',
         success: function(response) {
-            // Mostrar el mensaje de campos faltantes
-            $('.mensaje').text(response.mensaje);
-            
-            // Si los datos existen, llenar los campos de los modales
+            if (response.mensaje) {
+                $('.mensaje').text(response.mensaje);
+            }
+
+            $('.modal-body').css({
+                'display': 'flex',
+                'flex-direction': 'column',
+                'justify-content': 'space-between'
+            });
+
             if (response.datos) {
                 $('#inputNombre').val(response.datos.nombre_apellido || '');
                 $('#inputMail').val(response.datos.mail || '');
@@ -161,21 +218,19 @@ function GuardarDatos() {
     });
 }
 
-
-
 </script>
 
 
 <div class="container-no-lee">
     <input type="hidden" id="id_hidden" value="@Model.id" />
-    <a data-bs-toggle="modal" data-bs-target="#Modal_InformacionPersonal" class="cuadro">
-        <div id="cuadro1">
+    <a data-bs-toggle="modal" data-bs-target="#Modal_InformacionPersonal" class="cuadro" id="cuadro1">
+        <div>
             <span onclick="VerificarVacio(1)">Informacion Personal</span>
         </div>
     </a>
 
-    <a data-bs-toggle="modal" data-bs-target="#Modal_Educacion" class="cuadro">
-        <div id="cuadro2"> 
+    <a data-bs-toggle="modal" data-bs-target="#Modal_Educacion" class="cuadro" id="cuadro2">
+        <div > 
             <span onclick="VerificarVacio(2)">Educacion</span> 
         </div>
     </a>
@@ -194,7 +249,7 @@ function GuardarDatos() {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <h5 class="mensaje"></h5>
+                <h5 class="mensaje"></h5> 
                 <button type="button" class="cuadro_conf grande" onclick="$('#Modal_RecibirNombre').modal('show'); $('#Modal_InformacionPersonal').modal('hide');">Si</button>
                 <button type="button" class="cuadro_conf grande" data-bs-dismiss="modal" onclick="confirmarEntrada('Cancelado')">No</button>
             </div>
@@ -202,7 +257,6 @@ function GuardarDatos() {
     </div>
 </div>
 <!-- DATOS -->
-                <!-- Modal NOMBRE -->
                 <div class="modal" tabindex="-1" id="Modal_RecibirNombre" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -292,15 +346,31 @@ function GuardarDatos() {
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title">Por favor, diga el estilo que prefiere</h5>
+                                <h5 class="modal-title">Por favor, seleccione el estilo que prefiere</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <input type="text" id="inputEstilo" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <!-- Opciones de colores predefinidos -->
+                                <div class="mb-3">
+                                    <label for="selectEstilo" class="form-label">Elija un color:</label>
+                                    <select id="selectEstilo" class="form-control" onchange="updateInputColor()">
+                                        <option value="">Seleccione un color...</option>
+                                        <option value="rosa">Rosa</option>
+                                        <option value="verde">Verde</option>
+                                        <option value="azul">Azul</option>
+                                        <option value="negro">Negro</option>
+                                    </select>
+                                </div>
+
+                                <!-- Campo de texto para ingresar color manualmente -->
+                                <div class="mb-3">
+                                    <label for="inputEstilo" class="form-label">O ingrese el color:</label>
+                                    <input type="text" id="inputEstilo" class="form-control" placeholder="Escriba un color" oninput="validateColorInput()" />
+                                    <button class="btn btn-primary mt-2" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                </div>
                             </div>
                             <div class="modal-footer">
-                                <button onclick="$('#Modal_RecibirUbicacion').modal('show'); $('#Modal_RecibirEstilo').modal('hide');">Listo</button>
+                                <button onclick="$('#Modal_RecibirUbicacion').modal('show'); $('#Modal_RecibirEstilo').modal('hide');" class="btn btn-primary">Listo</button>
                             </div>
                         </div>
                     </div>
@@ -322,7 +392,6 @@ function GuardarDatos() {
                         </div>
                     </div>
                 </div>
-
                 <!-- FIN -->
                 <div class="modal" tabindex="-1" id="Final" aria-hidden="true">
                     <div class="modal-dialog">
@@ -340,6 +409,191 @@ function GuardarDatos() {
                 </div>
 
 
+<!-- Modal Educación -->
+    <div class="modal" tabindex="-1" id="Modal_Educacion" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">¿Desea entrar en la sección de Educación?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h5 class="mensaje"></h5>
+                    <button type="button" class="cuadro_conf grande" onclick="$('#Modal_RecibirTitulo').modal('show'); $('#Modal_Educacion').modal('hide');">Si</button>
+                    <button type="button" class="cuadro_conf grande" data-bs-dismiss="modal" onclick="confirmarEntrada('Cancelado')">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+            <!-- DATOS-->
+            <div class="modal" tabindex="-1" id="Modal_RecibirTitulo" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Por favor, diga el título</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputTitulo" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Modal_RecibirInstitucion').modal('show'); $('#Modal_RecibirTitulo').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <div class="modal" tabindex="-1" id="Modal_RecibirInstitucion" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Por favor, diga la institución</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputNombre" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Modal_RecibirDisciplina').modal('show'); $('#Modal_RecibirInstitucion').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <div class="modal" tabindex="-1" id="Modal_RecibirDisciplina" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Por favor, diga la disciplina académica</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputDisci" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Modal_RecibirActividadesGrupo').modal('show'); $('#Modal_RecibirDisciplina').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <div class="modal" tabindex="-1" id="Modal_RecibirActividadesGrupo" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Por favor, diga la actividad en grupo que ha hecho!</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputActGrupo" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Modal_RecibirDescripion').modal('show'); $('#Modal_RecibirActividadesGrupo').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             <div class="modal" tabindex="-1" id="Modal_RecibirDescripion" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Por favor, diga una descripcion adicional!</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputDescripEdu" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Modal_RecibirAno1').modal('show'); $('#Modal_RecibirDescripion').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="modal" tabindex="-1" id="Modal_RecibirAno1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Por favor, diga en que año inició tal curso</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputAno1" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Modal_RecibirMes1').modal('show'); $('#Modal_RecibirDescripion').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" tabindex="-1" id="Modal_RecibirMes1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Ahora el mes</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputMes1" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Modal_RecibirAno2').modal('show'); $('#Modal_RecibirMes1').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" tabindex="-1" id="Modal_RecibirAno2" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Por favor, diga en que año finalizó tal curso</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputAno2" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#Modal_RecibirMes2').modal('show'); $('#Modal_RecibirAno2').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" tabindex="-1" id="Modal_RecibirMes2" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Ahora el mes de finalización</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="inputMes2" class="form-control" />
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="$('#FinalEdu').modal('show'); $('#Modal_RecibirMes2').modal('hide');">Listo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" tabindex="-1" id="FinalEdu" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">No hay más información que agregar</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                            <input type="hidden" id="inputId" value="@Model.id">
+                                <button onclick="GuardarDatos2()">Finalizar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
 <!-- Modal Certificaciones -->
 <div class="modal fade" id="Modal_Certificaciones" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -352,22 +606,6 @@ function GuardarDatos() {
         </div>
     </div>
 </div>
-
-<!-- Modal Educación -->
-<div class="modal fade" id="Modal_Educacion" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modalCont">
-            <h5 class="modal-title">¿Desea entrar en la sección de Educación?</h5>
-            <div class="modal-body">
-                <div class="cuadro_conf grande" onclick="confirmarEntrada('Entrando a Educación');" data-bs-dismiss="modal">Sí</div>
-                <div class="cuadro_conf grande" onclick="confirmarEntrada('Cancelado');" data-bs-dismiss="modal">No</div>
-            </div>
-        </div>
-    </div>
-</div>
-            <!-- DATOS-->
-
-
 <!-- Modal Experiencia -->
 <div class="modal fade" id="Modal_Experiencia" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -450,15 +688,18 @@ function GuardarDatos() {
 
 
 <style>
-.container-no-lee {
+    .container-no-lee {
     display: flex;
     flex-wrap: wrap;
     height: 100vh;
+    padding: 20px;
+    gap: 10px;
 }
+
 .cuadro, .cuadro_conf {
-    flex: 1 0 50%;
+    flex: 1 0 48%; 
     height: 40%;
-    border: 1px solid white;
+    border: 2px solid white;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -466,51 +707,143 @@ function GuardarDatos() {
     font-weight: bold;
     font-size: 1.5rem;
     cursor: pointer;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
 }
+
+.cuadro:hover, .cuadro_conf:hover {
+    transform: translateY(-5px); 
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+}
+
 .grande {
-    font-size: 3rem;  
-    margin: 10px;
+    font-size: 3rem;
+    margin: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
+    width: 90%; /* Para que ocupe más espacio */
+    height: 90%;
     text-align: center;
-    height: 100%; 
+    background-color: transparent;
+    border-radius: 8px;
 }
+
 .cuadro_conf {
     background-color: #48B1A1;
     color: white;
     font-size: 2rem;
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 20px;
     margin: 5px;
+    transition: background-color 0.3s ease;
 }
-.cuadro_conf.grande {
+
+.cuadro_conf:hover {
     background-color: #4CAF50;
-    width: 45%; 
-    height: 80%; 
 }
+
+.cuadro_conf.grande {
+    width: 100%;  /* Asegura que cada botón ocupe todo el ancho disponible */
+    height: 60px; /* Ajusta el alto de los botones */
+    margin-bottom: 20px; /* Espacio entre los botones */
+}
+
 .cuadro_conf.grande:last-child {
     background-color: #F44336;
-    width: 45%; 
-    height: 80%; 
 }
+
 .modal-body {
     display: flex;
-    flex-direction: row; 
-    justify-content: space-evenly;
-    align-items: center;
+    flex-direction: column; /* Los botones estarán en columna */
+    justify-content: space-evenly; /* Asegura que haya un espacio igual entre los botones */
     padding: 20px;
+    height: 100%;
 }
+
+.mensaje {
+    margin-bottom: 20px; /* Añadir espacio para evitar que el mensaje se pegue al contenido */
+    text-align: center;  /* Opcional: centrar el texto */
+}
+
 .modalCont {
     background-color: white;
     text-align: center;
     padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
-#cuadro1 { background-color: #D6F4EF; }
-#cuadro2 { background-color: #ABE7DD; }
-#cuadro3 { background-color: #7ECCC0; }
-#cuadro4 { background-color: #48B1A1; }
-#cuadro5 { color: white; background-color: #16544B; height: 20%; }
-#cuadro6 { color: white; background-color: #09302A; height: 20%; }
+
+#cuadro1 {
+    background-color: #D6F4EF;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+#cuadro2 {
+    background-color: #ABE7DD;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+#cuadro3 {
+    background-color: #7ECCC0;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+#cuadro4 {
+    background-color: #348d80;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+#cuadro5 {
+    color: white;
+    background-color: #16544B;
+    height: 20%;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+#cuadro6 {
+    color: white;
+    background-color: #09302A;
+    height: 20%;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+/* Ajuste para "Información Personal" y "Educación" */
+.cuadro a {
+    text-decoration: none; /* Elimina el subrayado del enlace */
+    color: inherit; /* Mantiene el color de fondo del cuadro */
+}
+
+#cuadro1, #cuadro2 {
+    background-color: #D6F4EF; /* Se mantiene el color de fondo */
+    color: #000; /* Color de texto oscuro */
+    font-weight: bold;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 12px;
+    transition: all 0.3s ease-in-out;
+     text-decoration: none;
+}
+
+#cuadro1:hover, #cuadro2:hover {
+    background-color: #ABE7DD; /* Mantener un efecto de hover suave */
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+#cuadro1 span, #cuadro2 span {
+    font-size: 1.5rem; /* Tamaño de texto consistente */
+    font-weight: bold; /* Hace que el texto sea más prominente */
+}
 </style>

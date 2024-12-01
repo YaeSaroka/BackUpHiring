@@ -115,7 +115,6 @@ public  class BD
             string sp = "InsertarEducacion";
             var parameters = new 
             { 
-                id = educacion.id == 0 ? 0 : educacion.id, 
                 titulo = educacion.titulo, 
                 nombre_institucion = educacion.nombre_institucion, 
                 disciplina_academica = educacion.disciplina_academica, 
