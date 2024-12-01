@@ -549,31 +549,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\devandroid\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\camib\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\devandroid\\BackUpHiring\\Hiring.csproj",
+      "projectUniqueName": "C:\\Users\\camib\\OneDrive\\Desktop\\BackUpHiring\\Hiring.csproj",
       "projectName": "Hiring",
-      "projectPath": "C:\\Users\\devandroid\\BackUpHiring\\Hiring.csproj",
-      "packagesPath": "C:\\Users\\devandroid\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\devandroid\\BackUpHiring\\obj\\",
+      "projectPath": "C:\\Users\\camib\\OneDrive\\Desktop\\BackUpHiring\\Hiring.csproj",
+      "packagesPath": "C:\\Users\\camib\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\camib\\OneDrive\\Desktop\\BackUpHiring\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\devandroid\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\camib\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -629,7 +622,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.302/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

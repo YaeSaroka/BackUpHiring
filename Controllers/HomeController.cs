@@ -139,6 +139,49 @@ public class HomeController : Controller
         return true;
     }
 
+ //PERFIL NO LEE
+
+    public JsonResult VerificarVacio(int sector, int id)
+{
+    Informacion_Personal_Empleado datos_ = null;
+    string mensaje = "DATOS"; // Mensaje predeterminado si todo está bien
+    if (sector == 1)
+        datos_ = Models.BD.CargarPerfilLogin(id);  // Obtener el perfil de la base de datos
+
+    if (datos_ == null)
+    {
+        mensaje = "No se encontró información personal.";
+    }
+    else
+    {
+        List<string> camposFaltantes = new List<string>();
+        var propiedades = datos_.GetType().GetProperties();
+
+        foreach (var propiedad in propiedades)
+        {
+            var valor = propiedad.GetValue(datos_);
+            if (valor == null || string.IsNullOrEmpty(valor.ToString()))
+            {
+                camposFaltantes.Add(propiedad.Name); 
+            }
+        }
+
+        if (camposFaltantes.Count > 0)
+        {
+            mensaje = "Faltan datos por ingresar (" + string.Join(", ", camposFaltantes) + ")";
+        }
+        else
+        {
+            mensaje = "Todos los datos están completos.";
+        }
+    }
+
+    // Devolver los datos del perfil al cliente para rellenar los inputs de los modales
+    return Json(new { mensaje = mensaje, datos = datos_ });
+}
+
+
+
  //INFO PERSONAL
     [HttpPost]
     public IActionResult InsertarInformacionPersonal1(Informacion_Personal_Empleado usuario)

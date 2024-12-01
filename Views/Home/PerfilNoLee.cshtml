@@ -131,12 +131,54 @@ function GuardarDatos() {
         console.log(nombre_, " - nombre ingresado"); // debugggg
     }
 
+   function VerificarVacio(sector_) {
+    const id_ = document.getElementById("id_hidden").value;
+    console.log(id_); // Verifica el valor de id_
+    
+    $.ajax({
+        url: '/Home/VerificarVacio',
+        data: { sector: sector_, id: id_ },
+        type: 'GET',  // Asegúrate de usar el tipo GET si la ruta es de solo lectura
+        success: function(response) {
+            // Mostrar el mensaje de campos faltantes
+            $('.mensaje').text(response.mensaje);
+            
+            // Si los datos existen, llenar los campos de los modales
+            if (response.datos) {
+                $('#inputNombre').val(response.datos.nombre_apellido || '');
+                $('#inputMail').val(response.datos.mail || '');
+                $('#inputTel').val(response.datos.telefono || '');
+                $('#inputAcerca').val(response.datos.acerca_de_mi || '');
+                $('#inputProfesion').val(response.datos.profesion_actual || '');
+                $('#inputEstilo').val(response.datos.estilo || '');
+                $('#inputUbicacion').val(response.datos.ubicacion || '');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Algo salió mal :(', status, error);
+            console.error('Detalles del error:', xhr.responseText);
+        }
+    });
+}
+
+
+
 </script>
 
 
 <div class="container-no-lee">
-    <a data-bs-toggle="modal" data-bs-target="#Modal_InformacionPersonal" class="cuadro"><div  id="cuadro1"> <span>Informacion Personal</span></div></a>
-    <div class="cuadro" id="cuadro2"><a data-bs-toggle="modal" data-bs-target="#Modal_Educacion"> <span>Educacion</span></a></div>
+    <input type="hidden" id="id_hidden" value="@Model.id" />
+    <a data-bs-toggle="modal" data-bs-target="#Modal_InformacionPersonal" class="cuadro">
+        <div id="cuadro1">
+            <span onclick="VerificarVacio(1)">Informacion Personal</span>
+        </div>
+    </a>
+
+    <a data-bs-toggle="modal" data-bs-target="#Modal_Educacion" class="cuadro">
+        <div id="cuadro2"> 
+            <span onclick="VerificarVacio(2)">Educacion</span> 
+        </div>
+    </a>
     <div class="cuadro" id="cuadro3"><a data-bs-toggle="modal" data-bs-target="#Modal_Experiencia"><span>Experiencia</span></a></div>
     <div class="cuadro" id="cuadro4"><a data-bs-toggle="modal" data-bs-target="#Modal_Necesidades"> <span>Necesidades de adaptación</span></a></div>
     <div class="cuadro" id="cuadro5"> <button onclick="repetirTexto()"> Repetir </button></div>
@@ -152,6 +194,7 @@ function GuardarDatos() {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <h5 class="mensaje"></h5>
                 <button type="button" class="cuadro_conf grande" onclick="$('#Modal_RecibirNombre').modal('show'); $('#Modal_InformacionPersonal').modal('hide');">Si</button>
                 <button type="button" class="cuadro_conf grande" data-bs-dismiss="modal" onclick="confirmarEntrada('Cancelado')">No</button>
             </div>
@@ -296,23 +339,6 @@ function GuardarDatos() {
                     </div>
                 </div>
 
-
-
-<!--
-<div class="modal" tabindex="-1" id="Modal_RecibirNombre" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Por favor, diga su mail</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <input type="text" id="inputNombre" class="form-control" >
-        <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar para ingresar Mail</button>
-      </div>
-    </div>
-  </div>
-</div> -->
 
 <!-- Modal Certificaciones -->
 <div class="modal fade" id="Modal_Certificaciones" tabindex="-1" role="dialog" aria-hidden="true">
