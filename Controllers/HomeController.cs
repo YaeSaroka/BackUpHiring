@@ -132,57 +132,68 @@ public class HomeController : Controller
         // Insertar en la BD los datos
         return true;
     }
-    public bool GuardarEduNoLee(string Titulo, string Institucion, string Disciplina, string Actividades, string Descripcion, string AnoInicio, string MesInicio, string AnoFinal, string MesFinal, int id){
-    Educacion educacion_ = new Educacion
-    {
-        titulo = Titulo,
-        nombre_institucion = Institucion,
-        disciplina_academica = Disciplina,
-        actividades_grupo = Actividades,
-        descripcion = Descripcion,
-        mes_expedicion = MesInicio,
-        mes_caducidad = MesFinal,
-        fecha_expedicion = AnoInicio,
-        fecha_caducidad = AnoFinal
-    };
-    Models.BD.InsertarEducacion(educacion_, id);
-    return true;
+    public bool GuardarEduNoLee(string Titulo, string Institucion, string Disciplina, string Actividades, string Descripcion, string AnoInicio, string MesInicio, string AnoFinal, string MesFinal, int id, Educacion edu){
+        Educacion educacion_ = new Educacion
+            {
+                titulo = Titulo,
+                nombre_institucion = Institucion,
+                disciplina_academica = Disciplina,
+                actividades_grupo = Actividades,
+                descripcion = Descripcion,
+                mes_expedicion = MesInicio,
+                mes_caducidad = MesFinal,
+                fecha_expedicion = AnoInicio,
+                fecha_caducidad = AnoFinal
+            };
+        if(edu == null){
+            Models.BD.InsertarEducacion(educacion_, id);
+        } else if(edu != null) Models.BD.ActualizarEducacion(educacion_, id);
+    
+        return true;
     }
 
-  public JsonResult VerificarVacio(int sector, int id)
+public JsonResult VerificarVacio(int sector, int id)
 {
     Informacion_Personal_Empleado datos_ = null;
     List<Educacion> datos_2 = null;
-    string mensaje = "DATOS"; // predeterminado
+    string mensaje = "DATOS"; // Predeterminado
 
     // Cargar los datos según el sector
-    if (sector == 1) datos_ = Models.BD.CargarPerfilLogin(id);  // info personal
-    else if (sector == 2) datos_2 = Models.BD.SelectEducacion(id); // educacion
-    
+    if (sector == 1)
+        datos_ = Models.BD.CargarPerfilLogin(id);  // Información personal
+    else if (sector == 2)
+        datos_2 = Models.BD.SelectEducacion(id); // Educación
 
-    // Verificar si los datos existen para el sector seleccionado
-    if (sector == 1 && datos_ == null) mensaje = "No se encontraron datos de Información Personal ingresados!";
-    else if (sector == 2 && (datos_2 == null || !datos_2.Any()))  mensaje = "No se encontraron datos de Educación ingresados!";
-    
-    else if (datos_ != null)
+    if (sector == 1 && datos_ == null)
+        mensaje = "No se encontraron datos de Información Personal ingresados!";
+    else if (sector == 2 && (datos_2 == null || !datos_2.Any()))
+        mensaje = "No se encontraron datos de Educación ingresados!";
+
+    // Verificar los campos faltantes de Información Personal (sector 1)
+    else if (sector == 1 && datos_ != null)
     {
         List<string> camposFaltantes = new List<string>();
         var propiedades = datos_.GetType().GetProperties();
-
         foreach (var propiedad in propiedades)
         {
             var valor = propiedad.GetValue(datos_);
             if (valor == null || string.IsNullOrEmpty(valor.ToString()))
             {
-                camposFaltantes.Add(propiedad.Name);
+                camposFaltantes.Add(propiedad.Name); 
             }
         }
-        if (camposFaltantes.Count > 0) mensaje = "Faltan datos por ingresar (" + string.Join(", ", camposFaltantes) + ")";
-        else mensaje = "Todos los datos están completos.";
+
+        if (camposFaltantes.Count > 0)
+            mensaje = "Faltan datos por ingresar en Información Personal (" + string.Join(", ", camposFaltantes) + ")";
+        else
+            mensaje = "Todos los datos de Información Personal están completos.";
     }
-    else if (datos_2 != null && datos_2.Any())
+
+    // Verificar los campos faltantes de Educación (sector 2)
+    else if (sector == 2 && datos_2 != null && datos_2.Any())
     {
-        List<string> camposFaltantes = new List<string>();
+        HashSet<string> camposFaltantesSet = new HashSet<string>(); // Usamos HashSet para evitar duplicados
+
         foreach (var educacion in datos_2)
         {
             var propiedades = educacion.GetType().GetProperties();
@@ -191,18 +202,43 @@ public class HomeController : Controller
                 var valor = propiedad.GetValue(educacion);
                 if (valor == null || string.IsNullOrEmpty(valor.ToString()))
                 {
-                    camposFaltantes.Add(propiedad.Name);
+                    camposFaltantesSet.Add(propiedad.Name); 
                 }
             }
         }
-        if (camposFaltantes.Count > 0) mensaje = "Faltan datos por ingresar en Educación (" + string.Join(", ", camposFaltantes) + ")";
-        else mensaje = "Todos los datos de Educación están completos.";
+
+        if (camposFaltantesSet.Count > 0)
+            mensaje = "Faltan datos por ingresar en Educación (" + string.Join(", ", camposFaltantesSet) + ")";
+        else
+            mensaje = "Todos los datos de Educación están completos.";
     }
-    
-    if (sector == 1) return Json(new { mensaje = mensaje, datos = datos_ });  
-    else if (sector == 2) return Json(new { mensaje = mensaje, datos = datos_2 }); 
-    return Json(new { mensaje = "Sector desconocido", datos = (object)null });
+
+    if (sector == 1)
+        return Json(new { mensaje = mensaje, datos = datos_ });
+    else if (sector == 2 && datos_2 != null && datos_2.Any())
+    {
+        var educacionData = datos_2.First();  
+        return Json(new
+        {
+            mensaje = mensaje,
+            datos = new
+            {
+                titulo = educacionData.titulo,
+                institucion = educacionData.nombre_institucion,
+                disciplina = educacionData.disciplina_academica,
+                actividad_grupo = educacionData.actividades_grupo,
+                descripcion = educacionData.descripcion,
+                ano_inicio = educacionData.fecha_expedicion,
+                mes_inicio = educacionData.mes_expedicion,
+                ano_fin = educacionData.fecha_caducidad,
+                mes_fin = educacionData.mes_caducidad
+            }
+        });
+    }
+
+    return Json(new { mensaje, datos = (object)null });
 }
+
 
 
  //INFO PERSONAL

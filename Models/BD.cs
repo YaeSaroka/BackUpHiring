@@ -147,6 +147,29 @@ public  class BD
 
         return Lista_educacion;
     }
+
+  public static void ActualizarEducacion(Educacion educacion, int id)
+{
+    using (SqlConnection db = new SqlConnection(ConnectionString))
+    {
+        string sp = "ActualizarEducacion";
+        var parameters = new
+        {
+            id_empleado = id, 
+            titulo = educacion.titulo,
+            nombre_institucion = educacion.nombre_institucion,
+            disciplina_academica = educacion.disciplina_academica,
+            actividades_grupo = educacion.actividades_grupo,
+            descripcion = educacion.descripcion,
+            fecha_expedicion = educacion.fecha_expedicion,
+            fecha_caducidad = educacion.fecha_caducidad,
+            mes_expedicion = educacion.mes_expedicion,
+            mes_caducidad = educacion.mes_caducidad
+        };
+        db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
+    }
+}
+
     public static Educacion SelectEducacionIdCard(int id)
     {
         Educacion educacion = null;

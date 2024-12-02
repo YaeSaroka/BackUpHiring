@@ -98,15 +98,13 @@ function iniciarReconocimientoVoz() {
     recognition.start();
 
     recognition.onresult = function(event) {
-        // Toma lo que se ha dicho, convierte a minúsculas y elimina el punto final si lo tiene
+        
         let color = event.results[0][0].transcript.toLowerCase().trim();
 
-        // Elimina el punto final si existe
         color = color.replace(/\.$/, '');
 
-        // Verifica si el color es válido
         if (["rosa", "verde", "azul", "negro"].includes(color)) {
-            document.getElementById("inputEstilo").value = color; // Muestra el color en el input
+            document.getElementById("inputEstilo").value = color;
         } else {
             alert("Por favor, diga un color válido: rosa, verde, azul o negro.");
         }
@@ -118,30 +116,43 @@ function iniciarReconocimientoVoz() {
 }
 
 // guradar datos con controller
-function GuardarDatos() {
-        const nombre_ = document.getElementById('inputNombre').value;
-        const mail_ = document.getElementById('inputMail').value;
-        const telefono_ = document.getElementById('inputTel').value;
-        const acerca_ = document.getElementById('inputAcerca').value;
-        const profesion_ = document.getElementById('inputProfesion').value;
-        const est_ = document.getElementById('inputEstilo').value;
-        const ubicacion_ = document.getElementById('inputUbicacion').value;
-        const id_ = document.getElementById('inputId').value;
-        $.ajax({
-            url: '/Home/InsertarUsuario/',
-            type: 'POST',
-            data: {id: id_,nombre: nombre_, mail:mail_, telefono: telefono_, acercademi: acerca_, profesion: profesion_, estilo: est_, ubicacion: ubicacion_},
-            success: function (response) {
-                alert("ok");
-            },
-            error: function (xhr, status, error) {
-                console.error("Error al obtener los datos: ", error);
-            }
+    function GuardarDatos() {
+    const nombre_ = document.getElementById('inputNombre').value;
+    const mail_ = document.getElementById('inputMail').value;
+    const telefono_ = document.getElementById('inputTel').value;
+    const acerca_ = document.getElementById('inputAcerca').value;
+    const profesion_ = document.getElementById('inputProfesion').value;
+    const est_ = document.getElementById('inputEstilo').value;
+    const ubicacion_ = document.getElementById('inputUbicacion').value;
+    const id_ = document.getElementById('inputId').value;
+
+    // Obtener el valor hexadecimal del color
+    const hexColor = getHexColor(est_);
+
+    $.ajax({
+        url: '/Home/InsertarUsuario/',
+        type: 'POST',
+        data: {
+            id: id_,
+            nombre: nombre_,
+            mail: mail_,
+            telefono: telefono_,
+            acercademi: acerca_,
+            profesion: profesion_,
+            estilo: hexColor, 
+            ubicacion: ubicacion_
+        },
+        success: function (response) {
+            alert("ok");
+        },
+        error: function (xhr, status, error) {
+            console.error("Error al obtener los datos: ", error);
+        }
     });
-    }
+}
     function GuardarDatos2(){
     const id_ = document.getElementById('inputId').value;
-    let titulo = $("#inputTitulo").val();
+    const titulo = document.getElementById("inputTitulo").value;
     let institucion = $("#inputInstitucion").val();
     let disciplina = $("#inputDisci").val();
     let actividades = $("#inputActGrupo").val();
@@ -154,37 +165,55 @@ function GuardarDatos() {
     $.ajax({
         type: "POST",
         url: "/Home/GuardarEduNoLee/", 
-        data: {titulo = titulo, institucion = institucion, Disciplina = disciplina, Actividades = actividades, Descripcion = descripcion, AnoInicio = anoInicio, MesInicio = mesInicio, AnoFinal = anoFinal, MesFinal = mesFinal, id = id_ },
-        contentType: "application/json",
+        data: {
+            Titulo: titulo, Institucion: institucion, Disciplina: disciplina, Actividades: actividades,
+            Descripcion: descripcion,
+            AnoInicio: anoInicio,
+            MesInicio: mesInicio,
+            AnoFinal: anoFinal,
+            MesFinal: mesFinal,
+            id: id_,
+            datos_: datos,
+        },
         success: function(response) {
-            // Manejo de éxito
-            console.log("Datos guardados con éxito");
+            alert("guardado!");
         },
         error: function(error) {
             // Manejo de error
             console.log("Error al guardar los datos");
         }
     });
-    }
+}
+function getHexColor(colorName) {
+    const colors = {
+        rosa: "#FF1493", 
+        verde: "#32CD32", 
+        azul: "#0000FF", 
+        negro: "#000000" 
+    };
 
+    return colors[colorName.toLowerCase()] || ""; 
+}
     function updateInputColor() {
-        var selectedColor = document.getElementById("selectEstilo").value;
-        document.getElementById("inputEstilo").value = selectedColor; // Actualiza el input con el color seleccionado
-    }
-    function validateColorInput() {
-        const validColors = ["rosa", "verde", "azul", "negro"];
-        const inputColor = document.getElementById("inputEstilo").value.toLowerCase().trim();
+    var selectedColor = document.getElementById("selectEstilo").value;
+    document.getElementById("inputEstilo").value = selectedColor; 
+}
 
-        // Si el color ingresado no es válido, limpiamos el input
-        if (!validColors.includes(inputColor) && inputColor !== "") {
-            document.getElementById("inputEstilo").setCustomValidity("Por favor, ingrese un color válido: rosa, verde, azul o negro.");
-        } else {
-            document.getElementById("inputEstilo").setCustomValidity(""); // Resetea el mensaje de error
-        }
+    function validateColorInput() {
+    const validColors = ["rosa", "verde", "azul", "negro"];
+    const inputColor = document.getElementById("inputEstilo").value.toLowerCase().trim();
+
+    if (!validColors.includes(inputColor) && inputColor !== "") {
+        document.getElementById("inputEstilo").setCustomValidity("Por favor, ingrese un color válido: rosa, verde, azul o negro.");
+    } else {
+        document.getElementById("inputEstilo").setCustomValidity(""); 
     }
+}
+
 function VerificarVacio(sector_) {
     const id_ = document.getElementById("id_hidden").value;
     console.log(id_); // Verifica el valor de id_
+    let datos=null;
 
     $.ajax({
         url: '/Home/VerificarVacio',
@@ -192,7 +221,7 @@ function VerificarVacio(sector_) {
         type: 'GET',
         success: function(response) {
             if (response.mensaje) {
-                $('.mensaje').text(response.mensaje);
+                $('.mensaje').text(response.mensaje); // Muestra el mensaje de error o éxito
             }
 
             $('.modal-body').css({
@@ -201,6 +230,7 @@ function VerificarVacio(sector_) {
                 'justify-content': 'space-between'
             });
 
+            // Si hay datos de información personal, llenar los campos correspondientes
             if (response.datos) {
                 $('#inputNombre').val(response.datos.nombre_apellido || '');
                 $('#inputMail').val(response.datos.mail || '');
@@ -210,6 +240,21 @@ function VerificarVacio(sector_) {
                 $('#inputEstilo').val(response.datos.estilo || '');
                 $('#inputUbicacion').val(response.datos.ubicacion || '');
             }
+
+            // Si el sector es 2 (Educación), llenar los campos de educación
+            if (sector_ === 2 && response.datos) {
+                const datosEducacion = response.datos;
+                datos = response.datos;
+                $('#inputTitulo').val(datosEducacion.titulo || '');
+                $('#inputNombre').val(datosEducacion.institucion || '');
+                $('#inputDisci').val(datosEducacion.disciplina || '');
+                $('#inputActGrupo').val(datosEducacion.actividad_grupo || '');
+                $('#inputDescripEdu').val(datosEducacion.descripcion || '');
+                $('#inputAno1').val(datosEducacion.ano_inicio || '');
+                $('#inputMes1').val(datosEducacion.mes_inicio || '');
+                $('#inputAno2').val(datosEducacion.ano_fin || '');
+                $('#inputMes2').val(datosEducacion.mes_fin || '');
+            }
         },
         error: function(xhr, status, error) {
             console.error('Algo salió mal :(', status, error);
@@ -217,6 +262,7 @@ function VerificarVacio(sector_) {
         }
     });
 }
+
 
 </script>
 
@@ -523,7 +569,7 @@ function VerificarVacio(sector_) {
                                 <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
                             </div>
                             <div class="modal-footer">
-                                <button onclick="$('#Modal_RecibirMes1').modal('show'); $('#Modal_RecibirDescripion').modal('hide');">Listo</button>
+                                <button onclick="$('#Modal_RecibirMes1').modal('show'); $('#Modal_RecibirAno1').modal('hide');">Listo</button>
                             </div>
                         </div>
                     </div>
