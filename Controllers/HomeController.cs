@@ -152,27 +152,21 @@ public class HomeController : Controller
         return true;
     }
     public bool GuardarCerti(
-    string titulo, 
-    string empresaEmisora, 
-    DateTime fechaExp, 
-    DateTime fechaCaducidad, 
-    int id, 
-    int idCredencial, int id_cert_)
+    string titulo_, string empresaEmisora, DateTime fechaExp, DateTime fechaCaducidad,
+    int id_user, int idCredencial, int id_cert_)
 {
-
     var certificacion = new Certificacion
     {
-        titulo = titulo,
+        titulo = titulo_,
         empresa_emisora = empresaEmisora,
         fecha_expedicion = fechaExp,
         fecha_caducidad = fechaCaducidad,
-        id_info_empleado = id,
+        id_info_empleado = id_user,
         id_credencial = idCredencial,
         id = id_cert_
     };
 
-    Models.BD.InsertarCertificaciones(certificacion, id, id_cert_);
-
+    Models.BD.InsertarCertificaciones(certificacion, id_user, id_cert_);
     return true;
 }
 

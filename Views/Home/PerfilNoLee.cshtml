@@ -227,7 +227,7 @@ function GuardarDatos3() {
     const fechaCaducidad = `${anoCaduc}-${mesCaduc.padStart(2, '0')}-01`;  
     const idCrede = idCredeElement.value;
     const id_cert = idHiddenCerti.value;
-    console.log(id_cert);
+    console.log(id_cert, id_, "#000 - ajax");
 
     $.ajax({
         type: "POST",
@@ -237,7 +237,7 @@ function GuardarDatos3() {
             EmpresaEmisora: empresaEmisora,
             FechaExp: fechaExp,
             FechaCaducidad: fechaCaducidad,
-            id: id_, // ID dinámico
+            id_user: id_, // ID dinámico
             Idcredencial: idCrede,
             id_cert_: id_cert
         },
