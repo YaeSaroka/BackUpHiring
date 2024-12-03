@@ -30,6 +30,7 @@ document.querySelectorAll('.cuadro span').forEach(span => {
 
 let usandoOpcionesAlternativas = false;
 
+
 function cambiarOpciones() {
     const cuadros = document.querySelectorAll('.cuadro');
     const opciones = [
@@ -48,10 +49,17 @@ function cambiarOpciones() {
     ];
 
     cuadros.forEach((cuadro, index) => {
-        const config = usandoOpcionesAlternativas ? opcionesDefault[index] : opciones[index];
+        // Validar que el índice sea válido
+        if (index >= opciones.length || index >= opcionesDefault.length) return;
+
         const span = cuadro.querySelector('span');
+        if (!span) return; // Salta cuadros sin un span
+
+        const config = usandoOpcionesAlternativas ? opcionesDefault[index] : opciones[index];
         span.textContent = config.texto;
         cuadro.setAttribute('data-bs-target', config.modal);
+
+        // Ajustar onclick según texto
         if (config.texto === "Certificaciones") {
             span.setAttribute('onclick', 'VerificarVacio(3)');
         } else {
@@ -61,17 +69,16 @@ function cambiarOpciones() {
     });
 
     usandoOpcionesAlternativas = !usandoOpcionesAlternativas;
-}
 
-
-
-function repetirTexto() {
+    // Repetir texto según el estado actual
     if (usandoOpcionesAlternativas) {
         text_to_speech('Ahora las opciones disponibles son Certificaciones, Certificado Único de discapacidad, Idiomas, Solicitar Recomendación, y Volver.');
     } else {
         text_to_speech('Izquierda Información Personal, abajo experiencia. Derecha educación, abajo necesidades de adaptación.');
     }
 }
+
+
 
 function confirmarEntrada(texto) {
     text_to_speech(texto);
@@ -355,14 +362,18 @@ function VerificarVacio(sector_) {
     </a>
 
     <a data-bs-toggle="modal" data-bs-target="#Modal_Educacion" class="cuadro" id="cuadro2">
-        <div > 
+        <div> 
             <span onclick="VerificarVacio(2)">Educacion</span> 
         </div>
     </a>
     <div class="cuadro" id="cuadro3"><a data-bs-toggle="modal" data-bs-target="#Modal_Experiencia"><span>Experiencia</span></a></div>
     <div class="cuadro" id="cuadro4"><a data-bs-toggle="modal" data-bs-target="#Modal_Necesidades"> <span>Necesidades de adaptación</span></a></div>
-    <div class="cuadro" id="cuadro5"> <button onclick="repetirTexto()"> Repetir </button></div>
-    <div class="cuadro" id="cuadro6"> <button onclick="cambiarOpciones()"><span>Otras Opciones</span></button></div>
+    <div class="cuadro" id="cuadro5"> 
+        <button onclick="repetirTexto()"> <span>Repetir</span> </button>
+    </div>
+    <div class="cuadro" id="cuadro6"> 
+        <button onclick="cambiarOpciones()"> <span>Otras Opciones</span> </button>
+    </div>
 </div>
 
 <!-- Modal INFO PERSONAL -->
