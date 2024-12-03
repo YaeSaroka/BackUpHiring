@@ -356,32 +356,34 @@ public  class BD
             }
 
     //CERTIFICACIONES
-    public static void InsertarCertificaciones(Certificacion Certificaciones, int id_info_empleado, int id)
+   public static void InsertarCertificaciones(Certificacion certificaciones, int id_info_empleado, int id_)
+{
+    try
+    {
+        using (SqlConnection db = new SqlConnection(ConnectionString))
         {
-            try
+            string sp = "InsertarCertificaciones";
+        
+            var parameters = new
             {
-                using (SqlConnection db = new SqlConnection(ConnectionString))
-                {
-                    string sp = "InsertarCertificaciones";
-                    var parameters = new 
-                    { 
-                        id = Certificaciones.id == 0 ? 0 : Certificaciones.id, 
-                        titulo = Certificaciones.titulo,
-                        empresa_emisora= Certificaciones.empresa_emisora,
-                        id_credencial= Certificaciones.id_credencial,
-                        url_credencial= Certificaciones.url_credencial,
-                        id_info_empleado= Certificaciones.id_info_empleado,
-                        fecha_caducidad= Certificaciones.fecha_caducidad,
-                        fecha_expedicion= Certificaciones.fecha_expedicion
-                    };
-                    db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error al insertar el cud en la base de datos.", ex);
-            }
+                id = id_,
+                titulo = certificaciones.titulo,
+                empresa_emisora = certificaciones.empresa_emisora,
+                id_credencial = certificaciones.id_credencial,
+                url_credencial = certificaciones.url_credencial,
+                id_info_empleado = id_info_empleado,
+                fecha_caducidad = certificaciones.fecha_caducidad,
+                fecha_expedicion = certificaciones.fecha_expedicion
+            };
+
+            db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
         }
+    }
+    catch (Exception ex)
+    {
+        throw new Exception("Error al insertar o actualizar en la base de datos.", ex);
+    }
+}
 
     public static List<Certificacion> SelectCertificacion(int Id_Info_Empleado)
         {

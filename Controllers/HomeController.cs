@@ -151,27 +151,37 @@ public class HomeController : Controller
     
         return true;
     }
-    public bool GuardarCerti(string Titulo_, string EmpresaEmisora, DateTime FechaExp, DateTime FechaCaducidad, int id, int Idcredencial){
-        int id_certi = 0;
-        Certificacion Certi = new Certificacion 
-        {
-            titulo = Titulo_,
-            empresa_emisora = EmpresaEmisora,
-            fecha_expedicion = FechaExp,
-            fecha_caducidad = FechaCaducidad,
-            id_info_empleado = id,
-            id_credencial = Idcredencial,
-            id = id_certi
-        };
-        Models.BD.InsertarCertificaciones(Certi, id, id_certi);
-        
-        return true;
-    }
+    public bool GuardarCerti(
+    string titulo, 
+    string empresaEmisora, 
+    DateTime fechaExp, 
+    DateTime fechaCaducidad, 
+    int id, 
+    int idCredencial, int id_cert_)
+{
+
+    var certificacion = new Certificacion
+    {
+        titulo = titulo,
+        empresa_emisora = empresaEmisora,
+        fecha_expedicion = fechaExp,
+        fecha_caducidad = fechaCaducidad,
+        id_info_empleado = id,
+        id_credencial = idCredencial,
+        id = id_cert_
+    };
+
+    Models.BD.InsertarCertificaciones(certificacion, id, id_cert_);
+
+    return true;
+}
+
 
 public JsonResult VerificarVacio(int sector, int id)
 {
     Informacion_Personal_Empleado datos_ = null;
     List<Educacion> datos_2 = null;
+    List<Certificacion> datos_3 = null;
     string mensaje = "DATOS"; // Predeterminado
 
     // Cargar los datos según el sector
@@ -179,11 +189,14 @@ public JsonResult VerificarVacio(int sector, int id)
         datos_ = Models.BD.CargarPerfilLogin(id);  // Información personal
     else if (sector == 2)
         datos_2 = Models.BD.SelectEducacion(id); // Educación
-
+    else if (sector == 3)
+        datos_3 = Models.BD.SelectCertificacion(id);
     if (sector == 1 && datos_ == null)
         mensaje = "No se encontraron datos de Información Personal ingresados!";
     else if (sector == 2 && (datos_2 == null || !datos_2.Any()))
         mensaje = "No se encontraron datos de Educación ingresados!";
+    else if (sector == 3 && (datos_3 == null || !datos_3.Any()))
+        mensaje = "No se encontraron datos de Certificacion!";
 
     // Verificar los campos faltantes de Información Personal (sector 1)
     else if (sector == 1 && datos_ != null)
@@ -205,7 +218,6 @@ public JsonResult VerificarVacio(int sector, int id)
             mensaje = "Todos los datos de Información Personal están completos.";
     }
 
-    // Verificar los campos faltantes de Educación (sector 2)
     else if (sector == 2 && datos_2 != null && datos_2.Any())
     {
         HashSet<string> camposFaltantesSet = new HashSet<string>(); // Usamos HashSet para evitar duplicados
@@ -229,6 +241,28 @@ public JsonResult VerificarVacio(int sector, int id)
             mensaje = "Todos los datos de Educación están completos.";
     }
 
+    else if(sector == 3 && datos_3 != null && datos_3.Any()){
+        HashSet<string> camposFaltantesSet = new HashSet<string>(); // Usamos HashSet para evitar duplicados
+
+        foreach (var certificacion in datos_3)
+        {
+            var propiedades = certificacion.GetType().GetProperties();
+            foreach (var propiedad in propiedades)
+            {
+                var valor = propiedad.GetValue(certificacion);
+                if (valor == null || string.IsNullOrEmpty(valor.ToString()))
+                {
+                    camposFaltantesSet.Add(propiedad.Name); 
+                }
+            }
+        }
+        if (camposFaltantesSet.Count > 0)
+            mensaje = "Faltan datos por ingresar en Certificacion (" + string.Join(", ", camposFaltantesSet) + ")";
+        else
+            mensaje = "Todos los datos de Certificaion están completos.";
+    }
+
+
     if (sector == 1)
         return Json(new { mensaje = mensaje, datos = datos_ });
     else if (sector == 2 && datos_2 != null && datos_2.Any())
@@ -251,6 +285,25 @@ public JsonResult VerificarVacio(int sector, int id)
             }
         });
     }
+    else if (sector == 3 && datos_3 != null && datos_3.Any())
+{
+    var certificacionData = datos_3.First();
+    Console.WriteLine("Certificación obtenida: " + certificacionData.titulo); // Log
+    return Json(new
+    {
+        mensaje = mensaje,
+        datos = new
+        {
+            titulo = certificacionData.titulo,
+            empresa = certificacionData.empresa_emisora,
+            credencial = certificacionData.id_credencial,
+            caducidad = certificacionData.fecha_caducidad,
+            expedicion = certificacionData.fecha_expedicion,
+            id = certificacionData.id_info_empleado,
+            id_certi = certificacionData.id
+        }
+    });
+}
 
     return Json(new { mensaje, datos = (object)null });
 }

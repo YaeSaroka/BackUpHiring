@@ -192,44 +192,63 @@ function iniciarReconocimientoVoz() {
         }
     });
 }
-
 function GuardarDatos3() {
-    const id_ = document.getElementById('inputId').value;
-    const titulo = document.getElementById("inputTitulo").value; 
-    const empresaEmisora = document.getElementById("inputTitulo").value;
-    const mesExp = document.getElementById("inputMesExp").value;
-    const anoExp = document.getElementById("inputAnoExp").value;
-    const mesCaduc = document.getElementById("inputMesCaduc").value;
-    const anoCaduc = document.getElementById("inputAnoCaduc").value;
+    const idElement = document.getElementById('inputId');
+    const tituloElement = document.getElementById("inputTituloCert");
+    const empresaEmisoraElement = document.getElementById("inputEmpresaCerti");
+    const mesExpElement = document.getElementById("inputMesExp");
+    const anoExpElement = document.getElementById("inputAnoExp");
+    const mesCaducElement = document.getElementById("inputMesCaduc");
+    const anoCaducElement = document.getElementById("inputAnoCaduc");
+    const idCredeElement = document.getElementById("inputCredencial");
+    const idHiddenCerti = document.getElementById("inputId_Certi");
+
+    if (!idElement || !tituloElement || !empresaEmisoraElement || 
+        !mesExpElement || !anoExpElement || 
+        !mesCaducElement || !anoCaducElement || !idCredeElement) {
+        console.error("Uno o más elementos no se encontraron en el DOM.");
+        return;
+    }
+
+    const id_ = idElement.value || 0; // Si no tiene ID, se asume que es 0 para insertar.
+    const titulo = tituloElement.value;
+    const empresaEmisora = empresaEmisoraElement.value;
+    const mesExp = mesExpElement.value;
+    const anoExp = anoExpElement.value;
+    const mesCaduc = mesCaducElement.value;
+    const anoCaduc = anoCaducElement.value;
 
     if (!mesExp || !anoExp || !mesCaduc || !anoCaduc) {
         alert("Por favor, complete todos los campos de mes y año.");
         return;
     }
+
     const fechaExp = `${anoExp}-${mesExp.padStart(2, '0')}-01`;  
     const fechaCaducidad = `${anoCaduc}-${mesCaduc.padStart(2, '0')}-01`;  
-    const idCrede = document.getElementById("inputTitulo").value; 
+    const idCrede = idCredeElement.value;
+    const id_cert = idHiddenCerti.value;
+    console.log(id_cert);
 
     $.ajax({
         type: "POST",
-        url: "/Home/GuardarCerti/",  
+        url: "/Home/GuardarCerti/",
         data: {
-            Titulo: titulo, 
-            EmpresaEmisora: empresaEmisora,  
-            FechaExp: fechaExp,  
-            FechaCaducidad: fechaCaducidad,  
-            id: id_,
-            Idcredencial: idCrede
+            Titulo_: titulo,
+            EmpresaEmisora: empresaEmisora,
+            FechaExp: fechaExp,
+            FechaCaducidad: fechaCaducidad,
+            id: id_, // ID dinámico
+            Idcredencial: idCrede,
+            id_cert_: id_cert
         },
         success: function(response) {
-            alert("Datos guardados!");
+            alert("Datos guardados correctamente.");
         },
         error: function(error) {
-            console.log("Error al guardar los datos");
+            console.error("Error al guardar los datos", error);
         }
     });
 }
-
 
 
 function getHexColor(colorName) {
@@ -300,6 +319,22 @@ function VerificarVacio(sector_) {
                 $('#inputMes1').val(datosEducacion.mes_inicio || '');
                 $('#inputAno2').val(datosEducacion.ano_fin || '');
                 $('#inputMes2').val(datosEducacion.mes_fin || '');
+            }
+            //si el sector 3 está
+            if (sector_ === 3 && response.datos) {
+                const datosCertificacion = response.datos;
+                console.log(datosCertificacion);
+                $('#inputTituloCert').val(datosCertificacion.titulo || '');
+                $('#inputEmpresaCerti').val(datosCertificacion.empresa || '');
+                $('#inputCredencial').val(datosCertificacion.credencial || '');
+                $('#inputMesExp').val(new Date(datosCertificacion.expedicion).getMonth() + 1 || '');
+                $('#inputAnoExp').val(new Date(datosCertificacion.expedicion).getFullYear() || '');
+                $('#inputMesCaduc').val(new Date(datosCertificacion.caducidad).getMonth() + 1 || '');
+                $('#inputAnoCaduc').val(new Date(datosCertificacion.caducidad).getFullYear() || '');
+                if(response.datos.id != 0) $('#inputId_Certi').val(datosCertificacion.id_certi);
+                console.log("Certificación actualizada:", datosCertificacion);
+                console.log(document.getElementById('inputId_Certi').value)
+                
             }
         },
         error: function(xhr, status, error) {
@@ -719,44 +754,46 @@ function VerificarVacio(sector_) {
     </div>
 </div>
 
-
-    <!-- DATOS -->
-            <div class="modal" tabindex="-1" id="Modal_RecibirTituloCerti" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Por favor, diga el título del certificado!</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <input type="text" id="inputTitulo" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
-                            </div>
-                            <div class="modal-footer">
-                                <button onclick="$('#Modal_RecibirEmpresaEmisora').modal('show'); $('#Modal_RecibirTituloCerti').modal('hide');">Listo</button>
-                            </div>
-                        </div>
-                    </div>
+<!-- Modal Título del Certificado -->
+<div class="modal" tabindex="-1" id="Modal_RecibirTituloCerti" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Por favor, diga el título del certificado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal" tabindex="-1" id="Modal_RecibirEmpresaEmisora" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Por favor, diga la institucion/empresa emisora</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <input type="text" id="inputTitulo" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
-                            </div>
-                            <div class="modal-footer">
-                                <button onclick="$('#Modal_RecibirFechaCredencialExp').modal('show'); $('#Modal_RecibirEmpresaEmisora').modal('hide');">Listo</button>
-                            </div>
-                        </div>
-                    </div>
+            <div class="modal-body">
+                <input type="text" id="inputTituloCert" class="form-control" />
+                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
             </div>
+            <div class="modal-footer">
+                <button onclick="$('#Modal_RecibirEmpresaEmisora').modal('show'); $('#Modal_RecibirTituloCerti').modal('hide');">Listo</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-            <div class="modal" tabindex="-1" id="Modal_RecibirFechaCredencialExp" aria-hidden="true">
+<!-- Modal Empresa Emisora -->
+<div class="modal" tabindex="-1" id="Modal_RecibirEmpresaEmisora" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Por favor, diga la institución/empresa emisora</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="inputEmpresaCerti" class="form-control" />
+                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+            </div>
+            <div class="modal-footer">
+                <button onclick="$('#Modal_RecibirFechaCredencialExp').modal('show'); $('#Modal_RecibirEmpresaEmisora').modal('hide');">Listo</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Fecha Expedición -->
+<div class="modal" tabindex="-1" id="Modal_RecibirFechaCredencialExp" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -776,7 +813,7 @@ function VerificarVacio(sector_) {
     </div>
 </div>
 
-<!-- Modal for Expiration Date -->
+<!-- Modal Fecha Caducidad -->
 <div class="modal" tabindex="-1" id="Modal_RecibirFechaCredencialCaduc" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -796,37 +833,42 @@ function VerificarVacio(sector_) {
         </div>
     </div>
 </div>
-            <div class="modal" tabindex="-1" id="Modal_RecibirIdCrede" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Por favor, diga el id de la credencial!</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <input type="text" id="inputTitulo" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
-                            </div>
-                            <div class="modal-footer">
-                                <button onclick="$('#FinalCerti').modal('show'); $('#Modal_RecibirIdCrede').modal('hide');">Listo</button>
-                            </div>
-                        </div>
-                    </div>
+
+<!-- Modal ID Credencial -->
+<div class="modal" tabindex="-1" id="Modal_RecibirIdCrede" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Por favor, diga el ID de la credencial</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal" tabindex="-1" id="FinalCerti" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">No hay más información que agregar</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                            <input type="hidden" id="inputId" value="@Model.id">
-                                <button onclick="GuardarDatos3()">Finalizar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="modal-body">
+                <input type="text" id="inputCredencial" class="form-control" />
+                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+            </div>
+            <div class="modal-footer">
+                <button onclick="$('#FinalCerti').modal('show'); $('#Modal_RecibirIdCrede').modal('hide');">Listo</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Final -->
+<div class="modal" tabindex="-1" id="FinalCerti" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">No hay más información que agregar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="inputId" value="1234"> 
+                <input type="hidden" id="inputId_Certi" value="">
+                <button class="btn btn-success" onclick="GuardarDatos3()">Finalizar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <!-- Modal Necesidades de adaptación -->
