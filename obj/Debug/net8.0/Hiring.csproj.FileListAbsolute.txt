@@ -80,3 +80,4 @@ C:\Users\camib\OneDrive\Desktop\BackUpHiring\obj\Debug\net8.0\refint\Hiring.dll
 C:\Users\camib\OneDrive\Desktop\BackUpHiring\obj\Debug\net8.0\Hiring.pdb
 C:\Users\camib\OneDrive\Desktop\BackUpHiring\obj\Debug\net8.0\Hiring.genruntimeconfig.cache
 C:\Users\camib\OneDrive\Desktop\BackUpHiring\obj\Debug\net8.0\ref\Hiring.dll
+C:\Users\camib\OneDrive\Desktop\BackUpHiring\bin\Debug\net8.0\package-lock.json

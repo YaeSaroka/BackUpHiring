@@ -151,6 +151,22 @@ public class HomeController : Controller
     
         return true;
     }
+    public bool GuardarCerti(string Titulo_, string EmpresaEmisora, DateTime FechaExp, DateTime FechaCaducidad, int id, int Idcredencial){
+        int id_certi = 0;
+        Certificacion Certi = new Certificacion 
+        {
+            titulo = Titulo_,
+            empresa_emisora = EmpresaEmisora,
+            fecha_expedicion = FechaExp,
+            fecha_caducidad = FechaCaducidad,
+            id_info_empleado = id,
+            id_credencial = Idcredencial,
+            id = id_certi
+        };
+        Models.BD.InsertarCertificaciones(Certi, id, id_certi);
+        
+        return true;
+    }
 
 public JsonResult VerificarVacio(int sector, int id)
 {
