@@ -250,6 +250,15 @@ public  class BD
         }
         return id;
     }
+    public static void ActualizarAdaptacion(int id, string nombre)
+    {
+        using (SqlConnection db = new SqlConnection(ConnectionString))
+        {
+            string sp = "ActualizarAdaptacion";
+            var parameters = new { id_necesidad = id, necesidad = nombre};
+            db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
+        }
+    }
 
     public static Necesidad SelectAdaptacion(int Id_Info_Empleado)
     {

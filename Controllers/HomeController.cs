@@ -169,6 +169,19 @@ public class HomeController : Controller
     Models.BD.InsertarCertificaciones(certificacion, id_user, id_cert_);
     return true;
 }
+public bool GuardarNece(int id_, string necesidad, int id_nece){
+    Necesidad necesidad_ = new Necesidad 
+    {
+        id = id_nece,
+        nombre = necesidad,
+        id_info_empleado = id_
+    };
+    var Nece = Models.BD.SelectAdaptacion(id_);
+    if(Nece == null) Models.BD.InsertarAdaptacion(necesidad_, id_);
+    else Models.BD.ActualizarAdaptacion(id_nece, necesidad);
+    
+return true;
+}
 
 
 public JsonResult VerificarVacio(int sector, int id)
@@ -176,7 +189,8 @@ public JsonResult VerificarVacio(int sector, int id)
     Informacion_Personal_Empleado datos_ = null;
     List<Educacion> datos_2 = null;
     List<Certificacion> datos_3 = null;
-    string mensaje = "DATOS"; // Predeterminado
+    Necesidad datos_4 = null;
+    string mensaje = "No se encontraron datos de "; // Predeterminado
 
     // Cargar los datos según el sector
     if (sector == 1)
@@ -185,12 +199,16 @@ public JsonResult VerificarVacio(int sector, int id)
         datos_2 = Models.BD.SelectEducacion(id); // Educación
     else if (sector == 3)
         datos_3 = Models.BD.SelectCertificacion(id);
+    else if (sector == 4)
+        datos_4 = Models.BD.SelectAdaptacion(id);
     if (sector == 1 && datos_ == null)
-        mensaje = "No se encontraron datos de Información Personal ingresados!";
+        mensaje += " Información Personal ingresados!";
     else if (sector == 2 && (datos_2 == null || !datos_2.Any()))
-        mensaje = "No se encontraron datos de Educación ingresados!";
+        mensaje += " Educación ingresados!";
     else if (sector == 3 && (datos_3 == null || !datos_3.Any()))
-        mensaje = "No se encontraron datos de Certificacion!";
+        mensaje += " Certificacion!";
+    else if(sector == 4 && (datos_4 == null))
+        mensaje += " Necesidades";
 
     // Verificar los campos faltantes de Información Personal (sector 1)
     else if (sector == 1 && datos_ != null)
@@ -211,7 +229,6 @@ public JsonResult VerificarVacio(int sector, int id)
         else
             mensaje = "Todos los datos de Información Personal están completos.";
     }
-
     else if (sector == 2 && datos_2 != null && datos_2.Any())
     {
         HashSet<string> camposFaltantesSet = new HashSet<string>(); // Usamos HashSet para evitar duplicados
@@ -234,9 +251,8 @@ public JsonResult VerificarVacio(int sector, int id)
         else
             mensaje = "Todos los datos de Educación están completos.";
     }
-
     else if(sector == 3 && datos_3 != null && datos_3.Any()){
-        HashSet<string> camposFaltantesSet = new HashSet<string>(); // Usamos HashSet para evitar duplicados
+        HashSet<string> camposFaltantesSet = new HashSet<string>();
 
         foreach (var certificacion in datos_3)
         {
@@ -255,10 +271,18 @@ public JsonResult VerificarVacio(int sector, int id)
         else
             mensaje = "Todos los datos de Certificaion están completos.";
     }
+    else if(sector == 4 && datos_4 != null){
+        List<string> camposFaltantes = new List<string>();
+        if(datos_4.nombre == null){
+             camposFaltantes.Add(datos_4.nombre); 
+        }
+        if (camposFaltantes.Count > 0)
+            mensaje = "Faltan datos por ingresar en Necesidad (" + string.Join(", ", camposFaltantes) + ")";
+        else
+            mensaje = "Todos los datos de Necesidad están completos.";
+    }
 
-
-    if (sector == 1)
-        return Json(new { mensaje = mensaje, datos = datos_ });
+    if (sector == 1) return Json(new { mensaje = mensaje, datos = datos_ });
     else if (sector == 2 && datos_2 != null && datos_2.Any())
     {
         var educacionData = datos_2.First();  
@@ -298,7 +322,7 @@ public JsonResult VerificarVacio(int sector, int id)
         }
     });
 }
-
+    else if (sector == 4 && datos_4 != null) return Json(new {mensaje = mensaje, datos = datos_4});
     return Json(new { mensaje, datos = (object)null });
 }
 
