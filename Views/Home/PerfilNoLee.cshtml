@@ -116,35 +116,34 @@ function confirmarEntrada(texto) {
 
 function iniciarReconocimientoVoz(id, tipo) {
     text_to_speech("hable"); // Iniciar confirmación con el texto reconocido
-    
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'es-ES'; 
-    
     recognition.start();
+    console.log("sdsadsadsad");
 
     recognition.onresult = function(event) {
-        let texto = event.results[0][0].transcript.toLowerCase().trim();
+    console.log("Resultado del reconocimiento: ", event);
+    let texto = event.results[0][0].transcript.toLowerCase().trim();
+    console.log(texto, " - lo que escuchóo");
 
-        // Eliminar el punto final, si existe
-        texto = texto.replace(/\.$/, '').trim();
+    // Eliminar el punto final, si existe
+    texto = texto.replace(/\.$/, '').trim();
 
-        // Si el tipo es 1 (es para colores), validamos los colores
-        if (tipo === 1) {
-            if (["rosa", "verde", "azul", "negro"].includes(texto)) {
-                startConfirmationMic(id, texto, tipo); 
-            } else {
-                alert("Por favor, diga un color válido: rosa, verde, azul o negro.");
-            }
+    // Si el tipo es 1 (es para colores), validamos los colores
+    if (tipo === 1) {
+        if (["rosa", "verde", "azul", "negro"].includes(texto)) {
+            startConfirmationMic(id, texto, tipo);
         } else {
-            text_to_speech(`El texto transcrito es: ${texto}. ¿Es correcto? Diga "sí" para confirmar o "no" para repetir.`); 
-            recognition.stop(); 
-
-            // Espera un poco antes de pedir la confirmación
-            setTimeout(function() {
-                startConfirmationMic(id, texto, tipo); 
-            }, 8000); 
+            alert("Por favor, diga un color válido: rosa, verde, azul o negro.");
         }
-    };
+    } else {
+        text_to_speech(`El texto transcrito es: ${texto}. ¿Es correcto? Diga "sí" para confirmar o "no" para repetir.`);
+        recognition.stop();
+        setTimeout(function() {
+            startConfirmationMic(id, texto, tipo);
+        }, 8000);
+    }
+};
 
     recognition.onerror = function(event) {
         console.error("Error en el reconocimiento de voz", event);
@@ -164,8 +163,6 @@ function startConfirmationMic(inputId, transcriptToConfirm, tipo) {
         const negativo = ['no.', 'incorrecto', 'no no', 'no', 'incorrecto.']; 
 
         console.log("Confirmación recibida: ", transcript);
-
-        // Confirmación positiva
         if (afirmativo.includes(transcript)) {
             text_to_speech('Gracias. Continuamos.');
 
@@ -175,8 +172,56 @@ function startConfirmationMic(inputId, transcriptToConfirm, tipo) {
             }
 
             confirmationRecognition.stop();  
+            
+            if (inputId === 'inputNombre') {
+                $('#Modal_RecibirMail').modal('show'); 
+                $('#Modal_RecibirNombre').modal('hide');
+                text_to_speech('Por favor, diga su Mail');
+                setTimeout(() => {
+                    iniciarReconocimientoVoz('inputMail', 2);
+                }, 5000);
+            } else if (inputId === 'inputMail') {
+                $('#Modal_RecibirTelefono').modal('show'); 
+                $('#Modal_RecibirMail').modal('hide');
+                text_to_speech('Por favor, diga su Telefono');
+                setTimeout(() => {
+                    iniciarReconocimientoVoz('inputTel', 2);
+                }, 5000);
+            } else if (inputId === 'inputTel') {
+                $('#Modal_RecibirAcerca').modal('show'); 
+                $('#Modal_RecibirTelefono').modal('hide');
+                text_to_speech('Por favor, diga acerca de tí');
+                setTimeout(() => {
+                    iniciarReconocimientoVoz('inputAcerca', 2);
+                }, 5000);
+            } else if (inputId === 'inputAcerca') {
+                $('#Modal_RecibirProfesion').modal('show'); 
+                $('#Modal_RecibirAcerca').modal('hide');
+                text_to_speech('Por favor, diga su profesión actual');
+                setTimeout(() => {
+                    iniciarReconocimientoVoz('inputProfesion', 2);
+                }, 5000);
+            } else if (inputId === 'inputProfesion') {
+                $('#Modal_RecibirEstilo').modal('show'); 
+                $('#Modal_RecibirProfesion').modal('hide');
+                text_to_speech('Por favor, diga el estilo de color que prefiere!');
+                setTimeout(() => {
+                    iniciarReconocimientoVoz('inputEstilo', 1);
+                }, 7000);
+            } else if (inputId === 'inputEstilo') {
+                $('#Modal_RecibirUbicacion').modal('show'); 
+                $('#Modal_RecibirEstilo').modal('hide');
+                text_to_speech('Por favor, diga su ubicacion');
+                setTimeout(() => {
+                    iniciarReconocimientoVoz('inputUbicacion', 2);
+                }, 7000);
+            } else if (inputId === 'inputUbicacion') {
+                $('#Final').modal('show'); 
+                $('#Modal_RecibirUbicacion').modal('hide');
+                text_to_speech('No hay más información que agregar!');
+            }
 
-        } else if (negativo.includes(transcript)) { // negativaa!!
+        } else if (negativo.includes(transcript)) { // respuesta negativa
             text_to_speech('Entendido, repita su respuesta.');
             confirmationRecognition.stop();
 
@@ -187,8 +232,6 @@ function startConfirmationMic(inputId, transcriptToConfirm, tipo) {
         } else {
             text_to_speech('No entendí su respuesta. Por favor, repita, "si" o "no"');
             confirmationRecognition.stop();
-
-            // Repetir el proceso de confirmación
             setTimeout(function() {
                 startConfirmationMic(inputId, transcriptToConfirm, tipo);
             }, 3000);
@@ -204,6 +247,7 @@ function startConfirmationMic(inputId, transcriptToConfirm, tipo) {
         text_to_speech('Error al reconocer la voz. Inténtelo de nuevo.');
     };
 }
+
 
 function GuardarDatos() {
     const nombre_ = document.getElementById('inputNombre').value;
@@ -467,6 +511,7 @@ function VerificarVacio(sector_) {
         success: function(response) {
             if (response.mensaje) {
                 $('.mensaje').text(response.mensaje); 
+                response.mensaje = response.mensaje.replaceAll("_"," ");
             }
 
             $('.modal-body').css({
@@ -477,6 +522,10 @@ function VerificarVacio(sector_) {
 
             // Si hay datos de información personal, llenar los campos correspondientes
             if (sector_ === 1 && response.datos) {
+                text_to_speech("Informacion Personal.......... "+ response.mensaje+ "¿Desea entrar, SI o NO?");
+                setTimeout(() => {
+                iniciarConfirmacionEntrada(sector_); 
+                }, 8000);
                 $('#inputNombre').val(response.datos.nombre_apellido || '');
                 $('#inputMail').val(response.datos.mail || '');
                 $('#inputTel').val(response.datos.telefono || '');
@@ -544,6 +593,45 @@ function VerificarVacio(sector_) {
         }
     });
 }
+function iniciarConfirmacionEntrada(sector_) {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'es-ES'; 
+    recognition.start();
+
+    recognition.onresult = function(event) {
+        let texto = event.results[0][0].transcript.toLowerCase().trim();
+        console.log("Texto transcrito para confirmación:", texto);
+
+        const afirmativo = ['si', 'sí', 'correcto', 'sí.'];
+        const negativo = ['no', 'no no', 'incorrecto', 'no.'];
+
+        if (afirmativo.includes(texto)) {
+            text_to_speech("Gracias. Continuamos.");
+            // Si la respuesta es afirmativa, mostrar el modal de nombre
+            $('#Modal_RecibirNombre').modal('show');
+            $('#Modal_InformacionPersonal').modal('hide');
+            text_to_speech('Por favor, diga su nombre y apellido');
+            setTimeout(() => {
+                iniciarReconocimientoVoz('inputNombre', 2);
+            }, 5000);
+            
+            
+        } else if (negativo.includes(texto)) {
+            text_to_speech("Entendido. Cancelo la operación.");
+            $('#Modal_InformacionPersonal').modal('hide');
+        } else {
+            text_to_speech("No entendí su respuesta, por favor repita.");
+            iniciarConfirmacionEntrada();
+        }
+    };
+
+    recognition.onerror = function(event) {
+        console.error("Error en el reconocimiento de voz", event);
+        text_to_speech('Error al reconocer la voz. Inténtelo de nuevo.');
+    };
+}
+
+
 </script>
 
 
@@ -551,7 +639,7 @@ function VerificarVacio(sector_) {
     <input type="hidden" id="id_hidden" value="@Model.id" />
     <a data-bs-toggle="modal" data-bs-target="#Modal_InformacionPersonal" class="cuadro" id="cuadro1">
         <div>
-            <span onclick="VerificarVacio(1)">Informacion Personal</span>
+            <span onclick="VerificarVacio(1); Entrada() ">Informacion Personal</span>
         </div>
     </a>
 
@@ -585,7 +673,7 @@ function VerificarVacio(sector_) {
             </div>
             <div class="modal-body">
                 <h5 class="mensaje"></h5> 
-                <button type="button" class="cuadro_conf grande" onclick="$('#Modal_RecibirNombre').modal('show'); $('#Modal_InformacionPersonal').modal('hide');">Si</button>
+                <button type="button" class="cuadro_conf grande" onclick="$('#Modal_RecibirNombre').modal('show'); $('#Modal_InformacionPersonal').modal('hide'); text_to_speech('Nombre y apellido')">Si</button>
                 <button type="button" class="cuadro_conf grande" data-bs-dismiss="modal" onclick="confirmarEntrada('Cancelado')">No</button>
             </div>
         </div>
@@ -604,7 +692,7 @@ function VerificarVacio(sector_) {
                                 <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputNombre', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
-                                <button onclick="$('#Modal_RecibirMail').modal('show'); $('#Modal_RecibirNombre').modal('hide');">Listo</button>
+                                <button onclick="$('#Modal_RecibirMail').modal('show'); $('#Modal_RecibirNombre').modal('hide'); text_to_speech('Mail');">Listo</button>
                             </div>
                         </div>
                     </div>
@@ -621,7 +709,7 @@ function VerificarVacio(sector_) {
                                 <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputMail', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
-                                <button onclick="$('#Modal_RecibirTelefono').modal('show'); $('#Modal_RecibirMail').modal('hide');">Listo</button>
+                                <button onclick="$('#Modal_RecibirTelefono').modal('show'); $('#Modal_RecibirMail').modal('hide'); text_to_speech('Telefono');">Listo</button>
                             </div>
                         </div>
                     </div>
@@ -638,7 +726,7 @@ function VerificarVacio(sector_) {
                                 <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputTel', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
-                                <button onclick="$('#Modal_RecibirAcerca').modal('show'); $('#Modal_RecibirTelefono').modal('hide');">Listo</button>
+                                <button onclick="$('#Modal_RecibirAcerca').modal('show'); $('#Modal_RecibirTelefono').modal('hide'); text_to_speech('Acerca de mi');">Listo</button>
                             </div>
                         </div>
                     </div>
@@ -655,7 +743,7 @@ function VerificarVacio(sector_) {
                                 <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputAcerca', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
-                                <button onclick="$('#Modal_RecibirProfesion').modal('show'); $('#Modal_RecibirAcerca').modal('hide');">Listo</button>
+                                <button onclick="$('#Modal_RecibirProfesion').modal('show'); $('#Modal_RecibirAcerca').modal('hide'); text_to_speech('Profesion');">Listo</button>
                             </div>
                         </div>
                     </div>
@@ -672,7 +760,7 @@ function VerificarVacio(sector_) {
                                 <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputProfesion', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
-                                <button onclick="$('#Modal_RecibirEstilo').modal('show'); $('#Modal_RecibirProfesion').modal('hide');">Listo</button>
+                                <button onclick="$('#Modal_RecibirEstilo').modal('show'); $('#Modal_RecibirProfesion').modal('hide'); text_to_speech('Estilo del perfil');">Listo</button>
                             </div>
                         </div>
                     </div>
@@ -705,7 +793,7 @@ function VerificarVacio(sector_) {
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button onclick="$('#Modal_RecibirUbicacion').modal('show'); $('#Modal_RecibirEstilo').modal('hide');" class="btn btn-primary">Listo</button>
+                                <button onclick="$('#Modal_RecibirUbicacion').modal('show'); $('#Modal_RecibirEstilo').modal('hide'); text_to_speech('Ubicacion');" class="btn btn-primary">Listo</button>
                             </div>
                         </div>
                     </div>
@@ -722,7 +810,7 @@ function VerificarVacio(sector_) {
                                 <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputUbicacion', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
-                                <button onclick="$('#Final').modal('show'); $('#Modal_RecibirUbicacion').modal('hide');">Listo</button>
+                                <button onclick="$('#Final').modal('show'); $('#Modal_RecibirUbicacion').modal('hide'); text_to_speech('No hay más información que agregar!');" >Listo</button>
                             </div>
                         </div>
                     </div>
