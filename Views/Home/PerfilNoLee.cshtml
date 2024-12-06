@@ -73,7 +73,6 @@ function cambiarOpciones() {
 
     usandoOpcionesAlternativas = !usandoOpcionesAlternativas;
 
-    // Repetir texto según el estado actual
     if (usandoOpcionesAlternativas) {
         text_to_speech('Ahora las opciones disponibles son Certificaciones, Certificado Único de discapacidad, Idiomas, Solicitar Recomendación, y Volver.');
     } else {
@@ -107,23 +106,35 @@ function confirmarEntrada(texto) {
     }
 }
 
-
-function iniciarReconocimientoVoz() {
+function iniciarReconocimientoVoz(id, tipo) {
+    text_to_speech("hable"); // Iniciar confirmación con el texto reconocido
+    
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'es-ES'; // Cambia esto a tu idioma preferido
-
+    recognition.lang = 'es-ES'; 
+    
     recognition.start();
 
     recognition.onresult = function(event) {
-        
-        let color = event.results[0][0].transcript.toLowerCase().trim();
+        let texto = event.results[0][0].transcript.toLowerCase().trim();
 
-        color = color.replace(/\.$/, '');
+        // Eliminar el punto final, si existe
+        texto = texto.replace(/\.$/, '').trim();
 
-        if (["rosa", "verde", "azul", "negro"].includes(color)) {
-            document.getElementById("inputEstilo").value = color;
+        // Si el tipo es 1 (es para colores), validamos los colores
+        if (tipo === 1) {
+            if (["rosa", "verde", "azul", "negro"].includes(texto)) {
+                startConfirmationMic(id, texto, tipo); 
+            } else {
+                alert("Por favor, diga un color válido: rosa, verde, azul o negro.");
+            }
         } else {
-            alert("Por favor, diga un color válido: rosa, verde, azul o negro.");
+            text_to_speech(`El texto transcrito es: ${texto}. ¿Es correcto? Diga "sí" para confirmar o "no" para repetir.`); 
+            recognition.stop(); 
+
+            // Espera un poco antes de pedir la confirmación
+            setTimeout(function() {
+                startConfirmationMic(id, texto, tipo); 
+            }, 8000); 
         }
     };
 
@@ -132,186 +143,60 @@ function iniciarReconocimientoVoz() {
     };
 }
 
-// guradar datos con controller
-    function GuardarDatos() {
-    const nombre_ = document.getElementById('inputNombre').value;
-    const mail_ = document.getElementById('inputMail').value;
-    const telefono_ = document.getElementById('inputTel').value;
-    const acerca_ = document.getElementById('inputAcerca').value;
-    const profesion_ = document.getElementById('inputProfesion').value;
-    const est_ = document.getElementById('inputEstilo').value;
-    const ubicacion_ = document.getElementById('inputUbicacion').value;
-    const id_ = document.getElementById('inputId').value;
+function startConfirmationMic(inputId, transcriptToConfirm, tipo) {
+    const confirmationRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    confirmationRecognition.lang = 'es-ES';
+    confirmationRecognition.interimResults = false;
 
-    // Obtener el valor hexadecimal del color
-    const hexColor = getHexColor(est_);
+    confirmationRecognition.start();
 
-    $.ajax({
-        url: '/Home/InsertarUsuario/',
-        type: 'POST',
-        data: {
-            id: id_,
-            nombre: nombre_,
-            mail: mail_,
-            telefono: telefono_,
-            acercademi: acerca_,
-            profesion: profesion_,
-            estilo: hexColor, 
-            ubicacion: ubicacion_
-        },
-        success: function (response) {
-            alert("ok");
-        },
-        error: function (xhr, status, error) {
-            console.error("Error al obtener los datos: ", error);
+    confirmationRecognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        const afirmativo = ['si', 'correcto', 'sí', 'sí sí', 'sí.', 'correcto.']; 
+        const negativo = ['no.', 'incorrecto', 'no no', 'no', 'incorrecto.']; 
+
+        console.log("Confirmación recibida: ", transcript);
+
+        // Confirmación positiva
+        if (afirmativo.includes(transcript)) {
+            text_to_speech('Gracias. Continuamos.');
+
+            const inputField = document.getElementById(inputId);
+            if (inputField) {
+                inputField.value = transcriptToConfirm;
+            }
+
+            confirmationRecognition.stop();  
+
+        } else if (negativo.includes(transcript)) { // negativaa!!
+            text_to_speech('Entendido, repita su respuesta.');
+            confirmationRecognition.stop();
+
+            setTimeout(function() {
+                iniciarReconocimientoVoz(inputId, tipo); 
+            }, 3000); 
+
+        } else {
+            text_to_speech('No entendí su respuesta. Por favor, repita, "si" o "no"');
+            confirmationRecognition.stop();
+
+            // Repetir el proceso de confirmación
+            setTimeout(function() {
+                startConfirmationMic(inputId, transcriptToConfirm, tipo);
+            }, 3000);
         }
-    });
+    };
+
+    confirmationRecognition.onspeechend = function() {
+        confirmationRecognition.stop(); // Detener al final de la conversacion
+    };
+
+    confirmationRecognition.onerror = function(event) {
+        console.error('Error de reconocimiento en la confirmación:', event.error);
+        text_to_speech('Error al reconocer la voz. Inténtelo de nuevo.');
+    };
 }
-    function GuardarDatos2(){
-    const id_ = document.getElementById('inputId').value;
-    const titulo = document.getElementById("inputTitulo").value;
-    let institucion = $("#inputInstitucion").val();
-    let disciplina = $("#inputDisci").val();
-    let actividades = $("#inputActGrupo").val();
-    let descripcion = $("#inputDescripEdu").val();
-    let anoInicio = $("#inputAno1").val();
-    let mesInicio = $("#inputMes1").val();
-    let anoFinal = $("#inputAno2").val();
-    let mesFinal = $("#inputMes2").val();
 
-    $.ajax({
-        type: "POST",
-        url: "/Home/GuardarEduNoLee/", 
-        data: {
-            Titulo: titulo, Institucion: institucion, Disciplina: disciplina, Actividades: actividades,
-            Descripcion: descripcion,
-            AnoInicio: anoInicio,
-            MesInicio: mesInicio,
-            AnoFinal: anoFinal,
-            MesFinal: mesFinal,
-            id: id_,
-            datos_: datos,
-        },
-        success: function(response) {
-            alert("guardado!");
-        },
-        error: function(error) {
-            // Manejo de error
-            console.log("Error al guardar los datos");
-        }
-    });
-}
-    function GuardarDatos3(){
-    const idElement = document.getElementById('inputId');
-    const tituloElement = document.getElementById("inputTituloCert");
-    const empresaEmisoraElement = document.getElementById("inputEmpresaCerti");
-    const mesExpElement = document.getElementById("inputMesExp");
-    const anoExpElement = document.getElementById("inputAnoExp");
-    const mesCaducElement = document.getElementById("inputMesCaduc");
-    const anoCaducElement = document.getElementById("inputAnoCaduc");
-    const idCredeElement = document.getElementById("inputCredencial");
-    const idHiddenCerti = document.getElementById("inputId_Certi");
-
-    if (!idElement || !tituloElement || !empresaEmisoraElement || 
-        !mesExpElement || !anoExpElement || 
-        !mesCaducElement || !anoCaducElement || !idCredeElement) {
-        console.error("Uno o más elementos no se encontraron en el DOM.");
-        return;
-    }
-
-    const id_ = idElement.value || 0; // Si no tiene ID, se asume que es 0 para insertar.
-    const titulo = tituloElement.value;
-    const empresaEmisora = empresaEmisoraElement.value;
-    const mesExp = mesExpElement.value;
-    const anoExp = anoExpElement.value;
-    const mesCaduc = mesCaducElement.value;
-    const anoCaduc = anoCaducElement.value;
-
-    if (!mesExp || !anoExp || !mesCaduc || !anoCaduc) {
-        alert("Por favor, complete todos los campos de mes y año.");
-        return;
-    }
-
-    const fechaExp = `${anoExp}-${mesExp.padStart(2, '0')}-01`;  
-    const fechaCaducidad = `${anoCaduc}-${mesCaduc.padStart(2, '0')}-01`;  
-    const idCrede = idCredeElement.value;
-    const id_cert = idHiddenCerti.value;
-    console.log(id_cert, id_, "#000 - ajax");
-
-    $.ajax({
-        type: "POST",
-        url: "/Home/GuardarCerti/",
-        data: {
-            Titulo_: titulo,
-            EmpresaEmisora: empresaEmisora,
-            FechaExp: fechaExp,
-            FechaCaducidad: fechaCaducidad,
-            id_user: id_, // ID dinámico
-            Idcredencial: idCrede,
-            id_cert_: id_cert
-        },
-        success: function(response) {
-            alert("Datos guardados correctamente.");
-        },
-        error: function(error) {
-            console.error("Error al guardar los datos", error);
-        }
-    });
-}
-    function GuardarDatos4(){
-    const id_user = document.getElementById('inputId').value;
-    const necesidad_ = document.getElementById('inputNece').value
-    const id_necesidad = document.getElementById('inputId_Nece').value
-    $.ajax({
-        type: "POST",
-        url: "/Home/GuardarNece/", 
-        data: {
-            id_: id_user,
-            necesidad: necesidad_,
-            id_nece: id_necesidad
-
-        },
-        success: function(response) {
-            alert("guardado!");
-        },
-        error: function(error) {
-            // Manejo de error
-            console.log("Error al guardar los datos");
-        }
-    });
-}
-function GuardarDatos5(){
-    const id_user = document.getElementById('inputId').value;
-    const insti = document.getElementById('inputInstiEmi').value
-    const mesExpElement = document.getElementById("inputMesExp3").value;
-    const anoExpElement = document.getElementById("inputAnoExp3").value;
-    const mesCaducElement = document.getElementById("inputMesCaduc3").value;
-    const anoCaducElement = document.getElementById("inputAnoCaduc3").value;
-    const id_cud = document.getElementById("inputCud").value;
-    
-
-
-    const fechaExp3 = `${anoExpElement}-${mesExpElement.padStart(2, '0')}-01`;  
-    const fechaCaducidad3 = `${anoCaducElement}-${mesCaducElement.padStart(2, '0')}-01`;  
-    $.ajax({
-        type: "POST",
-        url: "/Home/GuardarCUD/", 
-        data: {
-            id_: id_user,
-            institucion_emisora: insti,
-            expe: fechaExp3,
-            caducidad: fechaCaducidad3,
-            id_cud_: id_cud
-        },
-        success: function(response) {
-            alert("guardado!");
-        },
-        error: function(error) {
-            // Manejo de error
-            console.log("Error al guardar los datos");
-        }
-    });
-}
 
 function getHexColor(colorName) {
     const colors = {
@@ -349,7 +234,7 @@ function VerificarVacio(sector_) {
         type: 'GET',
         success: function(response) {
             if (response.mensaje) {
-                $('.mensaje').text(response.mensaje); // Muestra el mensaje de error o éxito
+                $('.mensaje').text(response.mensaje); 
             }
 
             $('.modal-body').css({
@@ -480,7 +365,7 @@ function VerificarVacio(sector_) {
                             </div>
                             <div class="modal-body">
                                 <input type="text" id="inputNombre" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputNombre', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
                                 <button onclick="$('#Modal_RecibirMail').modal('show'); $('#Modal_RecibirNombre').modal('hide');">Listo</button>
@@ -580,7 +465,7 @@ function VerificarVacio(sector_) {
                                 <div class="mb-3">
                                     <label for="inputEstilo" class="form-label">O ingrese el color:</label>
                                     <input type="text" id="inputEstilo" class="form-control" placeholder="Escriba un color" oninput="validateColorInput()" />
-                                    <button class="btn btn-primary mt-2" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                    <button class="btn btn-primary mt-2" onclick="iniciarReconocimientoVoz('inputEstilo',1  )">Hablar</button>
                                 </div>
                             </div>
                             <div class="modal-footer">
