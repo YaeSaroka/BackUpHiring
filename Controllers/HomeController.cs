@@ -196,8 +196,15 @@ public bool GuardarCUD(int id_, string institucion_emisora, DateTime expe, DateT
     }
     return true;
 }
-
-
+public bool GuardarIdiomas(string idiomas, int id_, int user){
+    Idioma cadena = new Idioma {
+        id = id_,
+        nombre = idiomas,
+        id_info_empleado = user
+    };
+    Models.BD.InsertarIdioma(cadena, user);
+    return true;
+}
 public JsonResult VerificarVacio(int sector, int id)
 {
     Informacion_Personal_Empleado datos_ = null;
@@ -205,6 +212,7 @@ public JsonResult VerificarVacio(int sector, int id)
     List<Certificacion> datos_3 = null;
     Necesidad datos_4 = null;
     Cud datos_5 = null;
+    Idioma datos_6 = null;
     string mensaje = "No se encontraron datos de "; // Predeterminado
 
     // Cargar los datos según el sector
@@ -218,6 +226,8 @@ public JsonResult VerificarVacio(int sector, int id)
         datos_4 = Models.BD.SelectAdaptacion(id);
     else if (sector == 5)
         datos_5 = Models.BD.SelectCUD(id);
+    else if(sector == 6)
+        datos_6 = Models.BD.SelectIdioma(id);
     if (sector == 1 && datos_ == null)
         mensaje += " Información Personal ingresados!";
     else if (sector == 2 && (datos_2 == null || !datos_2.Any()))
@@ -228,6 +238,8 @@ public JsonResult VerificarVacio(int sector, int id)
         mensaje += " Necesidades";
     else if(sector == 5 && (datos_5 == null))
         mensaje += " CUD";
+    else if(sector==6 && (datos_6==null))
+        mensaje += " Idioma";
         
 
     // Verificar los campos faltantes de Información Personal (sector 1)
@@ -290,7 +302,7 @@ public JsonResult VerificarVacio(int sector, int id)
             mensaje = "Faltan datos por ingresar en Certificacion (" + string.Join(", ", camposFaltantesSet) + ")";
         else
             mensaje = "Todos los datos de Certificaion están completos.";
-    }
+        }
     else if(sector == 4 && datos_4 != null){
         List<string> camposFaltantes = new List<string>();
         if(datos_4.nombre == null){
@@ -300,29 +312,41 @@ public JsonResult VerificarVacio(int sector, int id)
             mensaje = "Faltan datos por ingresar en Necesidad (" + string.Join(", ", camposFaltantes) + ")";
         else
             mensaje = "Todos los datos de Necesidad están completos.";
-    }
-     else if (sector == 5 && datos_5 != null)
-{
-    List<string> camposFaltantes = new List<string>();
-    var propiedades = datos_5.GetType().GetProperties();
-    foreach (var propiedad in propiedades)
-    {
-        var valor = propiedad.GetValue(datos_5);
-        if ((valor == null || string.IsNullOrEmpty(valor.ToString())) && 
-            !propiedad.Name.Equals("titulo", StringComparison.OrdinalIgnoreCase) && 
-            !propiedad.Name.Equals("url_", StringComparison.OrdinalIgnoreCase))
-        {
-            camposFaltantes.Add(propiedad.Name); 
         }
-    }
+     else if (sector == 5 && datos_5 != null)
+        {
+            List<string> camposFaltantes = new List<string>();
+            var propiedades = datos_5.GetType().GetProperties();
+            foreach (var propiedad in propiedades)
+            {
+                var valor = propiedad.GetValue(datos_5);
+                if ((valor == null || string.IsNullOrEmpty(valor.ToString())) && 
+                    !propiedad.Name.Equals("titulo", StringComparison.OrdinalIgnoreCase) && 
+                    !propiedad.Name.Equals("url_", StringComparison.OrdinalIgnoreCase))
+                {
+                    camposFaltantes.Add(propiedad.Name); 
+                }
+            }
 
-    if (camposFaltantes.Count > 0)
-        mensaje = "Faltan datos por ingresar en CUD (" + string.Join(", ", camposFaltantes) + ")";
-    else
-        mensaje = "Todos los datos de CUD están completos.";
-}
+            if (camposFaltantes.Count > 0)
+                mensaje = "Faltan datos por ingresar en CUD (" + string.Join(", ", camposFaltantes) + ")";
+            else
+                mensaje = "Todos los datos de CUD están completos.";
+        }
+        else if(sector == 6 && datos_6 != null){
+                List<string> camposFaltantes = new List<string>();
+                if(datos_6.nombre == null){
+                    camposFaltantes.Add(datos_6.nombre); 
+                }
+                if (camposFaltantes.Count > 0)
+                    mensaje = "Faltan datos por ingresar en Idioma (" + string.Join(", ", camposFaltantes) + ")";
+                else
+                    mensaje = "Todos los datos de Idioma están completos.";
+            }
 
-
+    
+    
+    
     if (sector == 1) return Json(new { mensaje = mensaje, datos = datos_ });
     else if (sector == 2 && datos_2 != null && datos_2.Any())
     {
@@ -345,27 +369,28 @@ public JsonResult VerificarVacio(int sector, int id)
         });
     }
     else if (sector == 3 && datos_3 != null && datos_3.Any())
-{
-    var certificacionData = datos_3.First();
-    Console.WriteLine("Certificación obtenida: " + certificacionData.titulo); // Log
-    return Json(new
-    {
-        mensaje = mensaje,
-        datos = new
         {
-            titulo = certificacionData.titulo,
-            empresa = certificacionData.empresa_emisora,
-            credencial = certificacionData.id_credencial,
-            caducidad = certificacionData.fecha_caducidad,
-            expedicion = certificacionData.fecha_expedicion,
-            id = certificacionData.id_info_empleado,
-            id_certi = certificacionData.id
+            var certificacionData = datos_3.First();
+            Console.WriteLine("Certificación obtenida: " + certificacionData.titulo); // Log
+            return Json(new
+            {
+                mensaje = mensaje,
+                datos = new
+                {
+                    titulo = certificacionData.titulo,
+                    empresa = certificacionData.empresa_emisora,
+                    credencial = certificacionData.id_credencial,
+                    caducidad = certificacionData.fecha_caducidad,
+                    expedicion = certificacionData.fecha_expedicion,
+                    id = certificacionData.id_info_empleado,
+                    id_certi = certificacionData.id
+                }
+            });
         }
-    });
-}
 
     else if (sector == 4 && datos_4 != null) return Json(new {mensaje = mensaje, datos = datos_4});
     if (sector == 5) return Json(new { mensaje = mensaje, datos = datos_5 });
+    if (sector == 6) return Json(new { mensaje = mensaje, datos = datos_6 });
     
     return Json(new { mensaje, datos = (object)null });
 }

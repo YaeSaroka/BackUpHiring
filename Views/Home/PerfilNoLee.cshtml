@@ -49,27 +49,35 @@ function cambiarOpciones() {
     ];
 
     cuadros.forEach((cuadro, index) => {
-    if (index >= opciones.length || index >= opcionesDefault.length) return;
+        if (index >= opciones.length || index >= opcionesDefault.length) return;
 
-    const span = cuadro.querySelector('span');
-    if (!span) return;
+        const span = cuadro.querySelector('span');
+        if (!span) return;
 
-    const config = usandoOpcionesAlternativas ? opcionesDefault[index] : opciones[index];
-    span.textContent = config.texto;
-    cuadro.setAttribute('data-bs-target', config.modal);
-    cuadro.setAttribute('class', 'cuadro');
+        const config = usandoOpcionesAlternativas ? opcionesDefault[index] : opciones[index];
+        span.textContent = config.texto;
+        cuadro.setAttribute('data-bs-target', config.modal);
+        cuadro.setAttribute('class', 'cuadro');
 
-    // Ajustar onclick según texto
-    if (config.texto === "Certificaciones") {
-        span.setAttribute('onclick', 'VerificarVacio(3)');
-    } 
-    else if(config.texto === "Certificado Único de discapacidad (CUD)"){
-        span.setAttribute('onclick', 'VerificarVacio(5)');
-        console.log(span);
-    }
+        // Aquí verificamos que el data-bs-target está configurado correctamente
+        console.log("Config modal para", config.texto, ":", config.modal);
+        console.log("Cuadro data-bs-target para", config.texto, ":", cuadro.getAttribute('data-bs-target'));
 
-    cuadro.setAttribute('data-bs-toggle', 'modal');
-});
+        // Ajustar onclick según texto
+        if (config.texto === "Certificaciones") {
+            span.setAttribute('onclick', 'VerificarVacio(3)');
+        } 
+        else if(config.texto === "Certificado Único de discapacidad (CUD)"){
+            span.setAttribute('onclick', 'VerificarVacio(5)');
+        }
+        else if(config.texto === "Idiomas"){
+            span.setAttribute('onclick', 'VerificarVacio(6)');
+            cuadro.setAttribute('data-bs-target', "#Modal_Idiomas");
+            console.log("Idiomas - data-bs-target:", cuadro.getAttribute('data-bs-target'));  // Verifica que apunte al modal correcto
+        }
+
+        cuadro.setAttribute('data-bs-toggle', 'modal');
+    });
 
     usandoOpcionesAlternativas = !usandoOpcionesAlternativas;
 
@@ -369,8 +377,29 @@ function GuardarDatos3() {
             FechaExp: fechaExp,
             FechaCaducidad: fechaCaducidad,
             id_user: id_, // ID dinámico
-            Idcredencial: idCrede,
+            idCredencial: idCrede,
             id_cert_: id_cert
+        },
+        success: function(response) {
+            alert("Datos guardados correctamente.");
+        },
+        error: function(error) {
+            console.error("Error al guardar los datos", error);
+        }
+    });
+}
+
+function GuardarDatos6(){
+    const string_idiomas = document.getElementById('inputIdiomas').value;
+    const idElement = document.getElementById('inputId');
+    const idIdioma = document.getElementById('inputIdiom');
+    $.ajax({
+        type: "POST",
+        url: "/Home/GuardarIdiomas/",
+        data: {
+            idiomas: string_idiomas,
+            id_: idIdioma,
+            user: idElement
         },
         success: function(response) {
             alert("Datos guardados correctamente.");
@@ -500,9 +529,13 @@ function VerificarVacio(sector_) {
                 $('#inputAnoCaduc3').val(new Date(datosCUD.fecha_vencimiento).getFullYear() || '');
                 $('#inputInstiEmi').val(datosCUD.empresa_emisora || '');
                 $('#inputCud').val(datosCUD.id || '');
-                
                 console.log("CUD actualizado:", datosCUD);
-                
+            }
+            if(sector_ === 6 && response.datos){
+                const datosIdiomas = response.datos;
+                $('#inputIdiomas').val(datosIdiomas.nombre || '');
+                $('#inputIdiom').val(datosIdiomas.id || '');
+                console.log("IDIOMAS actualizado:", datosIdiomas);
             }
         },
         error: function(xhr, status, error) {
@@ -900,12 +933,12 @@ function VerificarVacio(sector_) {
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">¿Desea entrar en la sección de Experiencia?</h5>
+                    <h5 class="modal-title">¿Desea entrar en la sección de Idiomas?</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <h5 class="mensaje"></h5>
-                    <button type="button" class="cuadro_conf grande" onclick="$('#Modal_RecibirTituloCerti').modal('show'); $('#Modal_Certificaciones').modal('hide');">Si</button>
+                    <button type="button" class="cuadro_conf grande" onclick="$('#Modal_RecibirIdiomas').modal('show'); $('#Modal_Experiencia').modal('hide');">Si</button>
                     <button type="button" class="cuadro_conf grande" data-bs-dismiss="modal" onclick="confirmarEntrada('Cancelado')">No</button>
                 </div>
             </div>
@@ -1178,18 +1211,57 @@ function VerificarVacio(sector_) {
         </div>
 
 <!-- Modal Idiomas -->
-<div class="modal fade" id="Modal_Idiomas" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modalCont">
-            <h5 class="modal-title">¿Desea entrar en la sección de Idiomas?</h5>
+
+<div class="modal" tabindex="-1" id="Modal_Idiomas" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">¿Desea entrar en la sección de Idiomas?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
             <div class="modal-body">
-                <div class="cuadro_conf grande" onclick="confirmarEntrada('Entrando a Idiomas');" data-bs-dismiss="modal">Sí</div>
-                <div class="cuadro_conf grande" onclick="confirmarEntrada('Cancelado');" data-bs-dismiss="modal">No</div>
+                <h5 class="mensaje"></h5>
+                <button type="button" class="cuadro_conf grande" onclick="$('#Modal_RecibirIdiomas').modal('show'); $('#Modal_Idiomas').modal('hide');">Si</button>
+                <button type="button" class="cuadro_conf grande" data-bs-dismiss="modal" onclick="confirmarEntrada('Cancelado')">No</button>
             </div>
         </div>
     </div>
 </div>
+ <!-- Datos -->
+        <div class="modal" tabindex="-1" id="Modal_RecibirIdiomas" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Por favor, diga los <b>Idiomas que sepa</b> </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" id="inputIdiomas" class="form-control" />
+                        <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputIdiomas', 2)">Hablar</button>
+                    </div>
+                    <div class="modal-footer">
+                        <button onclick="$('#FinalIidom').modal('show'); $('#Modal_RecibirIdiomas').modal('hide');">Listo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+<div class="modal" tabindex="-1" id="FinalIidom" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">No hay más información que agregar</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="inputId" value="1234"> 
+                        <input type="hidden" id="inputIdiom" value="">
+                        <button class="btn btn-success" onclick="GuardarDatos6()">Finalizar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        
 <!-- Modal Recomendación -->
 <div class="modal fade" id="Modal_Recomendacion" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
