@@ -180,7 +180,22 @@ public bool GuardarNece(int id_, string necesidad, int id_nece){
     if(Nece == null) Models.BD.InsertarAdaptacion(necesidad_, id_);
     else Models.BD.ActualizarAdaptacion(id_nece, necesidad);
     
-return true;
+return true; 
+}
+public bool GuardarCUD(int id_, string institucion_emisora, DateTime expe, DateTime caducidad, int id_cud_){
+    Cud certificado = new Cud {
+        empresa_emisora = institucion_emisora,
+        fecha_expedicion = expe,
+        fecha_vencimiento = caducidad,
+        id_info_empleado = id_,
+        id = id_cud_
+    };
+    var Cud_ = Models.BD.SelectCUD(id_);
+    if(Cud_ == null) Models.BD.InsertarCUD(certificado);
+    else {
+        Models.BD.ActualizarCUD(id_cud_, institucion_emisora, expe, caducidad);
+    }
+    return true;
 }
 
 
@@ -190,6 +205,7 @@ public JsonResult VerificarVacio(int sector, int id)
     List<Educacion> datos_2 = null;
     List<Certificacion> datos_3 = null;
     Necesidad datos_4 = null;
+    Cud datos_5 = null;
     string mensaje = "No se encontraron datos de "; // Predeterminado
 
     // Cargar los datos según el sector
@@ -201,6 +217,8 @@ public JsonResult VerificarVacio(int sector, int id)
         datos_3 = Models.BD.SelectCertificacion(id);
     else if (sector == 4)
         datos_4 = Models.BD.SelectAdaptacion(id);
+    else if (sector == 5)
+        datos_5 = Models.BD.SelectCUD(id);
     if (sector == 1 && datos_ == null)
         mensaje += " Información Personal ingresados!";
     else if (sector == 2 && (datos_2 == null || !datos_2.Any()))
@@ -209,6 +227,9 @@ public JsonResult VerificarVacio(int sector, int id)
         mensaje += " Certificacion!";
     else if(sector == 4 && (datos_4 == null))
         mensaje += " Necesidades";
+    else if(sector == 5 && (datos_5 == null))
+        mensaje += " CUD";
+        
 
     // Verificar los campos faltantes de Información Personal (sector 1)
     else if (sector == 1 && datos_ != null)
@@ -281,6 +302,27 @@ public JsonResult VerificarVacio(int sector, int id)
         else
             mensaje = "Todos los datos de Necesidad están completos.";
     }
+     else if (sector == 5 && datos_5 != null)
+{
+    List<string> camposFaltantes = new List<string>();
+    var propiedades = datos_5.GetType().GetProperties();
+    foreach (var propiedad in propiedades)
+    {
+        var valor = propiedad.GetValue(datos_5);
+        if ((valor == null || string.IsNullOrEmpty(valor.ToString())) && 
+            !propiedad.Name.Equals("titulo", StringComparison.OrdinalIgnoreCase) && 
+            !propiedad.Name.Equals("url_", StringComparison.OrdinalIgnoreCase))
+        {
+            camposFaltantes.Add(propiedad.Name); 
+        }
+    }
+
+    if (camposFaltantes.Count > 0)
+        mensaje = "Faltan datos por ingresar en CUD (" + string.Join(", ", camposFaltantes) + ")";
+    else
+        mensaje = "Todos los datos de CUD están completos.";
+}
+
 
     if (sector == 1) return Json(new { mensaje = mensaje, datos = datos_ });
     else if (sector == 2 && datos_2 != null && datos_2.Any())
@@ -322,7 +364,10 @@ public JsonResult VerificarVacio(int sector, int id)
         }
     });
 }
+
     else if (sector == 4 && datos_4 != null) return Json(new {mensaje = mensaje, datos = datos_4});
+    if (sector == 5) return Json(new { mensaje = mensaje, datos = datos_5 });
+    
     return Json(new { mensaje, datos = (object)null });
 }
 

@@ -259,6 +259,17 @@ public  class BD
             db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
         }
     }
+    public static void ActualizarCUD(int id, string empresa_, DateTime expedicion, DateTime caducidad)
+    {
+        using (SqlConnection db = new SqlConnection(ConnectionString))
+        {
+            string sp = "ActualizarCUD";
+            var parameters = new { id_cud = id, empresa = empresa_, expe = expedicion, cadu = caducidad};
+            db.Execute(sp, parameters, commandType: CommandType.StoredProcedure);
+        }
+    }
+
+
 
     public static Necesidad SelectAdaptacion(int Id_Info_Empleado)
     {

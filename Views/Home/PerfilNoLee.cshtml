@@ -49,25 +49,27 @@ function cambiarOpciones() {
     ];
 
     cuadros.forEach((cuadro, index) => {
-        // Validar que el índice sea válido
-        if (index >= opciones.length || index >= opcionesDefault.length) return;
+    if (index >= opciones.length || index >= opcionesDefault.length) return;
 
-        const span = cuadro.querySelector('span');
-        if (!span) return; // Salta cuadros sin un span
+    const span = cuadro.querySelector('span');
+    if (!span) return;
 
-        const config = usandoOpcionesAlternativas ? opcionesDefault[index] : opciones[index];
-        span.textContent = config.texto;
-        cuadro.setAttribute('data-bs-target', config.modal);
-        cuadro.setAttribute('class', 'cuadro');
+    const config = usandoOpcionesAlternativas ? opcionesDefault[index] : opciones[index];
+    span.textContent = config.texto;
+    cuadro.setAttribute('data-bs-target', config.modal);
+    cuadro.setAttribute('class', 'cuadro');
 
-        // Ajustar onclick según texto
-        if (config.texto === "Certificaciones") {
-            span.setAttribute('onclick', 'VerificarVacio(3)');
-        } else {
-            span.setAttribute('onclick', `VerificarVacio(${index + 1})`);
-        }
-        cuadro.setAttribute('data-bs-toggle', 'modal');
-    });
+    // Ajustar onclick según texto
+    if (config.texto === "Certificaciones") {
+        span.setAttribute('onclick', 'VerificarVacio(3)');
+    } 
+    else if(config.texto === "Certificado Único de discapacidad (CUD)"){
+        span.setAttribute('onclick', 'VerificarVacio(5)');
+        console.log(span);
+    }
+
+    cuadro.setAttribute('data-bs-toggle', 'modal');
+});
 
     usandoOpcionesAlternativas = !usandoOpcionesAlternativas;
 
@@ -278,6 +280,38 @@ function iniciarReconocimientoVoz() {
         }
     });
 }
+function GuardarDatos5(){
+    const id_user = document.getElementById('inputId').value;
+    const insti = document.getElementById('inputInstiEmi').value
+    const mesExpElement = document.getElementById("inputMesExp3").value;
+    const anoExpElement = document.getElementById("inputAnoExp3").value;
+    const mesCaducElement = document.getElementById("inputMesCaduc3").value;
+    const anoCaducElement = document.getElementById("inputAnoCaduc3").value;
+    const id_cud = document.getElementById("inputCud").value;
+    
+
+
+    const fechaExp3 = `${anoExpElement}-${mesExpElement.padStart(2, '0')}-01`;  
+    const fechaCaducidad3 = `${anoCaducElement}-${mesCaducElement.padStart(2, '0')}-01`;  
+    $.ajax({
+        type: "POST",
+        url: "/Home/GuardarCUD/", 
+        data: {
+            id_: id_user,
+            institucion_emisora: insti,
+            expe: fechaExp3,
+            caducidad: fechaCaducidad3,
+            id_cud_: id_cud
+        },
+        success: function(response) {
+            alert("guardado!");
+        },
+        error: function(error) {
+            // Manejo de error
+            console.log("Error al guardar los datos");
+        }
+    });
+}
 
 function getHexColor(colorName) {
     const colors = {
@@ -367,10 +401,20 @@ function VerificarVacio(sector_) {
             }
             if(sector_ === 4 && response.datos) {
                 const datosNece = response.datos;
-                console.log("hola!");
-                console.log(datosNece.nombre, " nece");
                 $('#inputNece').val(datosNece.nombre);
                 $('#inputId_Nece').val(datosNece.id);
+            }
+            if(sector_ === 5 && response.datos){
+                const datosCUD = response.datos;
+                $('#inputMesExp3').val(new Date(datosCUD.fecha_expedicion).getMonth() + 1 || '');
+                $('#inputAnoExp3').val(new Date(datosCUD.fecha_expedicion).getFullYear() || '');
+                $('#inputMesCaduc3').val(new Date(datosCUD.fecha_vencimiento).getMonth() + 1 || '');
+                $('#inputAnoCaduc3').val(new Date(datosCUD.fecha_vencimiento).getFullYear() || '');
+                $('#inputInstiEmi').val(datosCUD.empresa_emisora || '');
+                $('#inputCud').val(datosCUD.id || '');
+                
+                console.log("CUD actualizado:", datosCUD);
+                
             }
         },
         error: function(xhr, status, error) {
@@ -967,13 +1011,83 @@ function VerificarVacio(sector_) {
             </div>
             <div class="modal-body">
                 <h5 class="mensaje"></h5>
-                <button type="button" class="cuadro_conf grande" onclick="$('#Modal_RecibirNeces').modal('show'); $('#Modal_Necesidades').modal('hide');">Si</button>
+                <button type="button" class="cuadro_conf grande" onclick="$('#Modal_RecibirEmpresaEmis').modal('show'); $('#Modal_CUD').modal('hide');">Si</button>
                 <button type="button" class="cuadro_conf grande" data-bs-dismiss="modal" onclick="confirmarEntrada('Cancelado')">No</button>
             </div>
         </div>
     </div>
 </div>
-        
+        <!-- Datos -->
+        <div class="modal" tabindex="-1" id="Modal_RecibirEmpresaEmis" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Por favor, diga la <b>Institucion emisora</b></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" id="inputInstiEmi" class="form-control" />
+                        <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                    </div>
+                    <div class="modal-footer">
+                        <button onclick="$('#Modal_RecibirFechaCredencialExp2').modal('show'); $('#Modal_RecibirEmpresaEmis').modal('hide');">Listo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" tabindex="-1" id="Modal_RecibirFechaCredencialExp2" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Por favor, diga el mes y año de expedición</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="inputMesExp2">Mes:</label>
+                    <input type="number" id="inputMesExp3" class="form-control" min="1" max="12" placeholder="Mes" />
+                    <label for="inputAnoExp2">Año:</label>
+                    <input type="number" id="inputAnoExp3" class="form-control" min="1900" placeholder="Año" />
+                </div>
+                <div class="modal-footer">
+                    <button onclick="$('#Modal_RecibirFechaCredencialCaduc2').modal('show'); $('#Modal_RecibirFechaCredencialExp2').modal('hide');">Listo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" tabindex="-1" id="Modal_RecibirFechaCredencialCaduc2" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Por favor, diga el mes y año de caducidad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="inputMesCaduc2">Mes:</label>
+                    <input type="number" id="inputMesCaduc3" class="form-control" min="1" max="12" placeholder="Mes" />
+                    <label for="inputAnoCaduc2">Año:</label>
+                    <input type="number" id="inputAnoCaduc3" class="form-control" min="1900" placeholder="Año" />
+                </div>
+                <div class="modal-footer">
+                    <button onclick="$('#FinalCUD').modal('show'); $('#Modal_RecibirFechaCredencialCaduc2').modal('hide');">Listo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" tabindex="-1" id="FinalCUD" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">No hay más información que agregar</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="inputId" value="1234"> 
+                        <input type="hidden" id="inputCud" value="">
+                        <button class="btn btn-success" onclick="GuardarDatos5()">Finalizar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 <!-- Modal Idiomas -->
 <div class="modal fade" id="Modal_Idiomas" tabindex="-1" role="dialog" aria-hidden="true">
