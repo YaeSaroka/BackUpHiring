@@ -197,7 +197,210 @@ function startConfirmationMic(inputId, transcriptToConfirm, tipo) {
     };
 }
 
-
+function GuardarDatos() {
+    const nombre_ = document.getElementById('inputNombre').value;
+    const mail_ = document.getElementById('inputMail').value;
+    const telefono_ = document.getElementById('inputTel').value;
+    const acerca_ = document.getElementById('inputAcerca').value;
+    const profesion_ = document.getElementById('inputProfesion').value;
+    const est_ = document.getElementById('inputEstilo').value;
+    const ubicacion_ = document.getElementById('inputUbicacion').value;
+    const id_ = document.getElementById('inputId').value;
+    // Obtener el valor hexadecimal del color
+    const hexColor = getHexColor(est_);
+    $.ajax({
+        url: '/Home/InsertarUsuario/',
+        type: 'POST',
+        data: {
+            id: id_,
+            nombre: nombre_,
+            mail: mail_,
+            telefono: telefono_,
+            acerca: acerca_,
+            profesion: profesion_,
+            estilo: hexColor, 
+            ubicacion: ubicacion_
+        },
+        success: function (response) {
+            alert("ok");
+        },
+        error: function (xhr, status, error) {
+            console.error("Error al obtener los datos: ", error);
+        }
+    });
+}
+    function GuardarDatos2(){
+    const id_ = document.getElementById('inputId').value;
+    const titulo = document.getElementById("inputTitulo").value;
+    let institucion = $("#inputInstitucion").val();
+    let disciplina = $("#inputDisci").val();
+    let actividades = $("#inputActGrupo").val();
+    let descripcion = $("#inputDescripEdu").val();
+    let anoInicio = $("#inputAno1").val();
+    let mesInicio = $("#inputMes1").val();
+    let anoFinal = $("#inputAno2").val();
+    let mesFinal = $("#inputMes2").val();
+    $.ajax({
+        type: "POST",
+        url: "/Home/GuardarEduNoLee/", 
+        data: {
+            Titulo: titulo, Institucion: institucion, Disciplina: disciplina, Actividades: actividades,
+            Descripcion: descripcion,
+            AnoInicio: anoInicio,
+            MesInicio: mesInicio,
+            AnoFinal: anoFinal,
+            MesFinal: mesFinal,
+            id: id_,
+            datos_: datos,
+        },
+        success: function(response) {
+            alert("guardado!");
+        },
+        error: function(error) {
+            // Manejo de error
+            console.log("Error al guardar los datos");
+        }
+    });
+}
+// guradar datos con controller
+    function GuardarDatos() {
+    const nombre_ = document.getElementById('inputNombre').value;
+    const mail_ = document.getElementById('inputMail').value;
+    const telefono_ = document.getElementById('inputTel').value;
+    const acerca_ = document.getElementById('inputAcerca').value;
+    const profesion_ = document.getElementById('inputProfesion').value;
+    const est_ = document.getElementById('inputEstilo').value;
+    const ubicacion_ = document.getElementById('inputUbicacion').value;
+    const id_ = document.getElementById('inputId').value;
+    // Obtener el valor hexadecimal del color
+    const hexColor = getHexColor(est_);
+    $.ajax({
+        url: '/Home/InsertarUsuario/',
+        type: 'POST',
+        data: {
+            id: id_,
+            nombre: nombre_,
+            mail: mail_,
+            telefono: telefono_,
+            acercademi: acerca_,
+            profesion: profesion_,
+            estilo: hexColor, 
+            ubicacion: ubicacion_
+        },
+        success: function (response) {
+            alert("ok");
+        },
+        error: function (xhr, status, error) {
+            console.error("Error al obtener los datos: ", error);
+        }
+    });
+}
+    function GuardarDatos2(){
+    const id_ = document.getElementById('inputId').value;
+    const titulo = document.getElementById("inputTitulo").value;
+    let institucion = $("#inputInstitucion").val();
+    let disciplina = $("#inputDisci").val();
+    let actividades = $("#inputActGrupo").val();
+    let descripcion = $("#inputDescripEdu").val();
+    let anoInicio = $("#inputAno1").val();
+    let mesInicio = $("#inputMes1").val();
+    let anoFinal = $("#inputAno2").val();
+    let mesFinal = $("#inputMes2").val();
+    $.ajax({
+        type: "POST",
+        url: "/Home/GuardarEduNoLee/", 
+        data: {
+            Titulo: titulo, Institucion: institucion, Disciplina: disciplina, Actividades: actividades,
+            Descripcion: descripcion,
+            AnoInicio: anoInicio,
+            MesInicio: mesInicio,
+            AnoFinal: anoFinal,
+            MesFinal: mesFinal,
+            id: id_,
+            datos_: datos,
+        },
+        success: function(response) {
+            alert("guardado!");
+        },
+        error: function(error) {
+            // Manejo de error
+            console.log("Error al guardar los datos");
+        }
+    });
+}
+function GuardarDatos3() {
+    const idElement = document.getElementById('inputId');
+    const tituloElement = document.getElementById("inputTituloCert");
+    const empresaEmisoraElement = document.getElementById("inputEmpresaCerti");
+    const mesExpElement = document.getElementById("inputMesExp");
+    const anoExpElement = document.getElementById("inputAnoExp");
+    const mesCaducElement = document.getElementById("inputMesCaduc");
+    const anoCaducElement = document.getElementById("inputAnoCaduc");
+    const idCredeElement = document.getElementById("inputCredencial");
+    const idHiddenCerti = document.getElementById("inputId_Certi");
+    if (!idElement || !tituloElement || !empresaEmisoraElement || 
+        !mesExpElement || !anoExpElement || 
+        !mesCaducElement || !anoCaducElement || !idCredeElement) {
+        console.error("Uno o más elementos no se encontraron en el DOM.");
+        return;
+    }
+    const id_ = idElement.value || 0; // Si no tiene ID, se asume que es 0 para insertar.
+    const titulo = tituloElement.value;
+    const empresaEmisora = empresaEmisoraElement.value;
+    const mesExp = mesExpElement.value;
+    const anoExp = anoExpElement.value;
+    const mesCaduc = mesCaducElement.value;
+    const anoCaduc = anoCaducElement.value;
+    if (!mesExp || !anoExp || !mesCaduc || !anoCaduc) {
+        alert("Por favor, complete todos los campos de mes y año.");
+        return;
+    }
+    const fechaExp = `${anoExp}-${mesExp.padStart(2, '0')}-01`;  
+    const fechaCaducidad = `${anoCaduc}-${mesCaduc.padStart(2, '0')}-01`;  
+    const idCrede = idCredeElement.value;
+    const id_cert = idHiddenCerti.value;
+    console.log(id_cert, id_, "#000 - ajax");
+    $.ajax({
+        type: "POST",
+        url: "/Home/GuardarCerti/",
+        data: {
+            Titulo_: titulo,
+            EmpresaEmisora: empresaEmisora,
+            FechaExp: fechaExp,
+            FechaCaducidad: fechaCaducidad,
+            id_user: id_, // ID dinámico
+            Idcredencial: idCrede,
+            id_cert_: id_cert
+        },
+        success: function(response) {
+            alert("Datos guardados correctamente.");
+        },
+        error: function(error) {
+            console.error("Error al guardar los datos", error);
+        }
+    });
+}
+    function GuardarDatos4(){
+    const id_user = document.getElementById('inputId').value;
+    const necesidad_ = document.getElementById('inputNece').value
+    const id_necesidad = document.getElementById('inputId_Nece').value
+    $.ajax({
+        type: "POST",
+        url: "/Home/GuardarNece/", 
+        data: {
+            id_: id_user,
+            necesidad: necesidad_,
+            id_nece: id_necesidad
+        },
+        success: function(response) {
+            alert("guardado!");
+        },
+        error: function(error) {
+            // Manejo de error
+            console.log("Error al guardar los datos");
+        }
+    });
+}
 function getHexColor(colorName) {
     const colors = {
         rosa: "#FF1493", 
@@ -382,7 +585,7 @@ function VerificarVacio(sector_) {
                             </div>
                             <div class="modal-body">
                                 <input type="text" id="inputMail" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputMail', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
                                 <button onclick="$('#Modal_RecibirTelefono').modal('show'); $('#Modal_RecibirMail').modal('hide');">Listo</button>
@@ -399,7 +602,7 @@ function VerificarVacio(sector_) {
                             </div>
                             <div class="modal-body">
                                 <input type="text" id="inputTel" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputTel', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
                                 <button onclick="$('#Modal_RecibirAcerca').modal('show'); $('#Modal_RecibirTelefono').modal('hide');">Listo</button>
@@ -416,7 +619,7 @@ function VerificarVacio(sector_) {
                             </div>
                             <div class="modal-body">
                                 <input type="text" id="inputAcerca" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputAcerca', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
                                 <button onclick="$('#Modal_RecibirProfesion').modal('show'); $('#Modal_RecibirAcerca').modal('hide');">Listo</button>
@@ -433,7 +636,7 @@ function VerificarVacio(sector_) {
                             </div>
                             <div class="modal-body">
                                 <input type="text" id="inputProfesion" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputProfesion', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
                                 <button onclick="$('#Modal_RecibirEstilo').modal('show'); $('#Modal_RecibirProfesion').modal('hide');">Listo</button>
@@ -465,7 +668,7 @@ function VerificarVacio(sector_) {
                                 <div class="mb-3">
                                     <label for="inputEstilo" class="form-label">O ingrese el color:</label>
                                     <input type="text" id="inputEstilo" class="form-control" placeholder="Escriba un color" oninput="validateColorInput()" />
-                                    <button class="btn btn-primary mt-2" onclick="iniciarReconocimientoVoz('inputEstilo',1  )">Hablar</button>
+                                    <button class="btn btn-primary mt-2" onclick="iniciarReconocimientoVoz('inputEstilo',1 )">Hablar</button>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -483,7 +686,7 @@ function VerificarVacio(sector_) {
                             </div>
                             <div class="modal-body">
                                 <input type="text" id="inputUbicacion" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputUbicacion', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
                                 <button onclick="$('#Final').modal('show'); $('#Modal_RecibirUbicacion').modal('hide');">Listo</button>
@@ -533,7 +736,7 @@ function VerificarVacio(sector_) {
                             </div>
                             <div class="modal-body">
                                 <input type="text" id="inputTitulo" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputTitulo', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
                                 <button onclick="$('#Modal_RecibirInstitucion').modal('show'); $('#Modal_RecibirTitulo').modal('hide');">Listo</button>
@@ -550,7 +753,7 @@ function VerificarVacio(sector_) {
                             </div>
                             <div class="modal-body">
                                 <input type="text" id="inputNombre" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputNombre', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
                                 <button onclick="$('#Modal_RecibirDisciplina').modal('show'); $('#Modal_RecibirInstitucion').modal('hide');">Listo</button>
@@ -567,7 +770,7 @@ function VerificarVacio(sector_) {
                             </div>
                             <div class="modal-body">
                                 <input type="text" id="inputDisci" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputDisci', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
                                 <button onclick="$('#Modal_RecibirActividadesGrupo').modal('show'); $('#Modal_RecibirDisciplina').modal('hide');">Listo</button>
@@ -584,7 +787,7 @@ function VerificarVacio(sector_) {
                             </div>
                             <div class="modal-body">
                                 <input type="text" id="inputActGrupo" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputActGrupo', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
                                 <button onclick="$('#Modal_RecibirDescripion').modal('show'); $('#Modal_RecibirActividadesGrupo').modal('hide');">Listo</button>
@@ -601,7 +804,7 @@ function VerificarVacio(sector_) {
                             </div>
                             <div class="modal-body">
                                 <input type="text" id="inputDescripEdu" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputDescripEdu', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
                                 <button onclick="$('#Modal_RecibirAno1').modal('show'); $('#Modal_RecibirDescripion').modal('hide');">Listo</button>
@@ -618,7 +821,7 @@ function VerificarVacio(sector_) {
                             </div>
                             <div class="modal-body">
                                 <input type="text" id="inputAno1" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputAno1', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
                                 <button onclick="$('#Modal_RecibirMes1').modal('show'); $('#Modal_RecibirAno1').modal('hide');">Listo</button>
@@ -635,7 +838,7 @@ function VerificarVacio(sector_) {
                             </div>
                             <div class="modal-body">
                                 <input type="text" id="inputMes1" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputMes1', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
                                 <button onclick="$('#Modal_RecibirAno2').modal('show'); $('#Modal_RecibirMes1').modal('hide');">Listo</button>
@@ -669,7 +872,7 @@ function VerificarVacio(sector_) {
                             </div>
                             <div class="modal-body">
                                 <input type="text" id="inputMes2" class="form-control" />
-                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                                <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputMes2', 2)">Hablar</button>
                             </div>
                             <div class="modal-footer">
                                 <button onclick="$('#FinalEdu').modal('show'); $('#Modal_RecibirMes2').modal('hide');">Listo</button>
@@ -737,7 +940,7 @@ function VerificarVacio(sector_) {
                 </div>
                 <div class="modal-body">
                     <input type="text" id="inputTituloCert" class="form-control" />
-                    <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                    <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputTituloCert', 2)">Hablar</button>
                 </div>
                 <div class="modal-footer">
                     <button onclick="$('#Modal_RecibirEmpresaEmisora').modal('show'); $('#Modal_RecibirTituloCerti').modal('hide');">Listo</button>
@@ -754,7 +957,7 @@ function VerificarVacio(sector_) {
                 </div>
                 <div class="modal-body">
                     <input type="text" id="inputEmpresaCerti" class="form-control" />
-                    <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                    <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputEmpresaCerti', 2)">Hablar</button>
                 </div>
                 <div class="modal-footer">
                     <button onclick="$('#Modal_RecibirFechaCredencialExp').modal('show'); $('#Modal_RecibirEmpresaEmisora').modal('hide');">Listo</button>
@@ -809,7 +1012,7 @@ function VerificarVacio(sector_) {
                 </div>
                 <div class="modal-body">
                     <input type="text" id="inputCredencial" class="form-control" />
-                    <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                    <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputCredencial', 2)">Hablar</button>
                 </div>
                 <div class="modal-footer">
                     <button onclick="$('#FinalCerti').modal('show'); $('#Modal_RecibirIdCrede').modal('hide');">Listo</button>
@@ -861,7 +1064,7 @@ function VerificarVacio(sector_) {
                     </div>
                     <div class="modal-body">
                         <input type="text" id="inputNece" class="form-control" />
-                        <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                        <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputNece', 2)">Hablar</button>
                     </div>
                     <div class="modal-footer">
                         <button onclick="$('#FinalNece').modal('show'); $('#Modal_RecibirNeces').modal('hide');">Listo</button>
@@ -912,7 +1115,7 @@ function VerificarVacio(sector_) {
                     </div>
                     <div class="modal-body">
                         <input type="text" id="inputInstiEmi" class="form-control" />
-                        <button class="btn btn-primary" onclick="iniciarReconocimientoVoz()">Hablar</button>
+                        <button class="btn btn-primary" onclick="iniciarReconocimientoVoz('inputInstiEmi', 2)">Hablar</button>
                     </div>
                     <div class="modal-footer">
                         <button onclick="$('#Modal_RecibirFechaCredencialExp2').modal('show'); $('#Modal_RecibirEmpresaEmis').modal('hide');">Listo</button>
