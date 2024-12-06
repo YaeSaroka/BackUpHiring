@@ -129,7 +129,6 @@ public class HomeController : Controller
         };
             Models.BD.InsertarInformacionPersonalEmpleado1(usuario);
             Models.BD.InsertarInformacionPersonalEmpleado2(usuario);
-        // Insertar en la BD los datos
         return true;
     }
     public bool GuardarEduNoLee(string Titulo, string Institucion, string Disciplina, string Actividades, string Descripcion, string AnoInicio, string MesInicio, string AnoFinal, string MesFinal, int id, Educacion edu){
