@@ -115,6 +115,7 @@ function confirmarEntrada(texto) {
 }
 
 function iniciarReconocimientoVoz(id, tipo) {
+    
     text_to_speech("hable"); // Iniciar confirmación con el texto reconocido
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'es-ES'; 
@@ -130,12 +131,13 @@ function iniciarReconocimientoVoz(id, tipo) {
     texto = texto.replace(/\.$/, '').trim();
 
     // Si el tipo es 1 (es para colores), validamos los colores
-    if (tipo === 1) {
-        if (["rosa", "verde", "azul", "negro"].includes(texto)) {
-            startConfirmationMic(id, texto, tipo);
-        } else {
-            alert("Por favor, diga un color válido: rosa, verde, azul o negro.");
-        }
+    if (tipo == 1) {
+            if (["rosa", "verde", "azul", "negro"].includes(texto)) {
+                console.log("Color válido: " + texto);
+                startConfirmationMic(id, texto, tipo);
+            } else {
+                alert("Por favor, diga un color válido: rosa, verde, azul o negro.");
+            }
     } else {
         text_to_speech(`El texto transcrito es: ${texto}. ¿Es correcto? Diga "sí" para confirmar o "no" para repetir.`);
         recognition.stop();
@@ -161,7 +163,7 @@ function startConfirmationMic(inputId, transcriptToConfirm, tipo) {
         const transcript = event.results[0][0].transcript.toLowerCase();
         const afirmativo = ['si', 'correcto', 'sí', 'sí sí', 'sí.', 'correcto.']; 
         const negativo = ['no.', 'incorrecto', 'no no', 'no', 'incorrecto.']; 
-
+    
         console.log("Confirmación recibida: ", transcript);
         if (afirmativo.includes(transcript)) {
             text_to_speech('Gracias. Continuamos.');
@@ -169,6 +171,12 @@ function startConfirmationMic(inputId, transcriptToConfirm, tipo) {
             const inputField = document.getElementById(inputId);
             if (inputField) {
                 inputField.value = transcriptToConfirm;
+            }
+            if(tipo == 1){
+                const inputField = document.getElementById(inputId);
+                if (inputField) {
+                    inputField.value = transcriptToConfirm;
+                }
             }
 
             confirmationRecognition.stop();  
@@ -637,9 +645,9 @@ function iniciarConfirmacionEntrada(sector_) {
 
 <div class="container-no-lee">
     <input type="hidden" id="id_hidden" value="@Model.id" />
-    <a data-bs-toggle="modal" data-bs-target="#Modal_InformacionPersonal" class="cuadro" id="cuadro1">
+    <a onclick="VerificarVacio(1); Entrada() "data-bs-toggle="modal" data-bs-target="#Modal_InformacionPersonal" class="cuadro" id="cuadro1">
         <div>
-            <span onclick="VerificarVacio(1); Entrada() ">Informacion Personal</span>
+            <span >Informacion Personal</span>
         </div>
     </a>
 
